@@ -96,8 +96,8 @@ def view_data(train_dir_path, test_dir_path, show_histogram=True):
 
     if show_histogram:
         # plot histogram
-        plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=True,
-                                                store_in_folder=True)
+        plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=False,
+                                                store_in_folder=False)
 
 
 def checking_dataset(dataset_path, train_dir_path, test_dir_path):
@@ -123,7 +123,7 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path):
     print("\n> Metadata:\n {} \n".format(metadata_df.describe()))
 
     # displaying histogram
-    view_data(train_dir_path, test_dir_path, show_histogram=True)
+    view_data(train_dir_path, test_dir_path, show_histogram=False)
     print("\n> DATASET CHECK COMPLETE!")
 
 
@@ -138,41 +138,44 @@ def load_dataset(train_data_dir, test_data_dir, batch_size, img_size):
     :return: tf.Dataset.data object
     """
     # train dataset
+    print("\nTraining: ")
     train_dataset = tf.keras.utils.image_dataset_from_directory(
-        directory=train_data_dir,
+        train_data_dir,
         labels="inferred",
+        validation_split=0.2,
+        subset="training",
         label_mode="binary",
         color_mode="rgb",
         seed=123,
         image_size=(img_size, img_size),
-        batch_size=batch_size,
-        subset="training",
-        smart_resize=True
+        batch_size=batch_size
     )
 
     # validation dataset
+    print("\nValidation:")
     validation_dataset = tf.keras.utils.image_dataset_from_directory(
-        directory=train_data_dir,
+        train_data_dir,
         validation_split=0.2,
+        subset="validation",
         labels="inferred",
         label_mode="binary",
         color_mode="rgb",
         seed=123,
         image_size=(img_size, img_size),
-        batch_size=batch_size,
-        subset="validation",
-        smart_resize=True
+        batch_size=batch_size
     )
 
     # test dataset
+    print("\nTest:")
     test_dataset = tf.keras.utils.image_dataset_from_directory(
-        directory=test_data_dir,
+        test_data_dir,
         color_mode="rgb",
         seed=123,
         image_size=(img_size, img_size),
-        batch_size=batch_size,
-        smart_resize=True
+        batch_size=batch_size
     )
+
+    # plot_functions.plot_data_visualization(train_ds=train_dataset, show_on_screen=True, store_in_folder=False)
 
     def resize_and_scaling(keras_ds, shuffle=False):
         """

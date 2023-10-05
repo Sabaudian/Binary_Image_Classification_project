@@ -3,6 +3,7 @@
 
 # my import
 import constants as const
+import plot_functions
 import preProcessing
 
 # Main class of the project
@@ -27,3 +28,12 @@ if __name__ == '__main__':
     preProcessing.checking_dataset(dataset_path=const.DATA_PATH,
                                    train_dir_path=const.TRAIN_DIR,
                                    test_dir_path=const.TEST_DIR)
+
+    train_ds, validation_ds, test_ds = preProcessing.load_dataset(train_data_dir=const.TRAIN_DIR,
+                                                                  test_data_dir=const.TEST_DIR,
+                                                                  batch_size=const.BATCH_SIZE,
+                                                                  img_size=const.IMG_SIZE)
+
+    # plot_functions.plot_data_visualization(train_ds=train_ds)
+
+
