@@ -1,14 +1,11 @@
-# ------------------------------- #
-# ------- USEFUL CONSTANTS ------ #
-# ------------------------------- #
+# -------------------------------------- #
+# ---------- USEFUL CONSTANTS ---------- #
+# -------------------------------------- #
 
 # DATASET AND DATA LOCATION
-OG_DATA_PATH = "original_dataset"
-OG_TRAIN_DIR = OG_DATA_PATH + "/train"
-OG_TEST_DIR = OG_DATA_PATH + "/test"
-MY_DATA_PATH = "my_dataset"
-TRAIN_DIR = MY_DATA_PATH + "/train"
-TEST_DIR = MY_DATA_PATH + "/test"
+DATA_PATH = "original_dataset"
+TRAIN_DIR = DATA_PATH + "/train"
+TEST_DIR = DATA_PATH + "/test"
 SAVE_DATA = "data"
 
 # IMAGE VALUE AND DATA

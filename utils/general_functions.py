@@ -8,10 +8,9 @@ import pandas as pd
 from PIL import Image
 
 
-# ------------------------------- #
-# ------ GENERAL FUNCTIONS ------ #
-# ------------------------------- #
-
+# ------------------------------------- #
+# --------- GENERAL FUNCTIONS --------- #
+# ------------------------------------- #
 
 # create a new directory
 def makedir(dirpath):
@@ -135,33 +134,31 @@ def define_dataframe(train_dir_path, test_dir_path):
     :return: pandas.Dataframe (train_df, test_df)
     """
     # train data
-    train_muffin = load_file(dir_path=os.path.join(train_dir_path, "muffin"))
     train_chihuahua = load_file(dir_path=os.path.join(train_dir_path, "chihuahua"))
+    train_muffin = load_file(dir_path=os.path.join(train_dir_path, "muffin"))
 
     # define dataframe for the train set
     train_data = {
         "image": train_muffin + train_chihuahua,
-        "label": ["muffin"] * len(train_muffin) + ["chihuahua"] * len(train_chihuahua)
+        "label": ["chihuahua"] * len(train_chihuahua) + ["muffin"] * len(train_muffin)
     }
     train_df = pd.DataFrame(train_data)
     # train_df.to_csv(data_folder + "/train_data.csv", index=False)
 
     # test data
-    test_muffin = load_file(dir_path=os.path.join(test_dir_path, "muffin"))
     test_chihuahua = load_file(dir_path=os.path.join(test_dir_path, "chihuahua"))
+    test_muffin = load_file(dir_path=os.path.join(test_dir_path, "muffin"))
 
     # define dataframe for the test set
     test_data = {
         "image": test_muffin + test_chihuahua,
-        "label": ["muffin"] * len(test_muffin) + ["chihuahua"] * len(test_chihuahua)
+        "label": ["chihuahua"] * len(test_chihuahua) + ["muffin"] * len(test_muffin)
     }
     test_df = pd.DataFrame(test_data)
 
-    # # Encode data as: Muffin = 1 | Chihuahua = 0
+    # # Encode data as: Muffin = one | Chihuahua = zero
     # encoder = preprocessing.OrdinalEncoder()
     # train_df["label"] = encoder.fit_transform(train_df[["label"]])
     # test_df["label"] = encoder.fit_transform(test_df[["label"]])
 
     return train_df, test_df
-
-
