@@ -86,15 +86,17 @@ def plot_img_aspect_ratio(image_metadata, show_on_screen=True, store_in_folder=T
 
 
 def plot_data_visualization(train_ds, show_on_screen=True, store_in_folder=True):
-    class_names = train_ds.class_names
     # show on screen
     if show_on_screen:
         plt.figure(figsize=(16, 8))
         for images, labels in train_ds.take(1):
             for i in range(9):
                 plt.subplot(3, 3, i + 1)
-                plt.imshow(images[i].numpy().astype("uint8"))
-                plt.title(class_names[labels[i]])
+                plt.imshow((images[i]*255).numpy().astype("uint8"))
+                if labels[i] == 0:
+                    plt.title("chihuahua")
+                else:
+                    plt.title("muffin")
                 plt.axis("off")
 
         if store_in_folder:

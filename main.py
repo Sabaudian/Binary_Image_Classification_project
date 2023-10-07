@@ -1,10 +1,11 @@
 # Import
-
+import os
 
 # my import
-import constants as const
 import plot_functions
-import preProcessing
+import data_preparation
+import constants as const
+import utils.pre_processing as prepare
 
 # Main class of the project
 if __name__ == '__main__':
@@ -25,15 +26,15 @@ if __name__ == '__main__':
     computed according to the zero-one loss.
     """
 
-    preProcessing.checking_dataset(dataset_path=const.DATA_PATH,
-                                   train_dir_path=const.TRAIN_DIR,
-                                   test_dir_path=const.TEST_DIR)
+    # checking the dataset
+    prepare.checking_dataset(dataset_path=const.DATA_PATH,
+                             train_dir_path=const.TRAIN_DIR,
+                             test_dir_path=const.TEST_DIR)
 
-    train_ds, validation_ds, test_ds = preProcessing.load_dataset(train_data_dir=const.TRAIN_DIR,
-                                                                  test_data_dir=const.TEST_DIR,
-                                                                  batch_size=const.BATCH_SIZE,
-                                                                  img_size=const.IMG_SIZE)
-
-    # plot_functions.plot_data_visualization(train_ds=train_ds)
-
-
+    # # prepare and load the datasets
+    # train_ds, validation_ds, test_ds = data_preparation.load_dataset(train_data_dir=const.TRAIN_DIR,
+    #                                                                  test_data_dir=const.TEST_DIR,
+    #                                                                  batch_size=const.BATCH_SIZE,
+    #                                                                  img_size=const.IMG_SIZE)
+    # # visualize the dataset with corresponding labels
+    # plot_functions.plot_data_visualization(train_ds=train_ds, show_on_screen=True, store_in_folder=True)

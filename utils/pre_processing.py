@@ -1,20 +1,19 @@
 # Import
 import os
+import imagehash
 import pandas as pd
-import tensorflow as tf
 
-from keras import layers
-from keras.models import Sequential
 from PIL import Image, UnidentifiedImageError
 
 # My import
 import plot_functions
+from utils.general_functions import makedir
 from utils.general_functions import sort_files
 from utils.general_functions import define_dataframe
 
 
 # Check dataset: filter out possible corrupted files.
-def scanning_dataset(dataset_path):
+def corruption_filter(dataset_path):
     """
     Checking dataset,
     verifying the presence of corrupted file and collect metadata
@@ -47,6 +46,37 @@ def scanning_dataset(dataset_path):
                         bad_file.append(file_path)
                         count_bad_file += 1
                         print("\n> there are {} corrupted files: {}".format(count_bad_file, bad_file))
+
+
+# Check dataset: control the presence of duplicate inside the training set
+def find_out_duplicate(dataset_path, hash_size):
+    """
+    Find and delete Duplicates
+    :param dataset_path: the path to dataset
+    :param hash_size: images will be resized to a matrix with size by given value
+    """
+    # Initialize
+    hashes = {}
+    duplicates = []
+    # loop through file
+    for file in os.listdir(dataset_path):
+        with Image.open(os.path.join(dataset_path, file)) as image:
+            tmp_hash = imagehash.average_hash(image, hash_size)
+            if tmp_hash in hashes:
+                print("- Duplicate [{}] found for Image [{}]".format(file, hashes[tmp_hash]))
+                duplicates.append(file)
+            else:
+                hashes[tmp_hash] = file
+
+    if len(duplicates) != 0:
+        doc_message = input("\n> Do you want to delete these {} file? [Y/N]: ".format(len(duplicates)))
+        if doc_message.upper() == "Y":
+            for duplicate in duplicates:
+                # delete duplicate
+                os.remove(os.path.join(dataset_path, duplicate))
+                print("- {} Deleted Successfully!".format(duplicate))
+    else:
+        print("> No Duplicate Found")
 
 
 # Check dataset: collect metadata information.
@@ -83,7 +113,7 @@ def collect_metadata(dataset_path):
 
 
 # Displaying data as a clear plot
-def view_data(train_dir_path, test_dir_path, show_histogram=True):
+def view_data(train_dir_path, test_dir_path, show_histogram):
     """
     Display the amount of data per class of sets: train and test
     :param train_dir_path: the path to training data
@@ -96,8 +126,8 @@ def view_data(train_dir_path, test_dir_path, show_histogram=True):
 
     if show_histogram:
         # plot histogram
-        plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=False,
-                                                store_in_folder=False)
+        plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=True,
+                                                store_in_folder=True)
 
 
 def checking_dataset(dataset_path, train_dir_path, test_dir_path):
@@ -107,9 +137,15 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path):
     :param train_dir_path: the path to training data
     :param test_dir_path: the path to test data
     """
-    print("\n> CHECKING DATASET: ")
+    print("\n> CHECK THE DATASET")
     # check for corrupted file
-    scanning_dataset(dataset_path=dataset_path)
+    corruption_filter(dataset_path=dataset_path)
+
+    # check for duplicates
+    print("\n> Checking duplicates in CHIHUAHUA directory...")
+    find_out_duplicate(dataset_path=dataset_path + "/train/chihuahua", hash_size=8)
+    print("\n> Checking duplicates in MUFFIN directory...")
+    find_out_duplicate(dataset_path=dataset_path + "/train/muffin", hash_size=8)
 
     # structure of the metadata
     metadata = collect_metadata(dataset_path=dataset_path)
@@ -119,99 +155,12 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path):
     metadata_df["aspect_ratio"] = round(metadata_df["width"] / metadata_df["height"], 2)
     # Add label column
     metadata_df["label"] = metadata_df.apply(lambda row: row.iloc[0].rsplit("/")[-2], axis=1)  # label
+    # save the metadata into file
+    makedir(dirpath="data")
+    metadata_df.describe().to_csv(path_or_buf="data/dataset_metadata.csv", float_format="%.2f")
     # show metadata information
-    print("\n> Metadata:\n {} \n".format(metadata_df.describe()))
+    print("\n> Metadata:\n {}".format(metadata_df.describe()))
 
     # displaying histogram
-    view_data(train_dir_path, test_dir_path, show_histogram=False)
+    view_data(train_dir_path, test_dir_path, show_histogram=True)
     print("\n> DATASET CHECK COMPLETE!")
-
-
-# load data into keras dataset
-def load_dataset(train_data_dir, test_data_dir, batch_size, img_size):
-    """
-    Load data as a Keras dataset and perform tuning and rescaling processes
-    :param train_data_dir: the path to the training data
-    :param test_data_dir: the path to the test data
-    :param batch_size: defines batch size
-    :param img_size: define the size of the images -> (size, size)
-    :return: tf.Dataset.data object
-    """
-    # train dataset
-    print("\nTraining: ")
-    train_dataset = tf.keras.utils.image_dataset_from_directory(
-        train_data_dir,
-        labels="inferred",
-        validation_split=0.2,
-        subset="training",
-        label_mode="binary",
-        color_mode="rgb",
-        seed=123,
-        image_size=(img_size, img_size),
-        batch_size=batch_size
-    )
-
-    # validation dataset
-    print("\nValidation:")
-    validation_dataset = tf.keras.utils.image_dataset_from_directory(
-        train_data_dir,
-        validation_split=0.2,
-        subset="validation",
-        labels="inferred",
-        label_mode="binary",
-        color_mode="rgb",
-        seed=123,
-        image_size=(img_size, img_size),
-        batch_size=batch_size
-    )
-
-    # test dataset
-    print("\nTest:")
-    test_dataset = tf.keras.utils.image_dataset_from_directory(
-        test_data_dir,
-        color_mode="rgb",
-        seed=123,
-        image_size=(img_size, img_size),
-        batch_size=batch_size
-    )
-
-    # plot_functions.plot_data_visualization(train_ds=train_dataset, show_on_screen=True, store_in_folder=False)
-
-    def resize_and_scaling(keras_ds, shuffle=False):
-        """
-        Resize and Scaling dataset
-        :param keras_ds: tf.Dataset.data object
-        :param shuffle: choose if shuffle data
-        :return: a normalized tf.Dataset.data object
-        """
-        normalization_layer = tf.keras.layers.Rescaling(1. / 255)
-        normalized_ds = keras_ds.map(lambda x, y: (normalization_layer(x), y))
-        normalized_ds = normalized_ds.cache()
-
-        if shuffle:
-            normalized_ds = normalized_ds.shuffle(1000, seed=123)
-        normalized_ds = normalized_ds.prefetch(buffer_size=tf.data.AUTOTUNE)
-        return normalized_ds
-
-    train_ds = resize_and_scaling(train_dataset, True)
-    validation_ds = resize_and_scaling(validation_dataset, False)
-    test_ds = resize_and_scaling(test_dataset)
-
-    return train_ds, validation_ds, test_ds
-
-
-# Perform data augmentation
-def perform_data_augmentation():
-    """
-    Perform data Augmentation:
-     - RandomFlip
-     - RandomRotation
-     - RandomZoom
-    :return: tf.keras.Sequential model instance
-    """
-    data_augmentation = Sequential([
-        layers.RandomFlip("horizontal"),
-        layers.RandomRotation(0.1),
-        layers.RandomZoom(0.1),
-    ])
-    return data_augmentation
