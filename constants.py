@@ -3,10 +3,10 @@
 # -------------------------------------- #
 
 # DATASET AND DATA LOCATION
-DATA_PATH = "dataset"
-TRAIN_DIR = DATA_PATH + "/train"
-TEST_DIR = DATA_PATH + "/test"
-SAVE_DATA = "data"
+DATASET_PATH = "dataset"
+TRAIN_DIR = DATASET_PATH + "/train"
+TEST_DIR = DATASET_PATH + "/test"
+DATA_PATH = "data"
 
 # IMAGE VALUE AND DATA
 FILE_EXTENSION = ".jpg"

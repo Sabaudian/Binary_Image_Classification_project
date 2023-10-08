@@ -2,6 +2,7 @@
 import os
 import re
 import shutil
+import fnmatch
 import numpy as np
 import pandas as pd
 
@@ -56,6 +57,16 @@ def sort_files(file):
     file.sort(key=alphanum_key)
 
 
+def count_files(file_path):
+    """
+    Simple counter to count the number of files inside a directory
+    :param file_path: the path to file directory
+    :return: int value
+    """
+    counter = len(fnmatch.filter(os.listdir(file_path), "*.*"))
+    return counter
+
+
 # copy file to a new path
 def copy_file_to_new_location(old_file_path, new_file_path):
     """
@@ -74,7 +85,7 @@ def copy_file_to_new_location(old_file_path, new_file_path):
 def resize_and_change_color_mode(image, original_color_mode, new_color_mode, original_size, new_img_size, new_file_path,
                                  new_filename):
     """
-
+    Resize the images and Transform them into Grayscale
     :param image: input image file
     :param original_color_mode: original file color mode (ex.: RGB, Grayscale, ...)
     :param new_color_mode: new color mode to set up
@@ -82,7 +93,6 @@ def resize_and_change_color_mode(image, original_color_mode, new_color_mode, ori
     :param new_img_size: new file size to set up (128x128)
     :param new_file_path: file path
     :param new_filename: file name
-    :return:
     """
     # Convert image in dataset into grayscale
     if (original_color_mode != new_color_mode) or (original_size != new_img_size):

@@ -1,9 +1,6 @@
 # Import
-import os
 
 # my import
-import plot_functions
-import data_preparation
 import constants as const
 import utils.pre_processing as prepare
 
@@ -27,7 +24,7 @@ if __name__ == '__main__':
     """
 
     # checking the dataset
-    prepare.checking_dataset(dataset_path=const.DATA_PATH,
+    prepare.checking_dataset(dataset_path=const.DATASET_PATH,
                              train_dir_path=const.TRAIN_DIR,
                              test_dir_path=const.TEST_DIR)
 
