@@ -13,6 +13,10 @@ from utils.general_functions import count_files
 from utils.general_functions import define_dataframe
 
 
+# ********************************** #
+# ********* PRE-PROCESSING ********* #
+# ********************************** #
+
 # Check dataset: filter out possible corrupted files.
 def corruption_filter(dataset_path):
     """
@@ -59,10 +63,11 @@ def corruption_filter(dataset_path):
 
 # Check dataset: collect metadata information.
 # Save metadata of the dataset's files
-def collect_metadata(dataset_path):
+def collect_metadata(dataset_path, store_data=True):
     """
     Collect metadata from the files inside the dataset located at the given path
     :param dataset_path: the path to the dataset
+    :param store_data: boolean, decide if store the data into folder or not
     :return: metadata dictionary
     """
     # Initialize dictionary to collect metadata
@@ -95,9 +100,12 @@ def collect_metadata(dataset_path):
     metadata_df["aspect_ratio"] = round(metadata_df["width"] / metadata_df["height"], 2)
     # Add label column
     metadata_df["label"] = metadata_df.apply(lambda row: row.iloc[0].rsplit("/")[-2], axis=1)  # label
+
     # save the metadata into file
-    makedir(dirpath="data")
-    metadata_df.describe().to_csv(path_or_buf="data/dataset_metadata.csv", float_format="%.2f")
+    if store_data:
+        makedir(dirpath="data")
+        metadata_df.describe().to_csv(path_or_buf="data/dataset_metadata.csv", float_format="%.2f")
+
     # show metadata information
     print("\n> Metadata:\n {}\n\n{}".format(metadata_df, round(metadata_df.describe(), 2)))
 
@@ -134,38 +142,41 @@ def find_out_duplicate(dataset_path, hash_size):
 
 
 # Displaying data as a clear plot
-def view_data(train_dir_path, test_dir_path, show_histogram):
+def view_data(train_dir_path, test_dir_path, show_plot, save_plot):
     """
     Display the amount of data per class of sets: train and test
     :param train_dir_path: the path to training data
     :param test_dir_path: the path to test data
-    :param show_histogram: chooses whether to show plot
+    :param show_plot: chooses whether to show the plot
+    :param save_plot: chooses whether to store the plot
     """
     # function that defines dataset
     train_df, test_df = define_dataframe(train_dir_path=train_dir_path,
                                          test_dir_path=test_dir_path)
-
-    if show_histogram:
-        # plot histogram
-        plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=True,
-                                                store_in_folder=True)
+    # plot histogram
+    plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=show_plot,
+                                            store_in_folder=save_plot)
 
 
-def checking_dataset(dataset_path, train_dir_path, test_dir_path):
+def checking_dataset(dataset_path, train_dir_path, test_dir_path, show, save):
     """
     Preliminary check on dataset
     :param dataset_path: the path to the dataset
     :param train_dir_path: the path to training data
     :param test_dir_path: the path to test data
+    :param show: Decide if show data on screen or not
+    :param save: Decide if store data or not
     """
     print("\n> CHECK THE DATASET")
     print("\n> Checking the Number of file before performing Pre-processing Task...")
+
     # Count data
     count_train_chihuahua = count_files(file_path=dataset_path + "/train/chihuahua")
     count_train_muffin = count_files(file_path=dataset_path + "/train/muffin")
     count_test_chihuahua = count_files(file_path=dataset_path + "/test/chihuahua")
     count_test_muffin = count_files(file_path=dataset_path + "/test/muffin")
     tot_number_file = count_train_chihuahua + count_train_muffin + count_test_chihuahua + count_test_muffin
+
     print("> Number of file in train/chihuahua: {}".format(count_train_chihuahua) +
           "\n> Number of file in train/muffin: {}".format(count_train_muffin) +
           "\n> Number of file in test/chihuahua: {}".format(count_test_chihuahua) +
@@ -179,15 +190,20 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path):
 
     # check for duplicates in training dataset
     print("\n> Checking duplicates in CHIHUAHUA directory...[num. of file: {}]".format(count_train_chihuahua))
+
     find_out_duplicate(dataset_path=dataset_path + "/train/chihuahua", hash_size=8)
-    print("> Number of file in train/chihuahua: {}".format(count_train_chihuahua))
-    print("\n> Checking duplicates in MUFFIN directory...[num. of file: {}]".format(count_train_muffin))
+
+    print("> Number of file in train/chihuahua: {}"
+          .format(count_files(file_path=dataset_path + "/train/chihuahua")))
+    print("\n> Checking duplicates in MUFFIN directory...[num. of file: {}]"
+          .format(count_files(file_path=dataset_path + "/train/muffin")))
+
     find_out_duplicate(dataset_path=dataset_path + "/train/muffin", hash_size=8)
     print("> Number of file in train/muffin: {}".format(count_train_muffin))
 
     # structure of the metadata
-    collect_metadata(dataset_path=dataset_path)
+    collect_metadata(dataset_path=dataset_path, store_data=save)
 
     # displaying histogram
-    view_data(train_dir_path, test_dir_path, show_histogram=False)
+    view_data(train_dir_path, test_dir_path, show_plot=show, save_plot=save)
     print("\n> DATASET CHECK COMPLETE!")

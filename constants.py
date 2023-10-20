@@ -23,3 +23,8 @@ DATASET_VISUAL_INFO = "dataset_visualization_plot"
 
 # KERAS, HYPERPARAMETERS AND SIMILAR
 BATCH_SIZE = 32
+INPUT_SHAPE = IMG_SIZE + (3,)
+
+
+# NOTE PROGETTO:
+# modelli da usare: vgg-16, resnet50, mobileNet (approfondire vit)

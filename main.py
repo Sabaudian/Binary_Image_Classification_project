@@ -1,8 +1,13 @@
-# Import
-
-# my import
+# My import
+import cnn_model
 import constants as const
-import utils.pre_processing as prepare
+import plot_functions as my_plot
+import prepare_dataset as prepare
+import utils.pre_processing as pre_processing
+
+# ************************ #
+# ********* MAIN ********* #
+# ************************ #
 
 # Main class of the project
 if __name__ == '__main__':
@@ -22,16 +27,33 @@ if __name__ == '__main__':
     While the training loss can be chosen freely, the reported cross-validated estimates must be 
     computed according to the zero-one loss.
     """
+    # Checking the dataset
+    check_dataset = input("> START TO CHECK THE DATASET? [Y/N]: ")
+    if check_dataset.upper() == "Y":
+        pre_processing.checking_dataset(dataset_path=const.DATASET_PATH,
+                                        train_dir_path=const.TRAIN_DIR,
+                                        test_dir_path=const.TEST_DIR,
+                                        show=False,
+                                        save=False)
 
-    # checking the dataset
-    prepare.checking_dataset(dataset_path=const.DATASET_PATH,
-                             train_dir_path=const.TRAIN_DIR,
-                             test_dir_path=const.TEST_DIR)
+    # Load keras datasets
+    train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,
+                                                                    test_data_dir=const.TEST_DIR)
 
-    # # prepare and load the datasets
-    # train_ds, validation_ds, test_ds = data_preparation.load_dataset(train_data_dir=const.TRAIN_DIR,
-    #                                                                  test_data_dir=const.TEST_DIR,
-    #                                                                  batch_size=const.BATCH_SIZE,
-    #                                                                  img_size=const.IMG_SIZE)
-    # # visualize the dataset with corresponding labels
-    # plot_functions.plot_data_visualization(train_ds=train_ds, show_on_screen=True, store_in_folder=True)
+    # Printing information about the datasets
+    print("\n> Class Names: {}".format(train_dataset.class_names))
+
+    # Information
+    print("\n> Type specification: {}\n".format(train_dataset.element_spec))
+
+    # Visualize the dataset with corresponding labels
+    my_plot.plot_data_visualization(train_ds=train_dataset, show_on_screen=True, store_in_folder=True)
+
+    # Scaling data
+    train_ds = prepare.data_normalization(train_dataset)
+    val_ds = prepare.data_normalization(val_dataset)
+    test_ds = prepare.data_normalization(test_dataset)
+
+    # CNN Model Tuning
+    cnn_model.tuning_cnn(train_ds, val_ds, test_ds)
+

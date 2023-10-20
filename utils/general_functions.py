@@ -1,17 +1,18 @@
 # Import
 import os
 import re
-import shutil
 import fnmatch
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 
 from PIL import Image
+from sklearn.metrics import precision_score, recall_score, f1_score
 
 
-# ------------------------------------- #
-# --------- GENERAL FUNCTIONS --------- #
-# ------------------------------------- #
+# ************************************* #
+# ********* GENERAL FUNCTIONS ********* #
+# ************************************* #
 
 # create a new directory
 def makedir(dirpath):
@@ -67,60 +68,6 @@ def count_files(file_path):
     return counter
 
 
-# copy file to a new path
-def copy_file_to_new_location(old_file_path, new_file_path):
-    """
-    Copy a file to a new given location
-    :param old_file_path: old location of the file
-    :param new_file_path: where the file needs to be placed
-    """
-    # Copy it only if the file does not exist
-    if not os.path.exists(new_file_path):
-        # Copy file into new location
-        shutil.copyfile(old_file_path, new_file_path)
-        print("> [{}] ––> [{}]".format(old_file_path, new_file_path))
-
-
-# resize file and change mode
-def resize_and_change_color_mode(image, original_color_mode, new_color_mode, original_size, new_img_size, new_file_path,
-                                 new_filename):
-    """
-    Resize the images and Transform them into Grayscale
-    :param image: input image file
-    :param original_color_mode: original file color mode (ex.: RGB, Grayscale, ...)
-    :param new_color_mode: new color mode to set up
-    :param original_size: original file size
-    :param new_img_size: new file size to set up (128x128)
-    :param new_file_path: file path
-    :param new_filename: file name
-    """
-    # Convert image in dataset into grayscale
-    if (original_color_mode != new_color_mode) or (original_size != new_img_size):
-        # Size and mode conversion
-        grayscale_image = image.convert(new_color_mode)
-        resized_grayscale_image = grayscale_image.resize(new_img_size)
-        # Check modified info
-        new_mode = grayscale_image.mode
-        new_size = resized_grayscale_image.size
-        # Save modified image to filepath
-        resized_grayscale_image.save(new_file_path)
-        # Print messages
-        print(">> [{}]: ".format(new_filename)
-              + "[size:{} | mode:{}]".format(original_size, original_color_mode)
-              + " --> "
-              + "[size:{} | mode:{}]".format(new_size, new_mode))
-
-
-# transform an image file into arrays
-def image_to_array(files):
-    """
-    Convert image file into Numpy.Array
-    :param files: input files
-    :return: Numpy.Array
-    """
-    return np.stack([np.array(file) for file in files])
-
-
 # Load data from a path
 def load_file(dir_path):
     """
@@ -172,3 +119,5 @@ def define_dataframe(train_dir_path, test_dir_path):
     # test_df["label"] = encoder.fit_transform(test_df[["label"]])
 
     return train_df, test_df
+
+
