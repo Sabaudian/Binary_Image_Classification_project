@@ -308,12 +308,12 @@ def evaluate_model(model, model_name, x_train, y_train, x_val, y_val, x_test, y_
     val_loss, val_accuracy = model.evaluate(x=x_val, y=y_val, verbose=0)
     test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test, verbose=0)
 
-    print("> Train Loss: {}"
-          "\n> Train Accuracy: {}\n"
-          "\n> Val Loss: {}"
-          "\n> Val Accuracy: {}\n"
-          "\n> Test Loss: {}"
-          "\n> Test Accuracy: {}\n"
+    print("\n- Train Loss: {}"
+          "\n- Train Accuracy: {}"
+          "\n- Val Loss: {}"
+          "\n- Val Accuracy: {}"
+          "\n- Test Loss: {}"
+          "\n- Test Accuracy: {}\n"
           .format(train_loss, train_accuracy, val_loss, val_accuracy, test_loss, test_accuracy))
 
     # Save information into a csv file
