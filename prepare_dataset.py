@@ -39,21 +39,30 @@ def load_dataset(train_data_dir, test_data_dir):
     return train_ks_dataset, val_ks_dataset, test_ks_dataset
 
 
-def data_normalization(keras_ds):
+def data_normalization(tf_dataset):
     """
     Scale the keras dataset and perform prefetch
-    :param keras_ds: tf.Dataset.data object
+    :param tf_dataset: tf.Dataset.data object
     :return: a scaled tf.Dataset.data object
     """
+    # Standardize the data
     normalization_layer = tf.keras.layers.Rescaling(1. / 255)
-    normalized_ds = keras_ds.map(lambda x, y: (normalization_layer(x), y))
-    normalized_ds = normalized_ds.prefetch(buffer_size=tf.data.AUTOTUNE)
+    normalized_ds = tf_dataset.map(lambda x, y: (normalization_layer(x), y))
+
+    # Configure the dataset for performance
+    AUTOTUNE = tf.data.AUTOTUNE
+    normalized_ds = normalized_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
     return normalized_ds
 
 
 def image_to_array(keras_ds):
-    X_array = []  # store data
+    """
+    Transform a keras dataset object into array form
+    :param keras_ds: tf.Dataset.data object
+    :return: X, y
+    """
+    X_array = []  # store images
     y_array = []  # store labels
 
     for image, label in keras_ds.unbatch().map(lambda x, y: (x, y)):

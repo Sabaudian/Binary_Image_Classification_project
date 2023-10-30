@@ -121,3 +121,18 @@ def define_dataframe(train_dir_path, test_dir_path):
     return train_df, test_df
 
 
+def get_labels_from_dataset(tf_dataset):
+    """
+    Get the data labels of the dataset in input
+    :param tf_dataset: tf.Dataset.data object in input
+    :return: label's array
+    """
+    # True labels array
+    true_labels = []
+
+    # Get labels
+    for _, labels in tf_dataset:
+        for label in labels:
+            true_labels.append(label.numpy())
+     # return labels
+    return true_labels
