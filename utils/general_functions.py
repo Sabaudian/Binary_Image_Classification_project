@@ -23,7 +23,7 @@ def makedir(dirpath):
     # check if dir exists
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
-        print("\n> Directory [{}] has been crated successfully!\n".format(dirpath))
+        print("\n> Directory [{}] has been created successfully!\n".format(dirpath))
 
 
 # Return text as int if possible, or "text" unchanged
