@@ -23,7 +23,7 @@ def load_dataset(train_data_dir, test_data_dir):
     :return: tf.Dataset.data object
     """
     # train dataset
-    print("\nTraining and Validation: ")
+    print("\n> Training and Validation: ")
     train_ks_dataset, val_ks_dataset = tf.keras.utils.image_dataset_from_directory(
         train_data_dir,
         color_mode="rgb",
@@ -36,12 +36,12 @@ def load_dataset(train_data_dir, test_data_dir):
     )
 
     # test dataset
-    print("\nTest:")
+    print("\n> Test:")
     test_ks_dataset = tf.keras.utils.image_dataset_from_directory(
         test_data_dir,
         batch_size=const.BATCH_SIZE,
         image_size=const.IMG_SIZE,
-        shuffle=True
+        shuffle=True,
     )
     return train_ks_dataset, val_ks_dataset, test_ks_dataset
 

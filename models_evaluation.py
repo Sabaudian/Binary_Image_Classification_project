@@ -1,4 +1,6 @@
 # Import
+import os
+import keras
 import pandas as pd
 
 from IPython import display
@@ -24,11 +26,11 @@ def accuracy_loss_model(model, x_test, y_test):
     :param y_test: Target values of the test dataset.
     """
     # Compute loss and accuracy
-    test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test, verbose=0)
+    test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test)
 
     # Print evaluation info. about the model
-    print("\n\t- Test Loss: {:.3f}%"
-          "\n\t- Test Accuracy: {:.3f}%\n"
+    print("\n- Test Loss: {:.2f}%"
+          "\n- Test Accuracy: {:.2f}%\n"
           .format(test_loss * 100, test_accuracy * 100))
 
 
@@ -69,14 +71,13 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
 
 
 # Model evaluation with extrapolation of data and information plot
-def evaluate_model(model, model_name, x_test, y_test, test_dataset):
+def evaluate_model(model, model_name, x_test, y_test):
     """
     Evaluate the Performance of the model on the test set.
     :param model: The model in input.
     :param model_name: Name of the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
-    :param test_dataset: Raw keras dataset (tf.keras.utils.image_dataset_from_directory).
     """
 
     # Evaluate the model
@@ -98,5 +99,5 @@ def evaluate_model(model, model_name, x_test, y_test, test_dataset):
                                                show_on_screen=True, store_in_folder=True)
 
     # Plot a visual representation of the classification model, predicting classes
-    plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, test_dataset=test_dataset,
+    plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
                                           show_on_screen=True, store_in_folder=True)

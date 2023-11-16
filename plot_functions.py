@@ -1,8 +1,10 @@
 # Import
 import os
+import random
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -16,7 +18,7 @@ import utils.general_functions as general
 # *********** PLOT FUNCTIONS *********** #
 # ************************************** #
 
-def show_and_save_plot(show: bool, save: bool, plot_folder: str, plot_name: str, plot_extension: str, dpi: int = 96):
+def show_and_save_plot(show, save, plot_folder, plot_name, plot_extension, dpi=96):
     """
     Manage the display and saving of a plot.
 
@@ -57,8 +59,8 @@ def plot_img_class_histogram(train_data, test_data, show_on_screen=True, store_i
     # plot dataframe, counting data in it
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(16, 8))
     fig.suptitle("DATA VISUALIZATION CHART", fontsize=18, weight="bold")
-    sns.countplot(data=train_data, x="label", ax=ax1, hue="label")
-    sns.countplot(data=test_data, x="label", ax=ax2, hue="label")
+    sns.countplot(data=train_data, x="label", ax=ax1, hue="label", edgecolor="black")
+    sns.countplot(data=test_data, x="label", ax=ax2, hue="label", edgecolor="black")
 
     # settings first plot
     ax1.set_title("Train Set", fontsize=16, weight="bold")
@@ -145,18 +147,6 @@ def plot_view_dataset(train_ds, show_on_screen=True, store_in_folder=True):
         plot_extension=const.FILE_EXTENSION
     )
 
-    # # if it is true, save the image
-    # if store_in_folder:
-    #     general.makedir(const.PLOT_FOLDER)
-    #     plt.savefig(const.PLOT_FOLDER + "/plot_show_images" + const.FILE_EXTENSION, dpi=300)
-    #     if not show_on_screen:
-    #         plt.close()
-    # # if it is true, show the image
-    # if show_on_screen:
-    #     plt.show()
-    # else:
-    #     plt.close()
-
 
 # Plot augmented images
 def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, store_in_folder=True):
@@ -166,19 +156,9 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
     :param train_ds: The training dataset contains original images.
     :param data_augmentation: The data augmentation pipeline applied to the images.
     :param show_on_screen: If True, display the plot on the screen.
-    Default is True.
+        Default is True.
     :param store_in_folder: If True, save the plot in a folder.
-    Default is True.
-
-    Example:
-    - To plot data augmentation with default options:
-      plot_data_augmentation(my_train_dataset, my_augmentation)
-
-    - To plot data augmentation and only display on screen:
-      plot_data_augmentation(my_train_dataset, my_augmentation, show_on_screen=True, store_in_folder=False)
-
-    - To plot data augmentation and save the plot without displaying:
-      plot_data_augmentation(my_train_dataset, my_augmentation, show_on_screen=False, store_in_folder=True)
+        Default is True.
     """
 
     # Plot
@@ -253,7 +233,7 @@ def plot_history(history, model_name, show_on_screen=True, store_in_folder=True)
     # Show and store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
-        plot_folder=const.PLOT_FOLDER,
+        plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
         plot_name=model_name + "_training_history_plot",
         plot_extension=const.FILE_EXTENSION
     )
@@ -294,7 +274,7 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     # Show and store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
-        plot_folder=const.PLOT_FOLDER,
+        plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
         plot_name=model_name + "_confusion_matrix_plot",
         plot_extension=const.FILE_EXTENSION
     )
@@ -357,23 +337,26 @@ def plot_predictions_evaluation(model, model_name, class_list, x_test, y_test, s
     # Show and store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
-        plot_folder=const.PLOT_FOLDER,
+        plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
         plot_name=model_name + "_prediction_evaluation_plot",
         plot_extension=const.FILE_EXTENSION
     )
 
 
 # Plot test images with prediction
-def plot_visual_prediction(model, model_name, x_test, test_dataset, show_on_screen=True, store_in_folder=True):
+def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=True, store_in_folder=True):
     """
-    PLot a visual representation of the labels prediction based on the input model,
-    and compare them with the true labels.
-    :param model: The model in input.
-    :param model_name: The model name.
-    :param x_test: Test dataset.
-    :param test_dataset: Raw test dataset.
-    :param show_on_screen: Boolean value, if True, shows the plot.
-    :param store_in_folder: Boolean value, if True, saves the plot.
+    Plots a visual representation of the model predictions on a test dataset.
+    This function generates a 3x3 grid of randomly selected test images along with their true and predicted labels.
+    The predicted labels are obtained by thresholding the model's output probabilities at 0.5.
+    The plot is displayed on the screen and/or saved in a specified folder.
+
+    :param model: The trained model for making predictions.
+    :param model_name: A string representing the name of the model.
+    :param x_test: Input test data (images).
+    :param y_test: True labels for the test data.
+    :param show_on_screen: Boolean, whether to display the plot on the screen (default=True).
+    :param store_in_folder: Boolean, whether to save the plot in a folder (default=True).
     """
     # Predict
     predicts = model.predict(x_test)
@@ -381,6 +364,7 @@ def plot_visual_prediction(model, model_name, x_test, test_dataset, show_on_scre
     predicted_classes = (predicts >= 0.5).astype(int)
     predicted_classes = predicted_classes.flatten()
 
+    # Assign class name to class indices (chihuahua = 0, muffin = 1)
     predicted_class_labels = ["chihuahua" if pred_label == 0 else "muffin" for pred_label in predicted_classes]
 
     # Plot configuration
@@ -393,30 +377,37 @@ def plot_visual_prediction(model, model_name, x_test, test_dataset, show_on_scre
     # Add a title to the entire plot
     plt.suptitle("{} Visual Prediction".format(model_name), fontsize=18, weight="bold")
 
-    for images, labels in test_dataset.take(1):
-        for i in range(subplot_rows * subplot_cols):
-            plt.subplot(subplot_rows, subplot_cols, i + 1)
-            plt.imshow(images[i].numpy().astype("uint8"))
-            true_class_labels = ["chihuahua" if true_label == 0 else "muffin" for true_label in labels]
+    for i in range(min(subplot_rows * subplot_cols, len(x_test))):
+        plt.subplot(subplot_rows, subplot_cols, i + 1)
 
-            # Add Visual aid to check the correctness of the prediction
-            title_color = "green" if true_class_labels[i] == predicted_class_labels[i] else "red"
-            plt.title(
-                label="TRUE: {}\nPREDICTED: {}".format(true_class_labels[i], predicted_class_labels[i]),
-                      fontsize=10, color=title_color,
-                bbox=dict(facecolor="lightgray", alpha=0.7, edgecolor="black", boxstyle="round,pad=0.5"),
-                fontweight="bold"
-            )
-            plt.tight_layout()
-            plt.axis("off")
+        # Extract a single image from the test data using the index
+        single_image = x_test[i]
+        plt.imshow(single_image)
+
+        # True class indices, assuming 0 represents "chihuahua" and 1 represents "muffin"
+        true_class_label = "chihuahua" if y_test[i] == 0 else "muffin"
+
+        # Add Visual aid to check the correctness of the prediction
+        title_color = "green" if true_class_label == predicted_class_labels[i] else "red"
+
+        # Add a title to every image with a background
+        plt.title(
+            label="TRUE: {}\nPREDICTED: {}".format(true_class_label, predicted_class_labels[i]),
+            fontsize=10, color=title_color,
+            bbox=dict(facecolor="lightgray", alpha=0.7, edgecolor="black", boxstyle="round,pad=0.5"),
+            fontweight="bold"
+        )
+        plt.tight_layout()
+        plt.axis("off")
 
     # Show and store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
-        plot_folder=const.PLOT_FOLDER,
+        plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
         plot_name=model_name + "_visual_prediction_plot",
         plot_extension=const.FILE_EXTENSION
     )
+
 
 # Posizionare testo ecc.
 # https://matplotlib.org/stable/gallery/text_labels_and_annotations/titles_demo.html
@@ -424,3 +415,63 @@ def plot_visual_prediction(model, model_name, x_test, test_dataset, show_on_scre
 # FUNZIONI DA DEFINIRE
 # https://towardsdatascience.com/10-minutes-to-building-a-binary-image-classifier-by-applying-transfer-learning-to-mobilenet-eab5a8719525
 # def plot_roc_curve(false_positive_rate, true_positive_rate, validation_data):
+
+
+# # Plot test images with prediction
+# def plot_visual_prediction(model, model_name, test_dataset, show_on_screen=True, store_in_folder=True):
+#     # Predict
+#     predicts = model.predict(test_dataset)
+#     # Convert the predictions to class indices (0 or 1)
+#     predicted_classes = (predicts >= 0.5).astype("int")
+#
+#     # Assign class name to class indices (chihuahua = 0, muffin = 1)
+#     predicted_class_labels = ["chihuahua" if pred_label == 0 else "muffin" for pred_label in predicted_classes]
+#
+#     # Plot configuration
+#     figure_size = (16, 8)
+#     subplot_rows, subplot_cols = 3, 3
+#
+#     # Plot
+#     plt.figure(figsize=figure_size)
+#
+#     # Add a title to the entire plot
+#     plt.suptitle("{} Visual Prediction".format(model_name), fontsize=18, weight="bold")
+#
+#     # Shuffle the entire test dataset
+#     num_elements_in_test_data = tf.data.experimental.cardinality(test_dataset).numpy()
+#     shuffled_test_data = test_dataset.shuffle(buffer_size=num_elements_in_test_data, reshuffle_each_iteration=False)
+#     batch = next(iter(shuffled_test_data.batch(32)))
+#
+#     # Randomly select 9 indices from the batch
+#     random_indices = random.sample(range(32), k=9)
+#
+#     for i, idx in enumerate(random_indices):
+#         plt.subplot(subplot_rows, subplot_cols, i + 1)
+#
+#         # Extract a single image from the batch using the random index
+#         single_image = batch[0][idx].numpy()[0].astype("uint8")
+#         plt.imshow(single_image)
+#
+#         # True class indices, 0 represents "chihuahua" and 1 represents "muffin"
+#         true_class_labels = ["chihuahua" if idx == 0 else "muffin" for idx in batch[1][idx]]
+#
+#         # Add Visual aid to check the correctness of the prediction
+#         title_color = "green" if true_class_labels[idx] == predicted_class_labels[idx] else "red"
+#
+#         # Add a title to every image with a background
+#         plt.title(
+#             label="TRUE: {}\nPREDICTED: {}".format(true_class_labels[idx], predicted_class_labels[idx]),
+#             fontsize=10, color=title_color,
+#             bbox=dict(facecolor="lightgray", alpha=0.7, edgecolor="black", boxstyle="round,pad=0.5"),
+#             fontweight="bold"
+#         )
+#         plt.tight_layout()
+#         plt.axis("off")
+#
+#     # Show and store the plot
+#     show_and_save_plot(
+#         show=show_on_screen, save=store_in_folder,
+#         plot_folder=const.PLOT_FOLDER,
+#         plot_name=model_name + "_visual_prediction_plot",
+#         plot_extension=const.FILE_EXTENSION
+#     )

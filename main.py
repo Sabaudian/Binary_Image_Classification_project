@@ -1,5 +1,5 @@
 # My import
-import keras
+import numpy as np
 import classifiers
 import plot_functions
 import constants as const
@@ -45,11 +45,13 @@ if __name__ == '__main__':
     # # Checking the dataset
     # check_dataset = input("> START TO CHECK THE DATASET? [Y/N]: ")
     # if check_dataset.upper() == "Y":
-    #     pre_processing.checking_dataset(dataset_path=const.DATASET_PATH,
-    #                                     train_dir_path=const.TRAIN_DIR,
-    #                                     test_dir_path=const.TEST_DIR,
-    #                                     show=False,
-    #                                     save=False)
+    #     pre_processing.checking_dataset(
+    #         dataset_path=const.DATASET_PATH,
+    #         train_dir_path=const.TRAIN_DIR,
+    #         test_dir_path=const.TEST_DIR,
+    #         show=True,
+    #         save=False
+    #     )
 
     # Load keras datasets
     train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,
@@ -71,22 +73,22 @@ if __name__ == '__main__':
 
     # Visualize the data_augmentation process effect
     plot_functions.plot_data_augmentation(train_ds=train_dataset, data_augmentation=prepare.data_augmentation,
-                                          show_on_screen=False, store_in_folder=True)
+                                          show_on_screen=False, store_in_folder=False)
 
     # test con array
     X_train, y_train = prepare.image_to_array(train_ds)
     X_val, y_val = prepare.image_to_array(val_ds)
     X_test, y_test = prepare.image_to_array(test_ds)
 
-    print(X_train.shape)
-
-    # Neural Network model tuning
-    nn_model = classifiers.build_nn_model
-    tuned_nn_model = classifiers.tuning_hyperparameters(model=nn_model, model_name="NN", x_train=X_train,
-                                                        y_train=y_train, x_val=X_val, y_val=y_val)
-    # Evaluate NN model
-    evaluate.evaluate_model(model=tuned_nn_model, model_name="NN",
-                            x_test=X_test, y_test=y_test, test_dataset=test_dataset)
+    # # NN Model Tuning
+    # nn_model = classifiers.build_nn_model
+    # tuned_nn_model = classifiers.tuning_hyperparameters(model=nn_model, model_name="NN", x_train=X_train,
+    #                                                     y_train=y_train, x_val=X_val, y_val=y_val)
+    # # NN KFold cross-validation
+    # kfold_nn_model = classifiers.kfold_cross_validation(model=tuned_nn_model, model_name="NN", x_train=X_train,
+    #                                                     y_train=y_train, x_val=X_val, y_val=y_val, k_folds=const.K_FOLD)
+    # # Evaluate NN model
+    # evaluate.evaluate_model(model=kfold_nn_model, model_name="NN", x_test=X_test, y_test=y_test)
 
     # # MLP Model Tuning
     # mlp_model = classifiers.build_mlp_model
@@ -94,15 +96,42 @@ if __name__ == '__main__':
     #                                                      y_train=y_train, x_val=X_val, y_val=y_val)
     # # Evaluate MLP model
     # evaluate.evaluate_model(model=tuned_mlp_model, model_name="MLP",
-    #                         x_test=X_test, y_test=y_test, test_dataset=test_dataset)
-    #
+    #                         x_test=X_test, y_test=y_test)
+
     # # CNN model tuning
     # cnn_model = classifiers.build_cnn_model
     # tuned_cnn_model = classifiers.tuning_hyperparameters(model=cnn_model, model_name="CNN", x_train=X_train,
     #                                                      y_train=y_train, x_val=X_val, y_val=y_val)
     # # Evaluate CNN model
-    # evaluate.evaluate_model(model=tuned_cnn_model, model_name="CNN",
-    #                         x_test=X_test, y_test=y_test, test_dataset=test_dataset)
+    # evaluate.evaluate_model(model=tuned_cnn_model, model_name="CNN", x_test=X_test, y_test=y_test)
+
+    # # VGG-16 model tuning
+    # vgg16_model = classifiers.build_vgg16_model
+    # tuned_vgg16_model = classifiers.tuning_hyperparameters(model=vgg16_model, model_name="VGG16", x_train=X_train,
+    #                                                        y_train=y_train, x_val=X_val, y_val=y_val)
+    # # Evaluate VGG-16 model
+    # evaluate.evaluate_model(model=tuned_vgg16_model, model_name="VGG16", x_test=X_test, y_test=y_test)
+
+    # # VGG-16 model tuning
+    # vgg16_model = classifiers.build_vgg16_model
+    # tuned_vgg16_model = classifiers.tuning_hyperparameters(model=vgg16_model, model_name="VGG16", x_train=X_train,
+    #                                                        y_train=y_train, x_val=X_val, y_val=y_val)
+    # # Evaluate VGG-16 model
+    # evaluate.evaluate_model(model=tuned_vgg16_model, model_name="VGG16", x_test=X_test, y_test=y_test)
+
+    # MobileNet model tuning
+    mobilenet_model = classifiers.build_mobilenet_model
+    # MobileNet Tuning hyperparameters
+    tuned_mobilenet_model = classifiers.tuning_hyperparameters(model=mobilenet_model, model_name="MobileNet",
+                                                               x_train=X_train, y_train=y_train,
+                                                               x_val=X_val, y_val=y_val)
+    # MobileNet KFold cross-validation
+    kfold_mobilenet_model = classifiers.kfold_cross_validation(model=tuned_mobilenet_model, model_name="MobileNet",
+                                                               x_train=X_train, y_train=y_train,
+                                                               x_val=X_val, y_val=y_val,
+                                                               k_folds=const.K_FOLD)
+    # Evaluate MobileNet model
+    evaluate.evaluate_model(model=kfold_mobilenet_model, model_name="MobileNet", x_test=X_test, y_test=y_test)
 
     # ***************************** #
     # **** VERSIONE PRECEDENTE **** #

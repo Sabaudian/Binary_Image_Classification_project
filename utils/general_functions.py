@@ -134,5 +134,5 @@ def get_labels_from_dataset(tf_dataset):
     for _, labels in tf_dataset:
         for label in labels:
             true_labels.append(label.numpy())
-     # return labels
+    # return labels
     return true_labels
