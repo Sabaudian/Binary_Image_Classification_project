@@ -105,29 +105,29 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
     )
 
 
-# Plot the value's distribution of the images in the dataset
-def plot_img_aspect_ratio(image_metadata, show_on_screen=True, store_in_folder=True):
-    """
-    Value's distribution of the images in the dataset
-
-    :param image_metadata: Metadata information collected from images in the dataset.
-    :param show_on_screen: Boolean value, if True, shows the plot.
-    :param store_in_folder: Boolean value, if True, saves the plot.
-    """
-    # Initialize value
-    width, height, label = image_metadata["width"], image_metadata["height"], image_metadata["label"]
-
-    # plot the image
-    plt.subplots(figsize=(16, 8))
-    sns.scatterplot(x=width, y=height, hue=label)
-
-    # Show and/or store the plot
-    show_and_save_plot(
-        show=show_on_screen, save=store_in_folder,
-        plot_folder=const.PLOT_FOLDER,
-        plot_name="img_aspect_ratio_plot",
-        plot_extension=const.FILE_EXTENSION
-    )
+# # Plot the value's distribution of the images in the dataset
+# def plot_img_aspect_ratio(image_metadata, show_on_screen=True, store_in_folder=True):
+#     """
+#     Value's distribution of the images in the dataset
+#
+#     :param image_metadata: Metadata information collected from images in the dataset.
+#     :param show_on_screen: Boolean value, if True, shows the plot.
+#     :param store_in_folder: Boolean value, if True, saves the plot.
+#     """
+#     # Initialize value
+#     width, height, label = image_metadata["width"], image_metadata["height"], image_metadata["label"]
+#
+#     # plot the image
+#     plt.subplots(figsize=(16, 8))
+#     sns.scatterplot(x=width, y=height, hue=label)
+#
+#     # Show and/or store the plot
+#     show_and_save_plot(
+#         show=show_on_screen, save=store_in_folder,
+#         plot_folder=const.PLOT_FOLDER,
+#         plot_name="img_aspect_ratio_plot",
+#         plot_extension=const.FILE_EXTENSION
+#     )
 
 
 # Plot some images with the corresponding class label

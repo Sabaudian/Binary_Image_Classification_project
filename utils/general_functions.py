@@ -65,19 +65,64 @@ def sort_files(file):
     file.sort(key=alphanum_key)
 
 
-def count_files(file_path):
+# # Count files given a path
+# def count_files(file_path):
+#     """
+#     Count the number of files with extensions in the specified directory.
+#
+#     :param file_path: (str) The path to the directory for which file count is required.
+#
+#     :return: (int) The number of files with extensions in the specified directory.
+#
+#     Example: count_files("/path/to/directory") -> 12
+#     """
+#     counter = len(fnmatch.filter(os.listdir(file_path), "*.*"))
+#
+#     return counter
+
+
+def count_files(file_path, extensions="jpg"):
     """
-    Count the number of files with extensions in the specified directory.
+    Count the number of files with specified extensions in the specified directory.
 
     :param file_path: (str) The path to the directory for which file count is required.
+    :param extensions: (list or None) List of file extensions to count. If None, count all files.
 
-    :return: (int) The number of files with extensions in the specified directory.
+    :return: (int) The number of files with specified extensions in the specified directory.
 
-    Example: count_files("/path/to/directory") -> 12
+    Example: count_files("/path/to/directory", extensions=["jpg", "png"]) -> 12
     """
-    counter = len(fnmatch.filter(os.listdir(file_path), "*.*"))
+    if extensions is None:
+        extensions = ['']
+
+    counter = 0
+    with os.scandir(file_path) as entries:
+        for entry in entries:
+            if entry.is_file() and any(entry.name.lower().endswith(ext) for ext in extensions):
+                counter += 1
 
     return counter
+
+
+# Just a helper funtion
+def print_file_counts(dataset_path):
+    """
+    A helper function t pint information about the number of files inside the directory.
+
+    :param dataset_path: The path to training data
+    """
+
+    count_train_chihuahua = count_files(file_path=os.path.join(dataset_path, "train/chihuahua"))
+    count_train_muffin = count_files(file_path=os.path.join(dataset_path, "train/muffin"))
+    count_test_chihuahua = count_files(file_path=os.path.join(dataset_path, "test/chihuahua"))
+    count_test_muffin = count_files(file_path=os.path.join(dataset_path, "test/muffin"))
+
+    tot_number_file = count_train_chihuahua + count_train_muffin + count_test_chihuahua + count_test_muffin
+    print("- Total Number of file: {}\n".format(tot_number_file) +
+          "- Number of file in train/chihuahua: {}\n".format(count_train_chihuahua) +
+          "- Number of file in train/muffin: {}\n".format(count_train_muffin) +
+          "- Number of file in test/chihuahua: {}\n".format(count_test_chihuahua) +
+          "- Number of file in test/muffin: {}\n".format(count_test_muffin))
 
 
 # Load data from a path
@@ -106,33 +151,35 @@ def define_dataframe(train_dir_path, test_dir_path):
 
     :return: Pandas.Dataframe (train_df, test_df)
     """
-    # train data
-    train_chihuahua = load_file(dir_path=os.path.join(train_dir_path, "chihuahua"))
-    train_muffin = load_file(dir_path=os.path.join(train_dir_path, "muffin"))
+    def load_and_construct_df(dir_path, label):
+        """
+        Load image files from the specified directory and construct a dataframe.
 
-    # define dataframe for the train set
-    train_data = {
-        "image": train_muffin + train_chihuahua,
-        "label": ["chihuahua"] * len(train_chihuahua) + ["muffin"] * len(train_muffin)
-    }
+        :param dir_path: The path to the directory containing image files.
+        :param label: The label to assign to the images in the dataframe.
+
+        :return: A list of dictionaries containing image paths and labels.
+        """
+        data = []
+        with os.scandir(dir_path) as entries:
+            for entry in entries:
+                if entry.is_file() and entry.name.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    data.append({"image": entry.path, "label": label})
+        return data
+
+    # Define dataframe for the train set
+    train_data = (
+        load_and_construct_df(os.path.join(train_dir_path, "chihuahua"), "chihuahua") +
+        load_and_construct_df(os.path.join(train_dir_path, "muffin"), "muffin")
+    )
     train_df = pd.DataFrame(train_data)
-    # train_df.to_csv(data_folder + "/train_data.csv", index=False)
 
-    # test data
-    test_chihuahua = load_file(dir_path=os.path.join(test_dir_path, "chihuahua"))
-    test_muffin = load_file(dir_path=os.path.join(test_dir_path, "muffin"))
-
-    # define dataframe for the test set
-    test_data = {
-        "image": test_muffin + test_chihuahua,
-        "label": ["chihuahua"] * len(test_chihuahua) + ["muffin"] * len(test_muffin)
-    }
+    # Define dataframe for the test set
+    test_data = (
+        load_and_construct_df(os.path.join(test_dir_path, "chihuahua"), "chihuahua") +
+        load_and_construct_df(os.path.join(test_dir_path, "muffin"), "muffin")
+    )
     test_df = pd.DataFrame(test_data)
-
-    # # Encode data as: Muffin = one | Chihuahua = zero
-    # encoder = preprocessing.OrdinalEncoder()
-    # train_df["label"] = encoder.fit_transform(train_df[["label"]])
-    # test_df["label"] = encoder.fit_transform(test_df[["label"]])
 
     return train_df, test_df
 
