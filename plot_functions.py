@@ -1,10 +1,10 @@
 # Import
 import os
-import random
+# import random
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import tensorflow as tf
+# import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -28,7 +28,7 @@ def show_and_save_plot(show, save, plot_folder, plot_name, plot_extension, dpi=9
     :param plot_name: The name of the plot file (excluding the extension).
     :param plot_extension: The file extension of the plot (e.g., 'png', 'jpg').
     :param dpi: Dots per inch (resolution) for the saved image.
-    Default is 96.
+                Default is 96.
     """
     if show and save:  # show and store plot
         general.makedir(plot_folder)
@@ -45,15 +45,23 @@ def show_and_save_plot(show, save, plot_folder, plot_name, plot_extension, dpi=9
 
 
 # Show the amount of data per class
-def plot_img_class_histogram(train_data, test_data, show_on_screen=True, store_in_folder=True):
+def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in_folder=True):
     """
-    Plot a histogram that shows the amount of data per class of the dataset.
-    The histogram shows the number of images that represent muffin and chihuahua for the training and test set.
+    Plot a histogram showing the distribution of data per class in the dataset.
 
-    :param train_data: Pandas.Dataframe, training data.
-    :param test_data: Pandas.Dataframe, test data.
-    :param show_on_screen: Boolean value, if True, shows the plot.
-    :param store_in_folder: Boolean value, if True, saves the plot.
+    :param train_data: Pandas.DataFrame.
+        The training data as a Pandas DataFrame.
+    :param test_data: Pandas.DataFrame.
+        The test data as a Pandas DataFrame.
+    :param show_on_screen: bool, optional
+        If True, displays the plot on the screen. Defaults to True.
+    :param store_in_folder: bool, optional
+        If True, save the plot. Defaults to True.
+
+    Notes:
+        The histogram illustrates the number of images for each class in both the training and test sets.
+
+    :return: None
     """
 
     # plot dataframe, counting data in it
@@ -77,20 +85,20 @@ def plot_img_class_histogram(train_data, test_data, show_on_screen=True, store_i
         x = data.get_x() + data.get_width() / 2  # text centered
         y = data.get_y() + data.get_height()  # text placed at column height => number of images in that label
         value = int(data.get_height())  # get value
-        ax1.text(x, y, value, ha="center", fontsize=12, weight="bold")
+        ax1.text(x, y, value, ha="center", fontsize=14, weight="bold")
 
     # plot the exact amount of test's data
     for data in ax2.patches:
         x = data.get_x() + data.get_width() / 2  # text centered
         y = data.get_y() + data.get_height()  # text placed at column height => number of images in that label
         value = int(data.get_height())  # get value
-        ax2.text(x, y, value, ha="center", fontsize=12, weight="bold")
+        ax2.text(x, y, value, ha="center", fontsize=14, weight="bold")
 
-    # store plot into a proper folder
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=const.PLOT_FOLDER,
-        plot_name="dataset_histogram_overview_plot",
+        plot_name="class_distribution_plot",
         plot_extension=const.FILE_EXTENSION
     )
 
@@ -111,7 +119,7 @@ def plot_img_aspect_ratio(image_metadata, show_on_screen=True, store_in_folder=T
     plt.subplots(figsize=(16, 8))
     sns.scatterplot(x=width, y=height, hue=label)
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=const.PLOT_FOLDER,
@@ -120,26 +128,50 @@ def plot_img_aspect_ratio(image_metadata, show_on_screen=True, store_in_folder=T
     )
 
 
+# Plot some images with the corresponding class label
 def plot_view_dataset(train_ds, show_on_screen=True, store_in_folder=True):
     """
-    View some images that composed the dataset.
+    Visualize a subset of images from the dataset.
 
-    :param train_ds: tf.Dataset.data object corresponding to the train data.
-    :param show_on_screen: Boolean value, if True, shows the plot.
-    :param store_in_folder: Boolean value, if True, saves the plot.
+    :param train_ds: tf.data.Dataset
+        A TensorFlow dataset object corresponding to the training data.
+    :param show_on_screen: bool, optional
+        If True, displays the plot on the screen. Defaults to True.
+    :param store_in_folder: bool, optional
+        If True, save the plot in a specified folder. Defaults to True.
+
+    :notes:
+        The function plots a 3x3 grid of images from the dataset's first batch, along with their corresponding labels.
+        The images are displayed with labels, and the plot can be shown on screen and/or saved to a specified folder.
+
+    :returns: None
     """
+    # Plot
     plt.figure(figsize=(16, 8))
+
+    # Add a title to the entire plot
+    plt.suptitle("Dataset Snapshot: Visualizing Images with Class Labels", fontsize=18, weight="bold")
+
+    # Take the first batch of images and labels from the dataset
     for images, labels in train_ds.take(1):
+        # Loop through the first 9 images in the batch
         for i in range(9):
+            # Create subplots in a 3x3 grid
             plt.subplot(3, 3, i + 1)
+
+            # Display the image
             plt.imshow(images[i].numpy().astype("uint8"))
-            if labels[i] == 0:
-                plt.title("chihuahua")
-            else:
-                plt.title("muffin")
+
+            # Determine the class label based on the dataset
+            class_label = "chihuahua" if labels[i] == 0 else "muffin"
+
+            # Add title with label information
+            plt.title(label=f"{class_label}", fontsize=16)
+            # Adjust layout and turn off axis for cleaner presentation
+            plt.tight_layout()
             plt.axis("off")
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=const.PLOT_FOLDER,
@@ -167,14 +199,22 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
     # Add a title to the entire plot
     plt.suptitle("Data Augmentation", fontsize=22, weight="bold")
 
+    # Take the first batch of images from the dataset
     for images, _ in train_ds.take(1):
+        # Loop through the first 9 images in the batch
         for i in range(9):
+            # Apply data augmentation
             augmented_images = data_augmentation(images)
+
+            # Create subplots in a 3x3 grid
             plt.subplot(3, 3, i + 1)
+
+            # Display the image
             plt.imshow(augmented_images[0].numpy().astype("uint8"))
+
             plt.axis("off")
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=const.PLOT_FOLDER,
@@ -230,7 +270,7 @@ def plot_history(history, model_name, show_on_screen=True, store_in_folder=True)
     plt.grid()
     plt.legend(["Train", "Validation"], loc="best")
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
@@ -271,7 +311,7 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     display = ConfusionMatrixDisplay(confusion_matrix=confusion, display_labels=["Chihuahua", "Muffin"])
     display.plot(cmap="viridis", values_format="d", ax=ax)
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
@@ -280,20 +320,31 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     )
 
 
-def plot_predictions_evaluation(model, model_name, class_list, x_test, y_test, show_on_screen=True,
-                                store_in_folder=True):
+def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_test, show_on_screen=True,
+                                      store_in_folder=True):
     """
-    Plot a bar graph that compares true classes with the one predicted by the model in input.
-    :param model: Model in input.
-    :param model_name: Model name.
-    :param class_list: The list of class names.
-    :param x_test: Input values of the test dataset.
-    :param y_test: Target values of the test dataset.
-    :param show_on_screen: Boolean value, if True, shows the plot.
-    :param store_in_folder: Boolean value, if True, saves the plot.
+    Plot a bar graph that compares true classes with the ones predicted by the model in input.
+
+    :param model: tensorflow.keras.Model
+        The input model for predictions.
+    :param model_name: str
+        The name of the model.
+    :param class_list: list of str
+        The list of class names.
+    :param x_test: numpy.ndarray
+        Input values of the test dataset.
+    :param y_test: numpy.ndarray
+        Target values of the test dataset.
+    :param show_on_screen: bool, optional
+        If True, displays the plot on the screen.
+        Defaults to True.
+    :param store_in_folder: bool, optional
+        If True, save the plot.
+        Defaults to True.
     """
     # Predict
     predicts = model.predict(x_test)
+
     # Convert the predictions to binary classes (0 or 1)
     predicted_classes = (predicts >= 0.5).astype(int)
     predicted_classes = predicted_classes.flatten()
@@ -301,6 +352,7 @@ def plot_predictions_evaluation(model, model_name, class_list, x_test, y_test, s
     # Classes
     classes = {i: const.CLASS_LIST[i] for i in range(0, len(const.CLASS_LIST))}
 
+    # Create a DataFrame for storing class comparison data
     clf_data = pd.DataFrame(columns=["real_class_num", "predict_class_num",
                                      "real_class_label", "predict_class_label"])
     clf_data["real_class_num"] = y_test
@@ -313,6 +365,7 @@ def plot_predictions_evaluation(model, model_name, class_list, x_test, y_test, s
     clf_data["real_class_label"] = clf_data["real_class_num"].replace(classes)
     clf_data["predict_class_label"] = clf_data["predict_class_num"].replace(classes)
 
+    # Create a DataFrame for input data
     input_data = pd.DataFrame()
     input_data[["Genre", "Real_Value"]] = \
         clf_data[["real_class_label", "predict_class_label"]].groupby(["real_class_label"], as_index=False).count()
@@ -329,12 +382,13 @@ def plot_predictions_evaluation(model, model_name, class_list, x_test, y_test, s
     plt.xlabel(xlabel="Classes", fontsize=16)
     plt.ylabel(ylabel="Occurrences", fontsize=16)
 
+    # Annotate each bar with its height, i.e., the Real Value vs the Predicted one
     for p in ax.patches:
         ax.annotate(format(p.get_height()),
                     (p.get_x() + (p.get_width() / 2), p.get_height()), ha="center", va="center",
                     xytext=(0, 5), textcoords="offset points", fontsize=12, rotation=0)
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
@@ -347,19 +401,25 @@ def plot_predictions_evaluation(model, model_name, class_list, x_test, y_test, s
 def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=True, store_in_folder=True):
     """
     Plots a visual representation of the model predictions on a test dataset.
-    This function generates a 3x3 grid of randomly selected test images along with their true and predicted labels.
-    The predicted labels are obtained by thresholding the model's output probabilities at 0.5.
-    The plot is displayed on the screen and/or saved in a specified folder.
 
-    :param model: The trained model for making predictions.
-    :param model_name: A string representing the name of the model.
-    :param x_test: Input test data (images).
-    :param y_test: True labels for the test data.
-    :param show_on_screen: Boolean, whether to display the plot on the screen (default=True).
-    :param store_in_folder: Boolean, whether to save the plot in a folder (default=True).
+    :param model: tensorflow.keras.Model
+        The trained model for making predictions.
+    :param model_name: str
+        A string representing the name of the model.
+    :param x_test: numpy.ndarray
+        Input test data (images).
+    :param y_test: numpy.ndarray
+        True labels for the test data.
+    :param show_on_screen: bool, optional
+        Whether to display the plot on the screen.
+         Defaults to True.
+    :param store_in_folder: bool, optional
+        Whether to save the plot in a folder.
+        Defaults to True.
     """
     # Predict
     predicts = model.predict(x_test)
+
     # Convert the predictions to binary classes (0 or 1)
     predicted_classes = (predicts >= 0.5).astype(int)
     predicted_classes = predicted_classes.flatten()
@@ -390,7 +450,7 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         # Add Visual aid to check the correctness of the prediction
         title_color = "green" if true_class_label == predicted_class_labels[i] else "red"
 
-        # Add a title to every image with a background
+        # Add a title to all images (true vs predicted class label) with a background for a better presentation
         plt.title(
             label="TRUE: {}\nPREDICTED: {}".format(true_class_label, predicted_class_labels[i]),
             fontsize=10, color=title_color,
@@ -400,22 +460,13 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         plt.tight_layout()
         plt.axis("off")
 
-    # Show and store the plot
+    # Show and/or store the plot
     show_and_save_plot(
         show=show_on_screen, save=store_in_folder,
         plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
         plot_name=model_name + "_visual_prediction_plot",
         plot_extension=const.FILE_EXTENSION
     )
-
-
-# Posizionare testo ecc.
-# https://matplotlib.org/stable/gallery/text_labels_and_annotations/titles_demo.html
-
-# FUNZIONI DA DEFINIRE
-# https://towardsdatascience.com/10-minutes-to-building-a-binary-image-classifier-by-applying-transfer-learning-to-mobilenet-eab5a8719525
-# def plot_roc_curve(false_positive_rate, true_positive_rate, validation_data):
-
 
 # # Plot test images with prediction
 # def plot_visual_prediction(model, model_name, test_dataset, show_on_screen=True, store_in_folder=True):

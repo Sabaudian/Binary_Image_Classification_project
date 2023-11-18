@@ -20,9 +20,9 @@ from utils.general_functions import define_dataframe
 # Check dataset: filter out possible corrupted files.
 def corruption_filter(dataset_path):
     """
-    Checking dataset,
-    verifying the presence of corrupted file and collect metadata
-    :param dataset_path: the path to the dataset
+    Check dataset for corrupted files and delete them if requested.
+
+    :param dataset_path: The path to the dataset.
     """
     # Initialize
     bad_files = []  # to store corrupted file
@@ -145,6 +145,7 @@ def find_out_duplicate(dataset_path, hash_size):
 def view_data(train_dir_path, test_dir_path, show_plot, save_plot):
     """
     Display the amount of data per class of sets: train and test
+
     :param train_dir_path: the path to training data
     :param test_dir_path: the path to test data
     :param show_plot: chooses whether to show the plot
@@ -154,56 +155,81 @@ def view_data(train_dir_path, test_dir_path, show_plot, save_plot):
     train_df, test_df = define_dataframe(train_dir_path=train_dir_path,
                                          test_dir_path=test_dir_path)
     # plot histogram
-    plot_functions.plot_img_class_histogram(train_data=train_df, test_data=test_df, show_on_screen=show_plot,
-                                            store_in_folder=save_plot)
+    plot_functions.plot_class_distribution(train_data=train_df, test_data=test_df, show_on_screen=show_plot,
+                                           store_in_folder=save_plot)
 
 
-def checking_dataset(dataset_path, train_dir_path, test_dir_path, show, save):
+# Just a helper funtion
+def print_file_counts(train_dir_chihuahua, train_dir_muffin, test_dir_chihuahua, test_dir_muffin):
     """
-    Preliminary check on dataset
-    :param dataset_path: the path to the dataset
-    :param train_dir_path: the path to training data
-    :param test_dir_path: the path to test data
-    :param show: Decide if show data on screen or not
-    :param save: Decide if store data or not
+    A helper function t pint information about the number of files inside the directory.
+
+    :param train_dir_chihuahua: The path to training data -> train/chihuahua.
+    :param train_dir_muffin: The path to training data -> test/muffin.
+    :param test_dir_chihuahua: The path to test data -> train/chihuahua.
+    :param test_dir_muffin: The path to test data -> train/muffin.
+    """
+
+    tot_number_file = train_dir_chihuahua + train_dir_muffin + test_dir_chihuahua + test_dir_muffin
+    print("- Total Number of file: {}\n".format(tot_number_file) +
+          "- Number of file in train/chihuahua: {}\n".format(train_dir_chihuahua) +
+          "- Number of file in train/muffin: {}\n".format(train_dir_muffin) +
+          "- Number of file in test/chihuahua: {}\n".format(test_dir_chihuahua) +
+          "- Number of file in test/muffin: {}\n".format(test_dir_muffin))
+
+
+def checking_dataset(dataset_path, save):
+    """
+    Preliminary check on dataset:
+        Calling corruption_filter, find_out_duplicate, collect_metadata and view_data function
+        to analyze and control the dataset.
+
+    :param dataset_path: The path to the dataset.
+    :param save: Decide if store data or not.
     """
     print("\n> CHECK THE DATASET")
     print("\n> Checking the Number of file before performing Pre-processing Task...")
 
     # Count data
-    count_train_chihuahua = count_files(file_path=dataset_path + "/train/chihuahua")
-    count_train_muffin = count_files(file_path=dataset_path + "/train/muffin")
-    count_test_chihuahua = count_files(file_path=dataset_path + "/test/chihuahua")
-    count_test_muffin = count_files(file_path=dataset_path + "/test/muffin")
-    tot_number_file = count_train_chihuahua + count_train_muffin + count_test_chihuahua + count_test_muffin
+    count_train_chihuahua = count_files(file_path=os.path.join(dataset_path, "train/chihuahua"))
+    count_train_muffin = count_files(file_path=os.path.join(dataset_path, "train/muffin"))
+    count_test_chihuahua = count_files(file_path=os.path.join(dataset_path, "test/chihuahua"))
+    count_test_muffin = count_files(file_path=os.path.join(dataset_path, "test/muffin"))
 
-    print("> Number of file in train/chihuahua: {}".format(count_train_chihuahua) +
-          "\n> Number of file in train/muffin: {}".format(count_train_muffin) +
-          "\n> Number of file in test/chihuahua: {}".format(count_test_chihuahua) +
-          "\n> Number of file in test/muffin: {}".format(count_test_muffin) +
-          "\n> Total Number of file: {}\n".format(tot_number_file))
+    # Print count
+    print_file_counts(count_train_chihuahua, count_train_muffin, count_test_chihuahua, count_test_muffin)
 
-    # check for corrupted file
-    print("\n> Checking for corrupted files...")
+    # Check for corrupted file
+    print("> Checking for corrupted files...")
     corruption_filter(dataset_path=dataset_path)
-    print("> Total Number of file After Applying Corruption Filter: {}\n".format(tot_number_file))
 
-    # check for duplicates in training dataset
-    print("\n> Checking duplicates in CHIHUAHUA directory...[num. of file: {}]".format(count_train_chihuahua))
+    # Count data after corruption filter
+    count_train_chihuahua = count_files(file_path=os.path.join(dataset_path, "train/chihuahua"))
+    count_train_muffin = count_files(file_path=os.path.join(dataset_path, "train/muffin"))
+    count_test_chihuahua = count_files(file_path=os.path.join(dataset_path, "test/chihuahua"))
+    count_test_muffin = count_files(file_path=os.path.join(dataset_path, "test/muffin"))
 
-    find_out_duplicate(dataset_path=dataset_path + "/train/chihuahua", hash_size=8)
+    # Print count
+    print("> Checking the Number of file after the application of the corruption filter:")
+    print_file_counts(count_train_chihuahua, count_train_muffin, count_test_chihuahua, count_test_muffin)
 
-    print("> Number of file in train/chihuahua: {}"
-          .format(count_files(file_path=dataset_path + "/train/chihuahua")))
-    print("\n> Checking duplicates in MUFFIN directory...[num. of file: {}]"
-          .format(count_files(file_path=dataset_path + "/train/muffin")))
+    # Check for duplicates in training dataset: train/chihuahua and train /muffin
+    print("> Checking duplicates in train/chihuahua directory...[current num. of file: {}]\n"
+          .format(count_train_chihuahua))
+    find_out_duplicate(dataset_path=os.path.join(dataset_path, "train/chihuahua"), hash_size=8)
 
-    find_out_duplicate(dataset_path=dataset_path + "/train/muffin", hash_size=8)
-    print("> Number of file in train/muffin: {}".format(count_train_muffin))
+    # Count again train/chihuahua after duplicate check
+    print("\n> The Number of file in train/chihuahua is: {}"
+          .format(count_files(file_path=os.path.join(dataset_path, "train/chihuahua"))))
 
-    # structure of the metadata
+    print("\n> Checking duplicates in train/muffin directory...[current num. of file: {}]".format(count_train_muffin))
+    find_out_duplicate(dataset_path=os.path.join(dataset_path, "train/muffin"), hash_size=8)
+
+    # Count again train/muffin after duplicate check
+    print("\n> The Number of file in train/muffin is: {}"
+          .format(count_files(file_path=os.path.join(dataset_path, "train/muffin"))))
+
+    # Structure of the files metadata
     collect_metadata(dataset_path=dataset_path, store_data=save)
 
-    # displaying histogram
-    view_data(train_dir_path, test_dir_path, show_plot=show, save_plot=save)
     print("\n> DATASET CHECK COMPLETE!")

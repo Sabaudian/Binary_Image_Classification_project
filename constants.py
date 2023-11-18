@@ -1,11 +1,14 @@
+# import
+import os
+
 # -------------------------------------- #
 # ---------- USEFUL CONSTANTS ---------- #
 # -------------------------------------- #
 
 # DATASET AND DATA LOCATION
 DATASET_PATH = "dataset"
-TRAIN_DIR = DATASET_PATH + "/train"
-TEST_DIR = DATASET_PATH + "/test"
+TRAIN_DIR = os.path.join(DATASET_PATH, "train")  # DATASET_PATH + "/train"
+TEST_DIR = os.path.join(DATASET_PATH, "test")  # DATASET_PATH + "/test"
 DATA_PATH = "data"
 REPORT_PATH = "report"
 
@@ -30,10 +33,3 @@ INPUT_SHAPE = (IMG_HEIGHT, IMG_WIDTH, CHANNELS)
 
 # KFOLD CROSS-VALIDATION AND SIMILAR
 K_FOLD = 5
-# NN_MODEL_CHECKPOINT =
-# MLP_MODEL_CHECKPOINT =
-# CNN_MODEL_CHECKPOINT =
-
-
-# NOTE PROGETTO:
-# modelli da usare: vgg-16, resnet50, mobileNet (approfondire vit)

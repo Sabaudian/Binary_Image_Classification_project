@@ -94,9 +94,9 @@ def evaluate_model(model, model_name, x_test, y_test):
                                          show_on_screen=True, store_in_folder=True)
 
     # Plot a representation of the prediction
-    plot_functions.plot_predictions_evaluation(model=model, model_name=model_name,
-                                               class_list=const.CLASS_LIST, x_test=x_test, y_test=y_test,
-                                               show_on_screen=True, store_in_folder=True)
+    plot_functions.plot_model_predictions_evaluation(model=model, model_name=model_name, class_list=const.CLASS_LIST,
+                                                     x_test=x_test, y_test=y_test, show_on_screen=True,
+                                                     store_in_folder=True)
 
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,

@@ -18,6 +18,7 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 def makedir(dirpath):
     """
     Create a directory, given a path
+
     :param dirpath: directory location
     """
     # check if dir exists
@@ -30,7 +31,9 @@ def makedir(dirpath):
 def convert(data):
     """
     Convert text into integer if possible
+
     :param data: input data
+
     :return: integer data, else data unchanged
     """
     return int(data) if data.isdigit() else data
@@ -40,7 +43,9 @@ def convert(data):
 def alphanum_key(data):
     """
     Transform a string into a list of strings and number chunks
+
     :param data: input data
+
     :return: transformed data string
     """
     return [convert(c.replace("_", "")) for c in re.split("([0-9]+)", data)]
@@ -50,8 +55,10 @@ def alphanum_key(data):
 def sort_files(file):
     """
     Sorting file as expected by human observer
-    Example: img_file_0001, img_file_0002, ..., img_file_NNNN
+
     :param file: input file
+
+    Example: img_file_0001, img_file_0002, ..., img_file_NNNN
     """
     # convert = lambda text: int(text) if text.isdigit() else text
     # alphanum_key = lambda key: [convert(c.replace("_", "")) for c in re.split("([0-9]+)", key)]
@@ -60,20 +67,27 @@ def sort_files(file):
 
 def count_files(file_path):
     """
-    Simple counter to count the number of files inside a directory
-    :param file_path: the path to file directory
-    :return: int value
+    Count the number of files with extensions in the specified directory.
+
+    :param file_path: (str) The path to the directory for which file count is required.
+
+    :return: (int) The number of files with extensions in the specified directory.
+
+    Example: count_files("/path/to/directory") -> 12
     """
     counter = len(fnmatch.filter(os.listdir(file_path), "*.*"))
+
     return counter
 
 
 # Load data from a path
 def load_file(dir_path):
     """
-    Load file from a given path
-    :param dir_path: directory path
-    :return: sorted array of file
+    Load file from a given path.
+
+    :param dir_path: Directory path.
+
+    :return: A sorted array of file.
     """
     files = []
     for filename in os.listdir(dir_path):
@@ -85,10 +99,12 @@ def load_file(dir_path):
 # define train and test dataframe from dataset
 def define_dataframe(train_dir_path, test_dir_path):
     """
-    Define two dataframe, one for the training set and the other for the test set
-    :param train_dir_path: training directory path
-    :param test_dir_path: test directory path
-    :return: pandas.Dataframe (train_df, test_df)
+    Define two dataframe, one for the training set and the other for the test set.
+
+    :param train_dir_path: Training directory path.
+    :param test_dir_path: Test directory path.
+
+    :return: Pandas.Dataframe (train_df, test_df)
     """
     # train data
     train_chihuahua = load_file(dir_path=os.path.join(train_dir_path, "chihuahua"))
@@ -123,9 +139,11 @@ def define_dataframe(train_dir_path, test_dir_path):
 
 def get_labels_from_dataset(tf_dataset):
     """
-    Get the data labels of the dataset in input
-    :param tf_dataset: tf.Dataset.data object in input
-    :return: label's array
+    Extract true labels from a TensorFlow dataset.
+
+    :param tf_dataset: (tf.data.Dataset) The TensorFlow dataset containing data and labels.
+
+    :return: (list) A list of true labels extracted from the dataset.
     """
     # True labels array
     true_labels = []

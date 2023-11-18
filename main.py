@@ -9,8 +9,8 @@ import utils.general_functions as general
 import utils.pre_processing as pre_processing
 
 # Imported to get package version info.
-import sys
 import sklearn
+import platform
 import tensorflow as tf
 
 # ************************ #
@@ -37,21 +37,20 @@ if __name__ == '__main__':
     """
     # Python Packages Version info.
     print("\n> Version control")
-    print("- Python version is: {}".format(sys.version))
+    print("- Python version is: {}".format(platform.python_version()))
     print("- Scikit-learn version is: {}".format(sklearn.__version__))
     print("- Tensorflow version is: {}".format(tf.__version__))
-    print("_________________________________________________________________")
+    print("______________________________________________________________________")
 
-    # # Checking the dataset
-    # check_dataset = input("> START TO CHECK THE DATASET? [Y/N]: ")
-    # if check_dataset.upper() == "Y":
-    #     pre_processing.checking_dataset(
-    #         dataset_path=const.DATASET_PATH,
-    #         train_dir_path=const.TRAIN_DIR,
-    #         test_dir_path=const.TEST_DIR,
-    #         show=True,
-    #         save=False
-    #     )
+    # Checking the dataset
+    check_dataset = input("> PREPROCESSING: START TO CHECK THE DATASET? [Y/N]: ")
+    if check_dataset.upper() == "Y":
+        pre_processing.checking_dataset(dataset_path=const.DATASET_PATH, save=True)
+    print("______________________________________________________________________")
+
+    # Displaying histogram describing dataset
+    pre_processing.view_data(train_dir_path=const.TRAIN_DIR, test_dir_path=const.TEST_DIR,
+                             show_plot=True, save_plot=True)
 
     # Load keras datasets
     train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,
@@ -63,8 +62,8 @@ if __name__ == '__main__':
           "\n\t- classe 1 = {}".format(train_dataset.class_names[0], train_dataset.class_names[1]) +
           "\n> Type specification:\n\t- {}\n".format(train_dataset.element_spec))
 
-    # Visualize the dataset with corresponding labels
-    plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=False, store_in_folder=False)
+    # Visualize the dataset showing some images with corresponding labels
+    plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=True, store_in_folder=True)
 
     # Scaling data
     train_ds = prepare.data_normalization(tf_dataset=train_dataset, augment=True)
@@ -73,7 +72,7 @@ if __name__ == '__main__':
 
     # Visualize the data_augmentation process effect
     plot_functions.plot_data_augmentation(train_ds=train_dataset, data_augmentation=prepare.data_augmentation,
-                                          show_on_screen=False, store_in_folder=False)
+                                          show_on_screen=True, store_in_folder=True)
 
     # test con array
     X_train, y_train = prepare.image_to_array(train_ds)
@@ -105,12 +104,19 @@ if __name__ == '__main__':
     # # Evaluate CNN model
     # evaluate.evaluate_model(model=tuned_cnn_model, model_name="CNN", x_test=X_test, y_test=y_test)
 
-    # # VGG-16 model tuning
-    # vgg16_model = classifiers.build_vgg16_model
-    # tuned_vgg16_model = classifiers.tuning_hyperparameters(model=vgg16_model, model_name="VGG16", x_train=X_train,
-    #                                                        y_train=y_train, x_val=X_val, y_val=y_val)
-    # # Evaluate VGG-16 model
-    # evaluate.evaluate_model(model=tuned_vgg16_model, model_name="VGG16", x_test=X_test, y_test=y_test)
+    # # MobileNet model tuning
+    # mobilenet_model = classifiers.build_mobilenet_model
+    # # MobileNet Tuning hyperparameters
+    # tuned_mobilenet_model = classifiers.tuning_hyperparameters(model=mobilenet_model, model_name="MobileNet",
+    #                                                            x_train=X_train, y_train=y_train,
+    #                                                            x_val=X_val, y_val=y_val)
+    # # MobileNet KFold cross-validation
+    # kfold_mobilenet_model = classifiers.kfold_cross_validation(model=tuned_mobilenet_model, model_name="MobileNet",
+    #                                                            x_train=X_train, y_train=y_train,
+    #                                                            x_val=X_val, y_val=y_val,
+    #                                                            k_folds=const.K_FOLD)
+    # # Evaluate MobileNet model
+    # evaluate.evaluate_model(model=kfold_mobilenet_model, model_name="MobileNet", x_test=X_test, y_test=y_test)
 
     # # VGG-16 model tuning
     # vgg16_model = classifiers.build_vgg16_model
@@ -118,50 +124,3 @@ if __name__ == '__main__':
     #                                                        y_train=y_train, x_val=X_val, y_val=y_val)
     # # Evaluate VGG-16 model
     # evaluate.evaluate_model(model=tuned_vgg16_model, model_name="VGG16", x_test=X_test, y_test=y_test)
-
-    # MobileNet model tuning
-    mobilenet_model = classifiers.build_mobilenet_model
-    # MobileNet Tuning hyperparameters
-    tuned_mobilenet_model = classifiers.tuning_hyperparameters(model=mobilenet_model, model_name="MobileNet",
-                                                               x_train=X_train, y_train=y_train,
-                                                               x_val=X_val, y_val=y_val)
-    # MobileNet KFold cross-validation
-    kfold_mobilenet_model = classifiers.kfold_cross_validation(model=tuned_mobilenet_model, model_name="MobileNet",
-                                                               x_train=X_train, y_train=y_train,
-                                                               x_val=X_val, y_val=y_val,
-                                                               k_folds=const.K_FOLD)
-    # Evaluate MobileNet model
-    evaluate.evaluate_model(model=kfold_mobilenet_model, model_name="MobileNet", x_test=X_test, y_test=y_test)
-
-    # ***************************** #
-    # **** VERSIONE PRECEDENTE **** #
-    # ***************************** #
-
-    # # Neural Network model tuning
-    # nn_model = classifiers.build_nn_model
-    # tuned_nn_model = classifiers.tuning_model_hyperparameter(model=nn_model, model_name="NN", x_train=X_train,
-    #                                                          y_train=y_train, x_val=X_val, y_val=y_val)
-    # # Evaluate NN model
-    # classifiers.evaluate_model(model=tuned_nn_model, model_name="NN", x_train=X_train, y_train=y_train,
-    #                            x_val=X_val, y_val=y_val, x_test=X_test, y_test=y_test, test_dataset=test_dataset)
-
-    # # MLP Model Tuning
-    # mlp_model = classifiers.build_mlp_model
-    # tuned_mlp_model = classifiers.tuning_model_hyperparameter(model=mlp_model, model_name="MLP", x_train=X_train,
-    #                                                           y_train=y_train, x_val=X_val, y_val=y_val)
-    # # Evaluate MLP model
-    # classifiers.evaluate_model(model=tuned_mlp_model, model_name="MLP", x_train=X_train, y_train=y_train,
-    #                            x_val=X_val, y_val=y_val, x_test=X_test, y_test=y_test, test_dataset=test_dataset)
-
-    # # CNN model tuning
-    # cnn_model = classifiers.build_cnn_model
-    # tuned_cnn_model = classifiers.tuning_model_hyperparameter(model=cnn_model, model_name="CNN", x_train=X_train,
-    #                                                           y_train=y_train,  x_val=X_val, y_val=y_val)
-    # # Evaluate CNN model
-    # classifiers.evaluate_model(model=tuned_cnn_model, model_name="CNN", x_train=X_train, y_train=y_train, x_val=X_val,
-    #                            y_val=y_val, x_test=X_test, y_test=y_test, test_dataset=test_dataset)
-
-    # # ResNet50 Model
-    # resnet50_model = classifiers.resnet50_model(x_train=X_train, y_train=y_train, x_val=X_val, y_val=y_val)
-    # classifiers.evaluate_model(model=resnet50_model, model_name="ResNet50", x_train=X_train, y_train=y_train,
-    #                            x_val=X_val, y_val=y_val, x_test=X_test, y_test=y_test, test_dataset=test_dataset)
