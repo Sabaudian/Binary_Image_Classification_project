@@ -141,24 +141,6 @@ def find_out_duplicate(dataset_path, hash_size):
         print("> No Duplicate Found")
 
 
-# Displaying data as a clear plot
-def view_data(train_dir_path, test_dir_path, show_plot, save_plot):
-    """
-    Display the amount of data per class of sets: train and test
-
-    :param train_dir_path: the path to training data
-    :param test_dir_path: the path to test data
-    :param show_plot: chooses whether to show the plot
-    :param save_plot: chooses whether to store the plot
-    """
-    # function that defines dataset
-    train_df, test_df = define_dataframe(train_dir_path=train_dir_path,
-                                         test_dir_path=test_dir_path)
-    # plot histogram
-    plot_functions.plot_class_distribution(train_data=train_df, test_data=test_df, show_on_screen=show_plot,
-                                           store_in_folder=save_plot)
-
-
 # Just a helper funtion
 def print_file_counts(train_dir_chihuahua, train_dir_muffin, test_dir_chihuahua, test_dir_muffin):
     """
@@ -178,14 +160,17 @@ def print_file_counts(train_dir_chihuahua, train_dir_muffin, test_dir_chihuahua,
           "- Number of file in test/muffin: {}\n".format(test_dir_muffin))
 
 
-def checking_dataset(dataset_path, save):
+def checking_dataset(dataset_path, train_dir_path, test_dir_path, show_plot, save_plot):
     """
     Preliminary check on dataset:
         Calling corruption_filter, find_out_duplicate, collect_metadata and view_data function
         to analyze and control the dataset.
 
     :param dataset_path: The path to the dataset.
-    :param save: Decide if store data or not.
+    :param train_dir_path: The path to the train dataset.
+    :param test_dir_path: The path to the test dataset.
+    :param show_plot: Decide if show data on screen or not.
+    :param save_plot: Decide if store data or not.
     """
     print("\n> CHECK THE DATASET")
     print("\n> Checking the Number of file before performing Pre-processing Task...")
@@ -230,6 +215,13 @@ def checking_dataset(dataset_path, save):
           .format(count_files(file_path=os.path.join(dataset_path, "train/muffin"))))
 
     # Structure of the files metadata
-    collect_metadata(dataset_path=dataset_path, store_data=save)
+    collect_metadata(dataset_path=dataset_path, store_data=save_plot)
+
+    # Defines a dataframe
+    train_df, test_df = define_dataframe(train_dir_path=train_dir_path,
+                                         test_dir_path=test_dir_path)
+    # Plot class distribution
+    plot_functions.plot_class_distribution(train_data=train_df, test_data=test_df, show_on_screen=show_plot,
+                                           store_in_folder=save_plot)
 
     print("\n> DATASET CHECK COMPLETE!")

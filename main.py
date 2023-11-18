@@ -45,12 +45,11 @@ if __name__ == '__main__':
     # Checking the dataset
     check_dataset = input("> PREPROCESSING: START TO CHECK THE DATASET? [Y/N]: ")
     if check_dataset.upper() == "Y":
-        pre_processing.checking_dataset(dataset_path=const.DATASET_PATH, save=True)
+        pre_processing.checking_dataset(dataset_path=const.DATASET_PATH,
+                                        train_dir_path=const.TRAIN_DIR,
+                                        test_dir_path=const.TEST_DIR,
+                                        show_plot=True, save_plot=True)
     print("______________________________________________________________________")
-
-    # Displaying histogram describing dataset
-    pre_processing.view_data(train_dir_path=const.TRAIN_DIR, test_dir_path=const.TEST_DIR,
-                             show_plot=True, save_plot=True)
 
     # Load keras datasets
     train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,
