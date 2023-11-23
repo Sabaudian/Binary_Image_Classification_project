@@ -6,7 +6,7 @@ from PIL import Image, UnidentifiedImageError
 
 # My import
 import plot_functions
-from utils.general_functions import sort_files
+# from utils.general_functions import sort_files
 from utils.general_functions import count_files
 from utils.general_functions import define_dataframe
 from utils.general_functions import print_file_counts
@@ -32,8 +32,8 @@ def corruption_filter(dataset_path):
         # Ensure we're processing a sub-folder level
         if dirpath is not dataset_path:
 
-            # Properly sorted file as presented in the original dataset
-            sort_files(filenames)
+            # # Properly sorted file as presented in the original dataset
+            # sort_files(filenames)
 
             # Loop through all files
             for filename in filenames:

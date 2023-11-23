@@ -1,21 +1,29 @@
 # My import
-import numpy as np
 import classifiers
 import plot_functions
 import constants as const
 import prepare_dataset as prepare
 import models_evaluation as evaluate
-import utils.general_functions as general
-import utils.pre_processing as pre_processing
 
 # Imported to get package version info.
 import sklearn
 import platform
 import tensorflow as tf
 
+import warnings
+
+warnings.filterwarnings("ignore")
+
 # ************************ #
 # ********* MAIN ********* #
 # ************************ #
+
+
+# ESEGUIRE IL REFACTORING NELLE FUNZIONI DI TUNING E KFOLD:
+# - impostare il corretto nome del file json e best_model con
+#   check generale-
+# - Implementare le funzioni di plot per il kfold -> conf_matrix_per_fold
+# - Implementare metodi per estrazione di info. di valutazione kfold e test set finale
 
 # Main class of the project
 if __name__ == '__main__':
@@ -40,16 +48,16 @@ if __name__ == '__main__':
     print("- Python version is: {}".format(platform.python_version()))
     print("- Scikit-learn version is: {}".format(sklearn.__version__))
     print("- Tensorflow version is: {}".format(tf.__version__))
-    print("______________________________________________________________________")
+    print("______________________________________________________________________________")
 
-    # Checking the dataset
-    check_dataset = input("> PREPROCESSING: START TO CHECK THE DATASET? [Y/N]: ")
-    if check_dataset.upper() == "Y":
-        pre_processing.checking_dataset(dataset_path=const.DATASET_PATH,
-                                        train_dir_path=const.TRAIN_DIR,
-                                        test_dir_path=const.TEST_DIR,
-                                        show_plot=False, save_plot=False)
-    print("______________________________________________________________________")
+    # # Checking the dataset
+    # check_dataset = input("> Preprocessing: Is it necessary to check the dataset? [Y/N]: ")
+    # if check_dataset.upper() == "Y":
+    #     pre_processing.checking_dataset(dataset_path=const.DATASET_PATH,
+    #                                     train_dir_path=const.TRAIN_DIR,
+    #                                     test_dir_path=const.TEST_DIR,
+    #                                     show_plot=False, save_plot=False)
+    # print("______________________________________________________________________________")
 
     # Load keras datasets
     train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,
@@ -78,30 +86,40 @@ if __name__ == '__main__':
     X_val, y_val = prepare.image_to_array(val_ds)
     X_test, y_test = prepare.image_to_array(test_ds)
 
-    # # NN Model Tuning
-    # nn_model = classifiers.build_nn_model
-    # tuned_nn_model = classifiers.tuning_hyperparameters(model=nn_model, model_name="NN", x_train=X_train,
-    #                                                     y_train=y_train, x_val=X_val, y_val=y_val)
-    # # NN KFold cross-validation
-    # kfold_nn_model = classifiers.kfold_cross_validation(model=tuned_nn_model, model_name="NN", x_train=X_train,
-    #                                                     y_train=y_train, x_val=X_val, y_val=y_val, k_folds=const.K_FOLD)
-    # # Evaluate NN model
-    # evaluate.evaluate_model(model=kfold_nn_model, model_name="NN", x_test=X_test, y_test=y_test)
+    # NN Model Tuning
+    nn_model = classifiers.build_nn_model
+    classifiers.tuning_hyperparameters(model=nn_model, model_name="NN",
+                                       x_train=X_train, y_train=y_train,
+                                       x_val=X_val, y_val=y_val)
+    # NN KFold cross-validation
+    kfold_nn_model = classifiers.kfold_cross_validation(model_name="NN",
+                                                        x_train=X_train, y_train=y_train,
+                                                        x_val=X_val, y_val=y_val,
+                                                        k_folds=const.K_FOLD)
+    # Evaluate NN model
+    evaluate.evaluate_model(model=kfold_nn_model, model_name="NN", x_test=X_test, y_test=y_test)
 
     # # MLP Model Tuning
     # mlp_model = classifiers.build_mlp_model
     # tuned_mlp_model = classifiers.tuning_hyperparameters(model=mlp_model, model_name="MLP", x_train=X_train,
     #                                                      y_train=y_train, x_val=X_val, y_val=y_val)
+    # # MLP KFold cross-validation
+    # kfold_mlp_model = classifiers.kfold_cross_validation(model=tuned_mlp_model, model_name="MLP", x_train=X_train,
+    #                                                      y_train=y_train, x_val=X_val, y_val=y_val,
+    #                                                      k_folds=const.K_FOLD)
     # # Evaluate MLP model
-    # evaluate.evaluate_model(model=tuned_mlp_model, model_name="MLP",
-    #                         x_test=X_test, y_test=y_test)
+    # evaluate.evaluate_model(model=kfold_mlp_model, model_name="MLP", x_test=X_test, y_test=y_test)
 
     # # CNN model tuning
     # cnn_model = classifiers.build_cnn_model
     # tuned_cnn_model = classifiers.tuning_hyperparameters(model=cnn_model, model_name="CNN", x_train=X_train,
     #                                                      y_train=y_train, x_val=X_val, y_val=y_val)
+    # # CNN KFold cross-validation
+    # kfold_cnn_model = classifiers.kfold_cross_validation(model=tuned_cnn_model, model_name="CNN", x_train=X_train,
+    #                                                      y_train=y_train, x_val=X_val, y_val=y_val,
+    #                                                      k_folds=const.K_FOLD)
     # # Evaluate CNN model
-    # evaluate.evaluate_model(model=tuned_cnn_model, model_name="CNN", x_test=X_test, y_test=y_test)
+    # evaluate.evaluate_model(model=kfold_cnn_model, model_name="CNN", x_test=X_test, y_test=y_test)
 
     # # MobileNet model tuning
     # mobilenet_model = classifiers.build_mobilenet_model
@@ -117,9 +135,14 @@ if __name__ == '__main__':
     # # Evaluate MobileNet model
     # evaluate.evaluate_model(model=kfold_mobilenet_model, model_name="MobileNet", x_test=X_test, y_test=y_test)
 
-    # # VGG-16 model tuning
+    # # VGG16 model tuning
     # vgg16_model = classifiers.build_vgg16_model
     # tuned_vgg16_model = classifiers.tuning_hyperparameters(model=vgg16_model, model_name="VGG16", x_train=X_train,
     #                                                        y_train=y_train, x_val=X_val, y_val=y_val)
-    # # Evaluate VGG-16 model
+    #
+    # # # VGG16 KFold cross-validation
+    # classifiers.kfold_cross_validation(model=tuned_vgg16_model, model_name="VGG16",
+    #                                    x_train=X_train, y_train=y_train, x_val=X_val, y_val=y_val,
+    #                                    k_folds=const.K_FOLD)
+    # # Evaluate VGG16 model
     # evaluate.evaluate_model(model=tuned_vgg16_model, model_name="VGG16", x_test=X_test, y_test=y_test)

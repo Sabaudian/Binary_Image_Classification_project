@@ -1,7 +1,9 @@
 # Import
 import os
+import pathlib
 import time
 import keras
+import keras_tuner
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -9,6 +11,7 @@ import keras_tuner as kt
 
 from IPython import display
 from keras import layers
+from keras import backend
 from keras.applications.vgg16 import VGG16
 from keras.applications.resnet50 import ResNet50
 from keras.applications.mobilenet import MobileNet
@@ -271,15 +274,24 @@ def build_mobilenet_model(hp):
 # Perform hyperparameter Tuning
 def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     """
-    Tuning the hyperparameters of the model in input.
-    :param model: Model in input.
-    :param model_name: String, name of the model.
+    Tuning the hyperparameters of the input model using Keras Tuner (kerastuner).
+    The function performs hyperparameter tuning using Keras Tuner's Hyperband algorithm.
+    It saves the best model, its hyperparameters, and training history in the "models" directory.
+
+    :param model: The Keras model to be tuned.
+    :param model_name: A string representing the name of the model.
     :param x_train: Input values of the training dataset.
     :param y_train: Target values of the training dataset.
     :param x_val: Input values of the validation dataset.
     :param y_val: Target values of the validation dataset.
-    :return: Trained model with tuned hyperparameter.
     """
+
+    # Create a directory for the best model
+    best_model_directory = os.path.join("models", model_name, "best_model")
+    general.makedir(best_model_directory)
+
+    # Best model filepath
+    file_path = os.path.join(best_model_directory, "best_model.h5")
 
     # Tuning model
     tuner = kt.Hyperband(
@@ -344,7 +356,9 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
 
     # Build the model with the optimal hyperparameters and train it on the data for 10 epochs
     print("\n> Build the model with the optimal hyperparameters and train it on the data for 10 epochs")
+
     optimal_hp_model = tuner.hypermodel.build(best_hyperparameters)
+
     history = optimal_hp_model.fit(
         x=x_train, y=y_train,
         epochs=10,
@@ -365,17 +379,17 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
         validation_data=(x_val, y_val)
     )
 
-    # Create a directory for the best model within the project directory
-    best_model_directory = os.path.join("models", model_name, "best_model")
-    # os.makedirs(best_model_directory, exist_ok=True)
-    general.makedir(best_model_directory)
+    # Serialize model to JSON
+    model_json = hypermodel.to_json()
+    with open(os.path.join(best_model_directory, "best_model.json"), "w") as json_file:
+        json_file.write(model_json)
+
     # Save the best model's weights to the created directory
-    hypermodel.save_weights(filepath=os.path.join(best_model_directory, "best_model"))
+    hypermodel.save_weights(filepath=file_path)
 
     # Plot history after tuning
     plot_functions.plot_history(history=hypermodel_history, model_name=model_name,
                                 show_on_screen=True, store_in_folder=True)
-    return hypermodel
 
 
 # # zero one loss
@@ -393,11 +407,10 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
 
 
 # KFold cross validation function
-def kfold_cross_validation(model, model_name, x_train, y_train, x_val, y_val, k_folds):
+def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     """
     Perform K-fold cross-validation on a Keras model using the zero-one loss.
 
-    :param model: Model in input.
     :param model_name: String, name of the model.
     :param x_train: Input values of the training dataset.
     :param y_train: Target values of the training dataset.
@@ -406,65 +419,114 @@ def kfold_cross_validation(model, model_name, x_train, y_train, x_val, y_val, k_
     :param k_folds: Number of folds for cross-validation.
     :return model: Model after performing KFold cross-validation.
     """
+    # Print about the model in input
+    print("\n> " + model_name + " KFold Cross-Validation:")
 
-    best_model_directory = os.path.join("models", model_name, "best_model")
-    model.load_weights(filepath=os.path.join(best_model_directory, "best_model"))
-
-    kfold = StratifiedKFold(n_splits=k_folds, shuffle=True, random_state=42)
-
-    fold_zero_one_loss = []
+    # Initialize lists to save data
+    fold_history = []
+    fold_loss = []
     fold_accuracy = []
+    fold_zero_one_loss = []
 
-    # Combine training and validation data for K-fold cross-validation
-    x_combined = np.concatenate((x_train, x_val), axis=0)
-    y_combined = np.concatenate((y_train, y_val), axis=0)
+    # Define the path for storing the models
+    dir_path = os.path.join("models", "KFold")
+    general.makedir(dir_path)
+    file_path = os.path.join(dir_path, model_name + "_kfold_model.h5")
 
-    for fold, (train_idx, val_idx) in enumerate(kfold.split(x_combined, y_combined)):
-        print(f"\nFold {fold + 1}/{k_folds}")
+    try:
+        model = keras.models.load_model(file_path)
+        print("-- Model Loaded Successfully!")
+    except (OSError, IOError):
 
-        # Create and compile a new instance of the model
-        model.compile(
-            optimizer=keras.optimizers.legacy.Adam(),
-            loss="binary_crossentropy",
-            metrics=["accuracy"]
-        )
+        # Path to the model directory
+        best_model_directory = os.path.join("models", model_name, "best_model")
 
-        # Train the model on the training set for this fold
-        kfold_history = model.fit(
-            x_combined[train_idx], y_combined[train_idx],
-            epochs=10,
-            validation_data=(x_combined[val_idx], y_combined[val_idx]),
-            verbose=1
-        )
+        # Load json and define model
+        json_file = open(os.path.join(best_model_directory, "model.json"), "r")
+        load_model_json = json_file.read()
+        json_file.close()
 
-        # Plot history after tuning
-        plot_functions.plot_history(history=kfold_history, model_name=model_name + f" fold {fold + 1}",
-                                    show_on_screen=True, store_in_folder=False)
+        # This is the structure of the best model obtained after tuning
+        model = keras.models.model_from_json(load_model_json)
 
-        # Evaluate the model on the validation set for this fold
-        predictions = model.predict(x_combined[val_idx])
-        zero_one_loss_value = zero_one_loss(y_combined[val_idx], np.argmax(predictions, axis=1))
+        # Load weight into the model, i.e., the best hyperparameters
+        model.load_weights(filepath=os.path.join(best_model_directory, "best_model.h5"))
+        print("-- Best Hyperparameters for " + model_name + " model have been Loaded Successfully!")
 
-        accuracy = model.evaluate(x_combined[val_idx], y_combined[val_idx])[1]
+        # KFold Cross-Validation function
+        kfold = KFold(n_splits=k_folds, shuffle=True, random_state=42)
 
-        # Print and store the results for this fold
-        print(f"Zero-One Loss: {zero_one_loss_value}, Validation Accuracy: {accuracy}")
-        fold_zero_one_loss.append(zero_one_loss_value)
-        fold_accuracy.append(accuracy)
+        # Combine training and validation data for K-fold cross-validation
+        x_combined = np.concatenate((x_train, x_val), axis=0)
+        y_combined = np.concatenate((y_train, y_val), axis=0)
 
-    # Calculate and print the mean and standard deviation of the evaluation metrics across folds
-    mean_zero_one_loss = np.mean(fold_zero_one_loss)
-    mean_accuracy = np.mean(fold_accuracy)
+        for fold, (train_idx, val_idx) in enumerate(kfold.split(x_combined, y_combined)):
+            print("\n> Fold {}/{}".format(fold + 1, k_folds))
 
-    print("\nMean Zero-One Loss:", mean_zero_one_loss)
-    print("Mean Accuracy:", mean_accuracy)
-    print("Standard Deviation Zero-One Loss:", np.std(fold_zero_one_loss))
-    print("Standard Deviation Accuracy:", np.std(fold_accuracy))
+            X_train, X_val = x_combined[train_idx], x_combined[val_idx]
+            Y_train, Y_val = y_combined[train_idx], y_combined[val_idx]
+
+            # Create and compile a new instance of the model
+            model.compile(
+                optimizer=keras.optimizers.legacy.Adam(),
+                loss="binary_crossentropy",
+                metrics=["accuracy"]
+            )
+
+            # Monitor "val_loss" and stop early if not improving
+            stop_early = keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
+
+            # Train the model on the training set for this fold
+            history = model.fit(
+                X_train, Y_train,
+                epochs=10,
+                validation_data=(X_val, Y_val),
+                callbacks=stop_early,
+                verbose=1
+            )
+
+            # # Plot history after tuning
+            # plot_functions.plot_history(history=history, model_name=model_name + f" Fold {fold + 1}",
+            #                             show_on_screen=False, store_in_folder=False)
+
+            # Evaluate the model on the validation set for this fold
+            y_predicts = model.predict(X_val)
+            predictions = (y_predicts > 0.5).astype("int")
+
+            val_zero_one_loss = zero_one_loss(Y_val, predictions)
+            val_loss, val_accuracy = model.evaluate(X_val, Y_val)
+
+            # Print and store the results for this fold
+            print("- Loss: {}\n"
+                  "- Accuracy: {}\n"
+                  "- Zero-one Loss: {}".format(val_loss, val_accuracy, val_zero_one_loss))
+            print("__________________________________________________________________________________________")
+
+            fold_loss.append(val_loss)
+            fold_accuracy.append(val_accuracy)
+            fold_history.append(history)
+            fold_zero_one_loss.append(val_zero_one_loss)
+
+        # Save the model to the path
+        model.save(file_path)
+
+    # # Calculate and print the mean and standard deviation of the evaluation metrics across folds
+    # mean_zero_one_loss = np.mean(fold_zero_one_loss)
+    # mean_loss = np.mean(fold_loss)
+    # mean_accuracy = np.mean(fold_accuracy)
+    # standard_deviation_zero_one_loss = np.std(fold_zero_one_loss)
+    # standard_deviation_loss = np.std(fold_loss)
+    # standard_deviation_accuracy = np.std(fold_accuracy)
+    #
+    # print("\n> " + model_name + " KFold data:")
+    # print("- Mean Zero-One Loss: {}".format(mean_zero_one_loss))
+    # print("- Mean Loss: {}".format(mean_loss))
+    # print("- Mean Accuracy: {}".format(mean_accuracy))
+    # print("- Standard Deviation Zero-One Loss: {}".format(standard_deviation_zero_one_loss))
+    # print("- Standard Deviation Loss: {}".format(standard_deviation_loss))
+    # print("- Standard Deviation Accuracy: {}".format(standard_deviation_accuracy))
 
     return model
-
-# FUNZIONE DA RICHIAMARE NEL MAIN
-# def classification_and_evaluation():
 
 
 # ******************************************** #
@@ -524,80 +586,3 @@ def kfold_cross_validation(model, model_name, x_train, y_train, x_val, y_val, k_
 #     # # Save dictionary as file .csv
 #     # df = pd.DataFrame.from_dict(dictionary)
 #     # df.to_csv("data/" + model_name + "_model_simple_loss_accuracy_eval.csv", index=False, float_format="%.3f")
-#
-#
-# def compute_evaluation_metrics(model, model_name, x_test, y_test):
-#     """
-#     Get the classification report about the model in input.
-#     :param model: Model in input.
-#     :param model_name: Name of the model.
-#     :param x_test: Input values of the test dataset.
-#     :param y_test: Target values of the test dataset.
-#     :return: The Classification Report Dataframe of the model
-#     """
-#     # Predict the target vector
-#     predict = model.predict(x_test)
-#
-#     # Convert the predictions to binary classes (0 or 1)
-#     predictions = (predict >= 0.5).astype(int)
-#     predictions = predictions.flatten()
-#
-#     # Compute report
-#     clf_report = classification_report(y_test, predictions, target_names=const.CLASS_LIST, digits=2, output_dict=True)
-#
-#     # Update so in df is shown in the same way as standard print
-#     clf_report.update({"accuracy": {"precision": None, "recall": None, "f1-score": clf_report["accuracy"],
-#                                     "support": clf_report.get("macro avg")["support"]}})
-#     df = pd.DataFrame(clf_report).transpose()
-#
-#     # Print report
-#     print("\n> Classification Report:")
-#     display.display(df)
-#     print("\n")
-#
-#     # Save the report
-#     general.makedir(const.DATA_PATH + "/" + const.REPORT_PATH)
-#     df.to_csv(const.DATA_PATH + "/" + const.REPORT_PATH + "/" + model_name + "_classification_report.csv",
-#               index=True, float_format="%.2f")
-#     return df
-#
-#
-# # Model evaluation with extrapolation of data and information plot
-# def evaluate_model(model, model_name, x_train, y_train, x_val, y_val, x_test, y_test, test_dataset):
-#     """
-#     Evaluate the Performance of the model on the test set.
-#     :param model: The model in input.
-#     :param model_name: Name of the model.
-#     :param x_train: Input values of the training dataset.
-#     :param y_train: Target values of the training dataset.
-#     :param x_val: Input values of the validation dataset.
-#     :param y_val: Target values of the validation dataset.
-#     :param x_test: Input values of the test dataset.
-#     :param y_test: Target values of the test dataset.
-#     :param test_dataset: Raw keras dataset (tf.keras.utils.image_dataset_from_directory).
-#     """
-#
-#     # Evaluate the model
-#     print("\n> " + model_name + " Model Evaluation:")
-#
-#     # Compute a simple evaluation report on the model performances
-#     accuracy_loss_model_dict(model=model, model_name=model_name,
-#                              x_train=x_train, y_train=y_train,
-#                              x_val=x_val, y_val=y_val,
-#                              x_test=x_test, y_test=y_test)
-#
-#     # Compute the classification_report of the model
-#     compute_evaluation_metrics(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
-#
-#     # Plot Confusion Matrix
-#     plot_functions.plot_confusion_matrix(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-#                                          show_on_screen=True, store_in_folder=True)
-#
-#     # Plot a representation of the prediction
-#     plot_functions.plot_predictions_evaluation(model=model, model_name=model_name,
-#                                                class_list=const.CLASS_LIST, x_test=x_test, y_test=y_test,
-#                                                show_on_screen=True, store_in_folder=True)
-#
-#     # Plot a visual representation of the classification model, predicting classes
-#     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, test_dataset=test_dataset,
-#                                           show_on_screen=True, store_in_folder=True)

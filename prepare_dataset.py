@@ -76,7 +76,7 @@ def image_to_array(tf_dataset):
     :return: X (Input values), y (target values)
     """
     X_array = []  # store images
-    y_array = []  # store labels
+    y_array = []  # store class labels
 
     for image, label in tf_dataset.unbatch().map(lambda x, y: (x, y)):
         X_array.append(image)

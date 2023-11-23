@@ -1,7 +1,5 @@
 # Import
 import os
-
-import matplotlib
 # import random
 import numpy as np
 import pandas as pd
@@ -103,31 +101,6 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
         plot_name="class_distribution_plot",
         plot_extension=const.FILE_EXTENSION
     )
-
-
-# # Plot the value's distribution of the images in the dataset
-# def plot_img_aspect_ratio(image_metadata, show_on_screen=True, store_in_folder=True):
-#     """
-#     Value's distribution of the images in the dataset
-#
-#     :param image_metadata: Metadata information collected from images in the dataset.
-#     :param show_on_screen: Boolean value, if True, shows the plot.
-#     :param store_in_folder: Boolean value, if True, saves the plot.
-#     """
-#     # Initialize value
-#     width, height, label = image_metadata["width"], image_metadata["height"], image_metadata["label"]
-#
-#     # plot the image
-#     plt.subplots(figsize=(16, 8))
-#     sns.scatterplot(x=width, y=height, hue=label)
-#
-#     # Show and/or store the plot
-#     show_and_save_plot(
-#         show=show_on_screen, save=store_in_folder,
-#         plot_folder=const.PLOT_FOLDER,
-#         plot_name="img_aspect_ratio_plot",
-#         plot_extension=const.FILE_EXTENSION
-#     )
 
 
 # Plot some images with the corresponding class label
@@ -256,7 +229,7 @@ def plot_history(history, model_name, show_on_screen=True, store_in_folder=True)
     plt.subplot(1, 2, 1)
     plt.plot(history.history["accuracy"], linewidth=3)
     plt.plot(history.history["val_accuracy"], linewidth=3)
-    plt.title(label="Training and Validation accuracy", fontsize=16)
+    plt.title(label="Training and Validation Accuracy", fontsize=16)
     plt.ylabel(ylabel="accuracy", fontsize=14)
     plt.xlabel(xlabel="epoch", fontsize=14)
     plt.grid()
@@ -266,7 +239,7 @@ def plot_history(history, model_name, show_on_screen=True, store_in_folder=True)
     plt.subplot(1, 2, 2)
     plt.plot(history.history["loss"], linewidth=3)
     plt.plot(history.history["val_loss"], linewidth=3)
-    plt.title(label="Training and Validation  Loss", fontsize=16)
+    plt.title(label="Training and Validation Loss", fontsize=16)
     plt.ylabel(ylabel="Loss", fontsize=14)
     plt.xlabel(xlabel="epoch", fontsize=14)
     plt.grid()
@@ -285,6 +258,7 @@ def plot_history(history, model_name, show_on_screen=True, store_in_folder=True)
 def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True, store_in_folder=True):
     """
     Plot the Confusion Matrix.
+
     :param model: The model.
     :param model_name: Name assigned to the model.
     :param x_test: Input values of the test dataset.
@@ -292,12 +266,12 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     :param show_on_screen: Boolean value, if True, shows the plot.
     :param store_in_folder: Boolean value, if True, saves the plot.
     """
-
     # Predict
     predicts = model.predict(x_test)
+
     # Convert the predictions to binary classes (0 or 1)
-    predicted_classes = (predicts >= 0.5).astype(int)
-    predicted_classes = predicted_classes.flatten()
+    predicted_classes = (predicts >= 0.5).astype("int")
+    # predicted_classes = predicted_classes.flatten()
 
     # Plot settings
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -348,8 +322,8 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
     predicts = model.predict(x_test)
 
     # Convert the predictions to binary classes (0 or 1)
-    predicted_classes = (predicts >= 0.5).astype(int)
-    predicted_classes = predicted_classes.flatten()
+    predicted_classes = (predicts >= 0.5).astype("int")
+    # predicted_classes = predicted_classes.flatten()
 
     # Classes
     classes = {i: const.CLASS_LIST[i] for i in range(0, len(const.CLASS_LIST))}
@@ -423,8 +397,8 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
     predicts = model.predict(x_test)
 
     # Convert the predictions to binary classes (0 or 1)
-    predicted_classes = (predicts >= 0.5).astype(int)
-    predicted_classes = predicted_classes.flatten()
+    predicted_classes = (predicts >= 0.5).astype("int")
+    # predicted_classes = predicted_classes.flatten()
 
     # Assign class name to class indices (chihuahua = 0, muffin = 1)
     predicted_class_labels = ["chihuahua" if pred_label == 0 else "muffin" for pred_label in predicted_classes]
@@ -469,6 +443,7 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         plot_name=model_name + "_visual_prediction_plot",
         plot_extension=const.FILE_EXTENSION
     )
+
 
 # # Plot test images with prediction
 # def plot_visual_prediction(model, model_name, test_dataset, show_on_screen=True, store_in_folder=True):
@@ -528,3 +503,51 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
 #         plot_name=model_name + "_visual_prediction_plot",
 #         plot_extension=const.FILE_EXTENSION
 #     )
+
+
+# Plot the training history for each fold in kfold cross validation
+def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_folder=True):
+    """
+
+    :param fold_history:
+    :param model_name:
+    :param show_on_screen:
+    :param store_in_folder:
+    :return:
+    """
+    # Plot the training history for each fold
+    for fold in range(len(fold_history)):
+
+        # Plot size
+        plt.figure(figsize=(16, 8))
+
+        # Add a title to the entire plot
+        plt.suptitle("{} Fold {} Training History".format(model_name, fold + 1), fontsize=18)
+
+        # Accuracy
+        plt.subplot(1, 2, 1)
+        plt.plot(fold_history[fold].history["accuracy"], linewidth=3)
+        plt.plot(fold_history[fold].history["val_accuracy"], linewidth=3)
+        plt.title(label="Training and Validation Accuracy", fontsize=16)
+        plt.ylabel(ylabel="accuracy", fontsize=14)
+        plt.xlabel(xlabel="epoch", fontsize=14)
+        plt.grid()
+        plt.legend(["Train", "Validation"], loc="best")
+
+        # Loss
+        plt.subplot(1, 2, 2)
+        plt.plot(fold_history[fold].fold_history["loss"], linewidth=3)
+        plt.plot(fold_history[fold].history["val_loss"], linewidth=3)
+        plt.title(label="Training and Validation Loss", fontsize=16)
+        plt.ylabel(ylabel="Loss", fontsize=14)
+        plt.xlabel(xlabel="epoch", fontsize=14)
+        plt.grid()
+        plt.legend(["Train", "Validation"], loc="best")
+
+        # Show and store the plot
+        show_and_save_plot(
+            show=show_on_screen, save=store_in_folder,
+            plot_folder=os.path.join(const.PLOT_FOLDER, "KFold", model_name),
+            plot_name=model_name + "_fold_" + f"{fold}_training_history_plot",
+            plot_extension=const.FILE_EXTENSION
+        )

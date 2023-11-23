@@ -23,46 +23,46 @@ def makedir(dirpath):
     """
     # check if dir exists
     if not os.path.exists(dirpath):
-        os.makedirs(dirpath)
+        os.makedirs(dirpath, exist_ok=True)
         print("\n> Directory [{}] has been created successfully!\n".format(dirpath))
 
 
-# Return text as int if possible, or "text" unchanged
-def convert(data):
-    """
-    Convert text into integer if possible
-
-    :param data: input data
-
-    :return: integer data, else data unchanged
-    """
-    return int(data) if data.isdigit() else data
-
-
-# Turn a string into a list of strings and number chunks.
-def alphanum_key(data):
-    """
-    Transform a string into a list of strings and number chunks
-
-    :param data: input data
-
-    :return: transformed data string
-    """
-    return [convert(c.replace("_", "")) for c in re.split("([0-9]+)", data)]
-
-
-# Sort filenames as expected
-def sort_files(file):
-    """
-    Sorting file as expected by human observer
-
-    :param file: input file
-
-    Example: img_file_0001, img_file_0002, ..., img_file_NNNN
-    """
-    # convert = lambda text: int(text) if text.isdigit() else text
-    # alphanum_key = lambda key: [convert(c.replace("_", "")) for c in re.split("([0-9]+)", key)]
-    file.sort(key=alphanum_key)
+# # Return text as int if possible, or "text" unchanged
+# def convert(data):
+#     """
+#     Convert text into integer if possible
+#
+#     :param data: input data
+#
+#     :return: integer data, else data unchanged
+#     """
+#     return int(data) if data.isdigit() else data
+#
+#
+# # Turn a string into a list of strings and number chunks.
+# def alphanum_key(data):
+#     """
+#     Transform a string into a list of strings and number chunks
+#
+#     :param data: input data
+#
+#     :return: transformed data string
+#     """
+#     return [convert(c.replace("_", "")) for c in re.split("([0-9]+)", data)]
+#
+#
+# # Sort filenames as expected
+# def sort_files(file):
+#     """
+#     Sorting file as expected by human observer
+#
+#     :param file: input file
+#
+#     Example: img_file_0001, img_file_0002, ..., img_file_NNNN
+#     """
+#     # convert = lambda text: int(text) if text.isdigit() else text
+#     # alphanum_key = lambda key: [convert(c.replace("_", "")) for c in re.split("([0-9]+)", key)]
+#     file.sort(key=alphanum_key)
 
 
 # # Count files given a path
