@@ -1,10 +1,11 @@
 # Import
 import os
+import numpy as np
 import pandas as pd
 
 from IPython import display
-from sklearn.metrics import zero_one_loss
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score, log_loss, zero_one_loss
+from sklearn.metrics import precision_recall_curve
 
 # My import
 import plot_functions
@@ -31,14 +32,13 @@ def accuracy_loss_model(model, x_test, y_test):
     test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test)
 
     predict = model.predict(x_test)
-    y_pred = (predict > 0.5).astype("int")
+    y_pred = (predict >= 0.5).astype("int32")
     test_zero_one_loss = zero_one_loss(y_test, y_pred)
 
     # Print evaluation info. about the model
-    print("\n- Test Loss: {:.2f}%"
-          "\n- Test Accuracy: {:.2f}%"
-          "\n- Test Zero-one Loss: {:.2f}%\n"
-          .format(test_loss * 100, test_accuracy * 100, test_zero_one_loss * 100))
+    print("\n- Test Loss: {:.4f}".format(test_loss))
+    print("- Test Accuracy: {:.4f}%".format(test_accuracy * 100))
+    print("- Teso zero-one loss: {:.4f}\n".format(test_zero_one_loss))
 
 
 def compute_evaluation_metrics(model, model_name, x_test, y_test):
@@ -51,14 +51,12 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
     :return: The Classification Report Dataframe of the model
     """
     # Predict
-    y_predicts = model.predict(x_test)
-
+    predict = model.predict(x_test)
     # Convert the predictions to binary classes (0 or 1)
-    predictions = (y_predicts > 0.5).astype("int")
-    # predictions = predictions.flatten()
+    y_pred = (predict >= 0.5).astype("int32")
 
     # Compute report
-    clf_report = classification_report(y_test, predictions, target_names=const.CLASS_LIST, digits=2, output_dict=True)
+    clf_report = classification_report(y_test, y_pred, target_names=const.CLASS_LIST, digits=2, output_dict=True)
 
     # Update so in df is shown in the same way as standard print
     clf_report.update({"accuracy": {"precision": None, "recall": None, "f1-score": clf_report["accuracy"],
@@ -99,13 +97,13 @@ def evaluate_model(model, model_name, x_test, y_test):
 
     # Plot Confusion Matrix
     plot_functions.plot_confusion_matrix(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                         show_on_screen=True, store_in_folder=False)
+                                         show_on_screen=True, store_in_folder=True)
 
     # Plot a representation of the prediction
     plot_functions.plot_model_predictions_evaluation(model=model, model_name=model_name, class_list=const.CLASS_LIST,
                                                      x_test=x_test, y_test=y_test,
-                                                     show_on_screen=True, store_in_folder=False)
+                                                     show_on_screen=True, store_in_folder=True)
 
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                          show_on_screen=True, store_in_folder=False)
+                                          show_on_screen=True, store_in_folder=True)

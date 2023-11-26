@@ -1,29 +1,24 @@
 # Import
 import os
-import pathlib
 import time
 import keras
-import keras_tuner
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import keras_tuner as kt
 
-from IPython import display
 from keras import layers
-from keras import backend
 from keras.applications.vgg16 import VGG16
-from keras.applications.resnet50 import ResNet50
 from keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
 from sklearn.metrics import zero_one_loss
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import accuracy_score, classification_report, f1_score, mean_squared_error
 
 # My import
 import plot_functions
+import models_evaluation
 import constants as const
+import prepare_dataset as prepare
 import utils.general_functions as general
 
 
@@ -92,10 +87,10 @@ def build_mlp_model(hp):
     model.add(layers.Flatten(input_shape=const.INPUT_SHAPE))
 
     for i in range(1, 6):
-        units = hp.Int(f"units_{i}", min_value=32, max_value=1024, step=32)
+        units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
         model.add(layers.Dense(units=units, activation="relu", name=f"hidden_layer_{i}"))
         model.add(layers.BatchNormalization())
-        model.add(layers.Dropout(0.3))
+        model.add(layers.Dropout(0.25))
 
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
 
@@ -138,16 +133,20 @@ def build_cnn_model(hp):
     model.add(layers.BatchNormalization())
     # MaxPooling layer to reduce spatial dimensions
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_1"))
+    # Add dropout for regularization to prevent overfitting
+    model.add(layers.Dropout(0.25))
 
     # Convolutional layer with 64 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_2"))
     model.add(layers.BatchNormalization())
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_2"))
+    model.add(layers.Dropout(0.25))
 
     # Convolutional layer with 128 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_3"))
     model.add(layers.BatchNormalization())
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_3"))
+    model.add(layers.Dropout(0.25))
 
     # Flatten layer to transition from convolutional layers to dense layer
     model.add(layers.Flatten(name="flatten"))
@@ -155,8 +154,6 @@ def build_cnn_model(hp):
     # Tune the number of units in the dense layer
     hp_units = hp.Int("units", min_value=32, max_value=512, step=32)
     model.add(layers.Dense(units=hp_units, activation="relu", name="hidden_layer"))
-
-    # Add dropout for regularization to prevent overfitting
     model.add(layers.Dropout(0.5))
 
     # Output layer with sigmoid activation for binary classification
@@ -271,6 +268,44 @@ def build_mobilenet_model(hp):
     return model
 
 
+# Organize models in a dictionary
+def get_classifier():
+    """
+    Retrieves a dictionary of pre-built classification models.
+
+    :return: A dictionary containing the following classification models:
+             - 'NN': Neural Network model
+             - 'MLP': Multi-layer Perceptron model
+             - 'CNN': Convolutional Neural Network model
+             - 'MobileNet': MobileNet model
+    :rtype: dict
+    """
+    # models dictionary
+    models = {"NN": [], "MLP": [], "CNN": [], "MobileNet": []}
+
+    # Neural Network model
+    nn_model = build_nn_model
+    models.update({"NN": nn_model})
+
+    # Multi-layer Perceptron model
+    mlp_model = build_mlp_model
+    models.update({"MLP": mlp_model})
+
+    # Convolutional Neural Network model
+    cnn_model = build_cnn_model
+    models.update({"CNN": cnn_model})
+
+    # MobileNet model
+    mobilenet_model = build_mobilenet_model
+    models.update({"MobileNet": mobilenet_model})
+
+    # # MobileNet model
+    # vgg16_model = build_vgg16_model
+    # models.update({"VGG16": vgg16_model})
+
+    return models
+
+
 # Perform hyperparameter Tuning
 def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     """
@@ -285,6 +320,8 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     :param x_val: Input values of the validation dataset.
     :param y_val: Target values of the validation dataset.
     """
+    # Print about the model in input
+    print("\n> " + model_name + " Tuning Hyperparameters:")
 
     # Create a directory for the best model
     best_model_directory = os.path.join("models", model_name, "best_model")
@@ -433,16 +470,17 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     general.makedir(dir_path)
     file_path = os.path.join(dir_path, model_name + "_kfold_model.h5")
 
-    try:
+    # Load model if exist and evaluate it
+    if os.path.exists(file_path):
         model = keras.models.load_model(file_path)
-        print("-- Model Loaded Successfully!")
-    except (OSError, IOError):
+        print("- Model Loaded Successfully!")
+    else:
 
         # Path to the model directory
         best_model_directory = os.path.join("models", model_name, "best_model")
 
         # Load json and define model
-        json_file = open(os.path.join(best_model_directory, "model.json"), "r")
+        json_file = open(os.path.join(best_model_directory, "best_model.json"), "r")
         load_model_json = json_file.read()
         json_file.close()
 
@@ -457,43 +495,36 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         kfold = KFold(n_splits=k_folds, shuffle=True, random_state=42)
 
         # Combine training and validation data for K-fold cross-validation
-        x_combined = np.concatenate((x_train, x_val), axis=0)
-        y_combined = np.concatenate((y_train, y_val), axis=0)
+        X = np.concatenate((x_train, x_val), axis=0)
+        Y = np.concatenate((y_train, y_val), axis=0)
 
-        for fold, (train_idx, val_idx) in enumerate(kfold.split(x_combined, y_combined)):
+        for fold, (train_idx, val_idx) in enumerate(kfold.split(X)):
             print("\n> Fold {}/{}".format(fold + 1, k_folds))
 
-            X_train, X_val = x_combined[train_idx], x_combined[val_idx]
-            Y_train, Y_val = y_combined[train_idx], y_combined[val_idx]
+            X_train, X_val = X[train_idx], X[val_idx]
+            Y_train, Y_val = Y[train_idx], Y[val_idx]
 
             # Create and compile a new instance of the model
             model.compile(
-                optimizer=keras.optimizers.legacy.Adam(),
+                optimizer="adam",
                 loss="binary_crossentropy",
                 metrics=["accuracy"]
             )
-
-            # Monitor "val_loss" and stop early if not improving
-            stop_early = keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
 
             # Train the model on the training set for this fold
             history = model.fit(
                 X_train, Y_train,
                 epochs=10,
                 validation_data=(X_val, Y_val),
-                callbacks=stop_early,
                 verbose=1
             )
 
-            # # Plot history after tuning
-            # plot_functions.plot_history(history=history, model_name=model_name + f" Fold {fold + 1}",
-            #                             show_on_screen=False, store_in_folder=False)
-
             # Evaluate the model on the validation set for this fold
-            y_predicts = model.predict(X_val)
-            predictions = (y_predicts > 0.5).astype("int")
+            predict = model.predict(X_val)
+            y_pred = (predict >= 0.5).astype("int32")
 
-            val_zero_one_loss = zero_one_loss(Y_val, predictions)
+            # Compute Zero-one loss and Evaluation
+            val_zero_one_loss = zero_one_loss(Y_val, y_pred)
             val_loss, val_accuracy = model.evaluate(X_val, Y_val)
 
             # Print and store the results for this fold
@@ -502,10 +533,15 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
                   "- Zero-one Loss: {}".format(val_loss, val_accuracy, val_zero_one_loss))
             print("__________________________________________________________________________________________")
 
+            # append values
             fold_loss.append(val_loss)
             fold_accuracy.append(val_accuracy)
             fold_history.append(history)
             fold_zero_one_loss.append(val_zero_one_loss)
+
+        # Plot fold history
+        plot_functions.plot_fold_history(fold_history=fold_history, model_name=model_name,
+                                         show_on_screen=False, store_in_folder=True)
 
         # Save the model to the path
         model.save(file_path)
@@ -529,60 +565,135 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     return model
 
 
-# ******************************************** #
-# ************* MODEL EVALUATION ************* #
-# ******************************************** #
+# Organize the various procedures
+def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_test, y_test, kfold):
+    """
+    Tune hyperparameters for a dictionary of classification models,
+    apply KFold cross-validation and then evaluate the various models
+
+    :param models: A dictionary containing classification models.
+    :param x_train: Training data features.
+    :param y_train: Training data labels.
+    :param x_val: Validation data features.
+    :param y_val: Validation data labels.
+    :param x_test: Test data features.
+    :param y_test: Test data labels.
+    :param kfold: Number of folds for k-fold cross-validation (default is 5).
+    """
+
+    # Scroll through the dictionary
+    for key, value in models.items():
+        # NN, MLP, CNN and MobileNet
+        model_name = key
+        # Model build
+        model_type = value
+
+        # Best model folder path
+        tuned_model_folder = os.path.join("models", model_name, "best_model")
+        # Best model filepath
+        tuned_file_path = os.path.join(tuned_model_folder, "best_model.h5")
+
+        if not os.path.exists(tuned_file_path):
+            # Tuning Hyperparameters
+            tuning_hyperparameters(model=model_type, model_name=model_name,
+                                   x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
+
+        # Apply Kfold Cross-validation
+        result = kfold_cross_validation(model_name=model_name,
+                                        x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, k_folds=kfold)
+        # Evaluation
+        models_evaluation.evaluate_model(model=result, model_name=model_name, x_test=x_test, y_test=y_test)
 
 
-# def accuracy_loss_model_dict(model, model_name, x_train, y_train, x_val, y_val, x_test, y_test):
-#     """
-#     Compute a simple evaluation of the model,
-#     printing and saving the loss and accuracy for the train, val and test set.
-#     The data are saved as a CSV file.
-#     :param model: Model in input.
-#     :param model_name: Name of the model in input.
-#     :param x_train: Input values of the train dataset.
-#     :param y_train: Target values of the train dataset.
-#     :param x_val: Input values of the val dataset.
-#     :param y_val: Target values of the val dataset.
-#     :param x_test: Input values of the test dataset.
-#     :param y_test: Target values of the test dataset.
-#     """
-#     # Compute loss and accuracy
-#     train_loss, train_accuracy = model.evaluate(x=x_train, y=y_train, verbose=0)
-#     val_loss, val_accuracy = model.evaluate(x=x_val, y=y_val, verbose=0)
-#     test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test, verbose=0)
-#
-#     # Print evaluation info. about the model
-#     print("\t- Train Loss: {:.3f}%"
-#           "\n\t- Train Accuracy: {:.3f}%"
-#           "\n\t- Val Loss: {:.3f}%"
-#           "\n\t- Val Accuracy: {:.3f}%"
-#           "\n\t- Test Loss: {:.3f}%"
-#           "\n\t- Test Accuracy: {:.3f}%\n"
-#           .format(train_loss * 100, train_accuracy * 100, val_loss * 100,
-#                   val_accuracy * 100, test_loss * 100, test_accuracy * 100))
-#
-#     # declare dictionary for saving evaluation data about the model in input
-#     dictionary = {
-#         "Train_Loss": [],
-#         "Train_Accuracy": [],
-#         "Val_Loss": [],
-#         "Val_Accuracy": [],
-#         "Test_Loss": [],
-#         "Test_Accuracy": []
-#     }
-#
-#     # Save information into a csv file
-#     dictionary.update({
-#         "Train_Loss": [train_loss],
-#         "Train_Accuracy": [train_accuracy],
-#         "Val_Loss": [val_loss],
-#         "Val_Accuracy": [val_accuracy],
-#         "Test_Loss": [test_loss],
-#         "Test_Accuracy": [test_accuracy],
-#     })
-#
-#     # # Save dictionary as file .csv
-#     # df = pd.DataFrame.from_dict(dictionary)
-#     # df.to_csv("data/" + model_name + "_model_simple_loss_accuracy_eval.csv", index=False, float_format="%.3f")
+# To be called in the main
+def classification_and_evaluation(train_path, test_path):
+    # Load keras datasets
+    train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=train_path,
+                                                                    test_data_dir=test_path)
+
+    # Printing information about the datasets
+    print("\n> Class Names:"
+          "\n\t- classe 0 = {}"
+          "\n\t- classe 1 = {}".format(train_dataset.class_names[0], train_dataset.class_names[1]) +
+          "\n> Type specification:\n\t- {}\n".format(train_dataset.element_spec))
+
+    # Visualize the dataset showing some images with corresponding labels
+    plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=False, store_in_folder=False)
+
+    # Scaling data
+    train_ds = prepare.data_normalization(tf_dataset=train_dataset, augment=True)
+    val_ds = prepare.data_normalization(tf_dataset=val_dataset, augment=False)
+    test_ds = prepare.data_normalization(tf_dataset=test_dataset, augment=False)
+
+    # Visualize the data_augmentation process effect
+    plot_functions.plot_data_augmentation(train_ds=train_dataset, data_augmentation=prepare.perform_data_augmentation(),
+                                          show_on_screen=False, store_in_folder=True)
+
+    # test con array
+    X_train, y_train = prepare.image_to_array(train_ds)
+    X_val, y_val = prepare.image_to_array(val_ds)
+    X_test, y_test = prepare.image_to_array(test_ds)
+
+    # Get the classification models
+    classification_models = get_classifier()
+
+    # Tuning, apply KFold and then evaluate the models
+    classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
+                                      y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.K_FOLD)
+
+    # ******************************************** #
+    # ************* MODEL EVALUATION ************* #
+    # ******************************************** #
+
+    # def accuracy_loss_model_dict(model, model_name, x_train, y_train, x_val, y_val, x_test, y_test):
+    #     """
+    #     Compute a simple evaluation of the model,
+    #     printing and saving the loss and accuracy for the train, val and test set.
+    #     The data are saved as a CSV file.
+    #     :param model: Model in input.
+    #     :param model_name: Name of the model in input.
+    #     :param x_train: Input values of the train dataset.
+    #     :param y_train: Target values of the train dataset.
+    #     :param x_val: Input values of the val dataset.
+    #     :param y_val: Target values of the val dataset.
+    #     :param x_test: Input values of the test dataset.
+    #     :param y_test: Target values of the test dataset.
+    #     """
+    #     # Compute loss and accuracy
+    #     train_loss, train_accuracy = model.evaluate(x=x_train, y=y_train, verbose=0)
+    #     val_loss, val_accuracy = model.evaluate(x=x_val, y=y_val, verbose=0)
+    #     test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test, verbose=0)
+    #
+    #     # Print evaluation info. about the model
+    #     print("\t- Train Loss: {:.3f}%"
+    #           "\n\t- Train Accuracy: {:.3f}%"
+    #           "\n\t- Val Loss: {:.3f}%"
+    #           "\n\t- Val Accuracy: {:.3f}%"
+    #           "\n\t- Test Loss: {:.3f}%"
+    #           "\n\t- Test Accuracy: {:.3f}%\n"
+    #           .format(train_loss * 100, train_accuracy * 100, val_loss * 100,
+    #                   val_accuracy * 100, test_loss * 100, test_accuracy * 100))
+    #
+    #     # declare dictionary for saving evaluation data about the model in input
+    #     dictionary = {
+    #         "Train_Loss": [],
+    #         "Train_Accuracy": [],
+    #         "Val_Loss": [],
+    #         "Val_Accuracy": [],
+    #         "Test_Loss": [],
+    #         "Test_Accuracy": []
+    #     }
+    #
+    #     # Save information into a csv file
+    #     dictionary.update({
+    #         "Train_Loss": [train_loss],
+    #         "Train_Accuracy": [train_accuracy],
+    #         "Val_Loss": [val_loss],
+    #         "Val_Accuracy": [val_accuracy],
+    #         "Test_Loss": [test_loss],
+    #         "Test_Accuracy": [test_accuracy],
+    #     })
+    #
+    #     # # Save dictionary as file .csv
+    #     # df = pd.DataFrame.from_dict(dictionary)
+    #     # df.to_csv("data/" + model_name + "_model_simple_loss_accuracy_eval.csv", index=False, float_format="%.3f")

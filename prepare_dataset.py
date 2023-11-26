@@ -6,12 +6,13 @@ import tensorflow as tf
 # My import
 import constants as const
 
-# Perform data augmentation
-data_augmentation = keras.Sequential([
-    keras.layers.RandomFlip("horizontal"),
-    keras.layers.RandomRotation(0.1),
-    keras.layers.RandomZoom(0.1),
-])
+
+# # Perform data augmentation
+# data_augmentation = keras.Sequential([
+#     keras.layers.RandomFlip("horizontal"),
+#     keras.layers.RandomRotation(0.1),
+#     keras.layers.RandomZoom(0.1),
+# ])
 
 
 # load data into keras dataset
@@ -22,7 +23,7 @@ def load_dataset(train_data_dir, test_data_dir):
     :param test_data_dir: the path to the test data
     :return: tf.Dataset.data object
     """
-    # train dataset
+    # train and validation dataset
     print("\n> Training and Validation: ")
     train_ks_dataset, val_ks_dataset = tf.keras.utils.image_dataset_from_directory(
         train_data_dir,
@@ -41,16 +42,43 @@ def load_dataset(train_data_dir, test_data_dir):
         test_data_dir,
         batch_size=const.BATCH_SIZE,
         image_size=const.IMG_SIZE,
-        shuffle=True,
+        shuffle=False,
     )
     return train_ks_dataset, val_ks_dataset, test_ks_dataset
+
+
+# Data Augmentation
+def perform_data_augmentation():
+    """
+    Performs data augmentation using Keras Sequential model with specific layers.
+
+    :return: Keras Sequential model representing the data augmentation operations.
+    :rtype: tensorflow.keras.Sequential
+
+    - RandomFlip: str, Specifies the type of random flip to be applied.
+
+    - RandomRotation: float, Specifies the maximum angle of rotation in degrees.
+
+    - RandomZoom: float, Specifies the maximum zoom factor.
+    """
+    # Perform data augmentation
+    data_augmentation = keras.Sequential([
+        keras.layers.RandomFlip("horizontal"),
+        keras.layers.RandomRotation(0.1),
+        keras.layers.RandomZoom(0.2),
+    ])
+
+    return data_augmentation
 
 
 def data_normalization(tf_dataset, augment):
     """
     Scale the keras dataset and perform prefetch.
+    Apply also data augmentation on the training set.
+
     :param tf_dataset: tf.Dataset.data object.
     :param augment: Boolean value, if True, performs data augmentation on dataset.
+
     :return: tf.Dataset.data object.
     """
     # Standardize the data
@@ -59,21 +87,23 @@ def data_normalization(tf_dataset, augment):
 
     # Use data augmentation only on the training set.
     if augment:
+        data_augmentation = perform_data_augmentation()
         ds = ds.map(lambda x, y: (data_augmentation(x), y))
 
     # Configure the dataset for performance
     AUTOTUNE = tf.data.AUTOTUNE
     ds = ds.prefetch(buffer_size=AUTOTUNE)
-    # ds = ds.cache().prefetch(buffer_size=AUTOTUNE)
 
     return ds
 
 
 def image_to_array(tf_dataset):
     """
-    Transform a Tensorflow dataset object into a split array form
-    :param tf_dataset: tf.Dataset.data object
-    :return: X (Input values), y (target values)
+    Transform a Tensorflow dataset object into a split array form.
+
+    :param tf_dataset: tf.Dataset.data object.
+
+    :return: X (Input values), y (target values).
     """
     X_array = []  # store images
     y_array = []  # store class labels
@@ -86,25 +116,3 @@ def image_to_array(tf_dataset):
     y_array = np.array(y_array)
 
     return X_array, y_array
-
-# # Test Main
-# if __name__ == '__main__':
-#     train_ks_ds, val_ks_ds, test_ks_ds = load_dataset(train_data_dir=const.TRAIN_DIR,
-#                                                       test_data_dir=const.TEST_DIR)
-#
-#     plot_functions.plot_data_visualization(train_ds=train_ks_ds, show_on_screen=True, store_in_folder=True)
-#
-#     data_augmentation = Sequential([
-#         layers.RandomFlip("horizontal"),
-#         layers.RandomRotation(0.1),
-#         layers.RandomZoom(0.1),
-#     ])
-#
-#     plot_functions.plot_data_augmentation(train_ds=train_ks_ds, data_augmentation=data_augmentation,
-#                                           show_on_screen=True, store_in_folder=True)
-#
-#     X_train = np.asarray(list(train_ds.map(lambda x, y: x)))
-#     y_train = np.asarray(list(train_ds.map(lambda x, y: y)))
-#
-#     X_val = np.asarray(list(val_ds.map(lambda x, y: x)))
-#     y_val = np.asarray(list(val_ds.map(lambda x, y: y)))

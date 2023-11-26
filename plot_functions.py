@@ -4,7 +4,6 @@ import os
 import numpy as np
 import pandas as pd
 import seaborn as sns
-# import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
@@ -63,7 +62,6 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
 
     :return: None
     """
-
     # plot dataframe, counting data in it
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(16, 8))
     fig.suptitle("DATA VISUALIZATION CHART", fontsize=18, weight="bold")
@@ -169,10 +167,10 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
     """
 
     # Plot
-    plt.figure(figsize=(16, 8))
+    plt.figure(figsize=(10, 8))
 
     # Add a title to the entire plot
-    plt.suptitle("Data Augmentation", fontsize=22, weight="bold")
+    plt.suptitle("Data Augmentation Example", fontsize=22, weight="bold")
 
     # Take the first batch of images from the dataset
     for images, _ in train_ds.take(1):
@@ -267,11 +265,9 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     :param store_in_folder: Boolean value, if True, saves the plot.
     """
     # Predict
-    predicts = model.predict(x_test)
-
+    predict = model.predict(x_test)
     # Convert the predictions to binary classes (0 or 1)
-    predicted_classes = (predicts >= 0.5).astype("int")
-    # predicted_classes = predicted_classes.flatten()
+    y_pred = (predict >= 0.5).astype("int32")
 
     # Plot settings
     fig, ax = plt.subplots(figsize=(12, 8))
@@ -281,7 +277,7 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     ax.tick_params(labelsize=12)
 
     # Compute the confusion matrix
-    confusion = confusion_matrix(y_test, predicted_classes)
+    confusion = confusion_matrix(y_test, y_pred)
 
     # Display the confusion matrix as a heatmap
     display = ConfusionMatrixDisplay(confusion_matrix=confusion, display_labels=["Chihuahua", "Muffin"])
@@ -296,6 +292,7 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     )
 
 
+# Bar graph: Real values vs Predict values
 def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_test, show_on_screen=True,
                                       store_in_folder=True):
     """
@@ -319,11 +316,9 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
         Defaults to True.
     """
     # Predict
-    predicts = model.predict(x_test)
-
+    predict = model.predict(x_test)
     # Convert the predictions to binary classes (0 or 1)
-    predicted_classes = (predicts >= 0.5).astype("int")
-    # predicted_classes = predicted_classes.flatten()
+    y_pred = (predict >= 0.5).astype("int32")
 
     # Classes
     classes = {i: const.CLASS_LIST[i] for i in range(0, len(const.CLASS_LIST))}
@@ -332,7 +327,7 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
     clf_data = pd.DataFrame(columns=["real_class_num", "predict_class_num",
                                      "real_class_label", "predict_class_label"])
     clf_data["real_class_num"] = y_test
-    clf_data["predict_class_num"] = predicted_classes
+    clf_data["predict_class_num"] = y_pred
 
     # Compare True classes with predicted ones
     comparison_column = np.where(clf_data["real_class_num"] == clf_data["predict_class_num"], True, False)
@@ -341,11 +336,11 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
     clf_data["real_class_label"] = clf_data["real_class_num"].replace(classes)
     clf_data["predict_class_label"] = clf_data["predict_class_num"].replace(classes)
 
-    # Create a DataFrame for input data
+    # Create a DataFrame for input data and count
     input_data = pd.DataFrame()
-    input_data[["Genre", "Real_Value"]] = \
+    input_data[["Images", "Real_Value"]] = \
         clf_data[["real_class_label", "predict_class_label"]].groupby(["real_class_label"], as_index=False).count()
-    input_data[["Genre", "Predict_Value"]] = \
+    input_data[["Images", "Predict_Value"]] = \
         clf_data[["real_class_label", "predict_class_label"]].groupby(["predict_class_label"], as_index=False).count()
 
     # Plot
@@ -362,7 +357,7 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
     for p in ax.patches:
         ax.annotate(format(p.get_height()),
                     (p.get_x() + (p.get_width() / 2), p.get_height()), ha="center", va="center",
-                    xytext=(0, 5), textcoords="offset points", fontsize=12, rotation=0)
+                    xytext=(0, 5), textcoords="offset points", fontsize=14, rotation=0)
 
     # Show and/or store the plot
     show_and_save_plot(
@@ -371,7 +366,6 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
         plot_name=model_name + "_prediction_evaluation_plot",
         plot_extension=const.FILE_EXTENSION
     )
-
 
 # Plot test images with prediction
 def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=True, store_in_folder=True):
@@ -393,6 +387,15 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         Whether to save the plot in a folder.
         Defaults to True.
     """
+    # # NOTE: -> (If you want to pick random images, comment out these lines and the random import at the start)
+    # # Select random indices from x_test
+    # num_samples = min(9, len(x_test))  # Adjust the number of samples to display
+    # random_indices = random.sample(range(len(x_test)), num_samples)
+    #
+    # # Select a subset of x_test and y_test based on the random indices
+    # x_test = x_test[random_indices]
+    # y_test = y_test[random_indices]
+
     # Predict
     predicts = model.predict(x_test)
 
@@ -445,79 +448,20 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
     )
 
 
-# # Plot test images with prediction
-# def plot_visual_prediction(model, model_name, test_dataset, show_on_screen=True, store_in_folder=True):
-#     # Predict
-#     predicts = model.predict(test_dataset)
-#     # Convert the predictions to class indices (0 or 1)
-#     predicted_classes = (predicts >= 0.5).astype("int")
-#
-#     # Assign class name to class indices (chihuahua = 0, muffin = 1)
-#     predicted_class_labels = ["chihuahua" if pred_label == 0 else "muffin" for pred_label in predicted_classes]
-#
-#     # Plot configuration
-#     figure_size = (16, 8)
-#     subplot_rows, subplot_cols = 3, 3
-#
-#     # Plot
-#     plt.figure(figsize=figure_size)
-#
-#     # Add a title to the entire plot
-#     plt.suptitle("{} Visual Prediction".format(model_name), fontsize=18, weight="bold")
-#
-#     # Shuffle the entire test dataset
-#     num_elements_in_test_data = tf.data.experimental.cardinality(test_dataset).numpy()
-#     shuffled_test_data = test_dataset.shuffle(buffer_size=num_elements_in_test_data, reshuffle_each_iteration=False)
-#     batch = next(iter(shuffled_test_data.batch(32)))
-#
-#     # Randomly select 9 indices from the batch
-#     random_indices = random.sample(range(32), k=9)
-#
-#     for i, idx in enumerate(random_indices):
-#         plt.subplot(subplot_rows, subplot_cols, i + 1)
-#
-#         # Extract a single image from the batch using the random index
-#         single_image = batch[0][idx].numpy()[0].astype("uint8")
-#         plt.imshow(single_image)
-#
-#         # True class indices, 0 represents "chihuahua" and 1 represents "muffin"
-#         true_class_labels = ["chihuahua" if idx == 0 else "muffin" for idx in batch[1][idx]]
-#
-#         # Add Visual aid to check the correctness of the prediction
-#         title_color = "green" if true_class_labels[idx] == predicted_class_labels[idx] else "red"
-#
-#         # Add a title to every image with a background
-#         plt.title(
-#             label="TRUE: {}\nPREDICTED: {}".format(true_class_labels[idx], predicted_class_labels[idx]),
-#             fontsize=10, color=title_color,
-#             bbox=dict(facecolor="lightgray", alpha=0.7, edgecolor="black", boxstyle="round,pad=0.5"),
-#             fontweight="bold"
-#         )
-#         plt.tight_layout()
-#         plt.axis("off")
-#
-#     # Show and store the plot
-#     show_and_save_plot(
-#         show=show_on_screen, save=store_in_folder,
-#         plot_folder=const.PLOT_FOLDER,
-#         plot_name=model_name + "_visual_prediction_plot",
-#         plot_extension=const.FILE_EXTENSION
-#     )
-
-
 # Plot the training history for each fold in kfold cross validation
 def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_folder=True):
     """
+    Visualize the training history of a model during KFold cross-validation
 
-    :param fold_history:
-    :param model_name:
-    :param show_on_screen:
-    :param store_in_folder:
-    :return:
+    :param fold_history: The training history of the model (e.g., history = model.fit()).
+    :param model_name: The name of the model for labeling the plot.
+    :param show_on_screen: If True, display the plot on the screen.
+        Default is True.
+    :param store_in_folder: If True, save the plot in a folder.
+        Default is True.
     """
     # Plot the training history for each fold
     for fold in range(len(fold_history)):
-
         # Plot size
         plt.figure(figsize=(16, 8))
 
@@ -532,22 +476,22 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
         plt.ylabel(ylabel="accuracy", fontsize=14)
         plt.xlabel(xlabel="epoch", fontsize=14)
         plt.grid()
-        plt.legend(["Train", "Validation"], loc="best")
+        plt.legend(["Train", "Validation"], loc="upper right")
 
         # Loss
         plt.subplot(1, 2, 2)
-        plt.plot(fold_history[fold].fold_history["loss"], linewidth=3)
+        plt.plot(fold_history[fold].history["loss"], linewidth=3)
         plt.plot(fold_history[fold].history["val_loss"], linewidth=3)
         plt.title(label="Training and Validation Loss", fontsize=16)
         plt.ylabel(ylabel="Loss", fontsize=14)
         plt.xlabel(xlabel="epoch", fontsize=14)
         plt.grid()
-        plt.legend(["Train", "Validation"], loc="best")
+        plt.legend(["Train", "Validation"], loc="upper right")
 
         # Show and store the plot
         show_and_save_plot(
             show=show_on_screen, save=store_in_folder,
             plot_folder=os.path.join(const.PLOT_FOLDER, "KFold", model_name),
-            plot_name=model_name + "_fold_" + f"{fold}_training_history_plot",
+            plot_name=model_name + "_fold_" + f"{fold + 1}_training_history_plot",
             plot_extension=const.FILE_EXTENSION
         )
