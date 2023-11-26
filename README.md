@@ -9,16 +9,12 @@
 Download this [dataset](https://www.kaggle.com/datasets/samuelcortinhas/muffin-vs-chihuahua-image-classification) and put in inside your project folder.
 
 ### Example:
-  my_project_folder/
   
+  my_project_folder/
     dataset/
-    
     classifier.py
-    
     constants.py
-    
     main.py
-    
     ...
 
 If you want to just run it, the dataset it is not really necessary, beacause in the **models** folder, the models are already saved there.
