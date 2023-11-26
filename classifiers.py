@@ -629,7 +629,7 @@ def classification_and_evaluation(train_path, test_path):
     plot_functions.plot_data_augmentation(train_ds=train_dataset, data_augmentation=prepare.perform_data_augmentation(),
                                           show_on_screen=False, store_in_folder=True)
 
-    # test con array
+    # dataset into array
     X_train, y_train = prepare.image_to_array(train_ds)
     X_val, y_val = prepare.image_to_array(val_ds)
     X_test, y_test = prepare.image_to_array(test_ds)
