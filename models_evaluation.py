@@ -1,11 +1,9 @@
 # Import
 import os
-import numpy as np
 import pandas as pd
 
 from IPython import display
-from sklearn.metrics import classification_report, accuracy_score, log_loss, zero_one_loss
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import classification_report, zero_one_loss
 
 # My import
 import plot_functions
@@ -16,6 +14,170 @@ import utils.general_functions as general
 # ******************************************** #
 # ************* MODEL EVALUATION ************* #
 # ******************************************** #
+
+# Print info about the hyperparameter search
+def print_hyperparameters_search_info(model_name, best_hyperparameters):
+    """
+    Print information about the optimal hyperparameter found during the tuning process.
+
+    :param model_name: The name of the model.
+    :param best_hyperparameters: The best hyperparameters.
+    """
+    if model_name == "NN":
+        print("\n> The hyperparameter search is complete!")
+        for i in range(1, 2):
+            print("- The optimal number of units in hidden_layer_{} is: {}"
+                  .format(i, best_hyperparameters[f"units_{i}"]))
+
+        print("- The optimal learning rate for the optimizer is: {}"
+              .format(best_hyperparameters.get("learning_rate")))
+    elif model_name == "MLP":
+        # Print Info.
+        print("\n> The hyperparameter search is complete!")
+        for i in range(1, 6):
+            print("\t- The optimal number of units in hidden_layer_{} is: {}"
+                  .format(i, best_hyperparameters[f"units_{i}"]))
+
+        print("- The optimal learning rate for the optimizer is: {}"
+              .format(best_hyperparameters.get("learning_rate")))
+    elif model_name == "CNN":
+        # Print Info.
+        print("\n> The hyperparameter search is complete!"
+              "\n- The optimal number of units in the densely-connected layer is: {}"
+              .format(best_hyperparameters.get("units")) +
+              "\n- The optimal learning rate for the optimizer is: {}"
+              .format(best_hyperparameters.get("learning_rate")))
+    else:
+        # Print info.
+        print("\n> The hyperparameter search is complete!"
+              "\n- The optimal number of units in the densely-connected layer is: {}"
+              .format(best_hyperparameters.get("units")) +
+              "\n- The optimal dropout rate is: {}"
+              .format(best_hyperparameters.get("dropout_rate")) +
+              "\n- The optimal learning rate for the optimizer is: {}"
+              .format(best_hyperparameters.get("learning_rate")))
+
+
+# Collect data about the search
+def collect_hyperparameters_tuning_data(model_name, tuner):
+    # if not already present, create a folder to store data
+    general.makedir(dirpath=const.DATA_PATH)
+
+    # Neural Network model
+    if model_name == "NN":
+
+        # NN data
+        nn_trials = []
+        nn_units_1 = []
+        nn_units_2 = []
+        nn_learning_rates = []
+        nn_epoch = []
+        nn_score = []
+
+        for num_trial in tuner.oracle.trials.values():
+            nn_trials.append(int(num_trial.trial_id) + 1)
+            nn_units_1.append(num_trial.hyperparameters["units_1"])
+            nn_units_2.append(num_trial.hyperparameters["units_2"])
+            nn_learning_rates.append(num_trial.hyperparameters["learning_rate"])
+            nn_epoch.append(num_trial.hyperparameters["tuner/epochs"])
+            nn_score.append(num_trial.score)
+
+        # Define a dataframe
+        df = pd.DataFrame(list(zip(nn_trials, nn_units_1, nn_units_1, nn_learning_rates, nn_epoch, nn_score)),
+                          columns=["Trial", "Units_1", "Units_2", "Learning Rate", "Epochs", "Validation Accuracy"])
+        # Sort the dataframe by trial values
+        df.sort_values(by=["Trial"], ascending=True, inplace=True)
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        df.to_csv(file_path, index=False)
+
+    # Neural Network model
+    elif model_name == "MLP":
+
+        # MLP data
+        mlp_trials = []
+        mlp_units_1 = []
+        mlp_units_2 = []
+        mlp_units_3 = []
+        mlp_units_4 = []
+        mlp_units_5 = []
+        mlp_learning_rates = []
+        mlp_score = []
+
+        for num_trial in tuner.oracle.trials.values():
+            mlp_trials.append(int(num_trial.trial_id) + 1)
+            mlp_units_1.append(num_trial.hyperparameters["units_1"])
+            mlp_units_2.append(num_trial.hyperparameters["units_2"])
+            mlp_units_3.append(num_trial.hyperparameters["units_3"])
+            mlp_units_4.append(num_trial.hyperparameters["units_4"])
+            mlp_units_5.append(num_trial.hyperparameters["units_5"])
+            mlp_learning_rates.append(num_trial.hyperparameters["learning_rate"])
+            mlp_score.append(num_trial.score)
+
+        # Define a dataframe
+        df = pd.DataFrame(list(zip(mlp_trials, mlp_units_1, mlp_units_2, mlp_units_3, mlp_units_4, mlp_units_5,
+                                   mlp_learning_rates, mlp_score)),
+                          columns=["Trial", "Units_1", "Units_2", "Units_3", "Units_4", "Units_5",
+                                   "Learning Rate", "Validation Accuracy"])
+
+        # Sort the dataframe by trial values
+        df.sort_values(by=["Trial"], ascending=True, inplace=True)
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        df.to_csv(file_path, index=False, float_format="%.3f")
+
+    elif model_name == "CNN":
+        # CNN
+        cnn_trials = []
+        cnn_units = []
+        cnn_learning_rates = []
+        cnn_score = []
+
+        for num_trial in tuner.oracle.trials.values():
+            cnn_trials.append(int(num_trial.trial_id) + 1)
+            cnn_units.append(num_trial.hyperparameters["units"])
+            cnn_learning_rates.append(num_trial.hyperparameters["learning_rate"])
+            cnn_score.append(num_trial.score)
+
+        # Define a dataframe
+        df = pd.DataFrame(list(zip(cnn_trials, cnn_units, cnn_learning_rates, cnn_score)),
+                          columns=["Trial", "Units", "Learning Rate", "Validation Accuracy"])
+
+        # Sort the dataframe by trial values
+        df.sort_values(by=["Trial"], ascending=True, inplace=True)
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        df.to_csv(file_path, index=False, float_format="%.3f")
+
+    else:
+        # MobileNet, VGG16
+        keras_model_trials = []
+        keras_model_units = []
+        keras_model_dropout_rate = []
+        keras_model_learning_rates = []
+        keras_model_score = []
+
+        for num_trial in tuner.oracle.trials.values():
+            keras_model_trials.append(int(num_trial.trial_id) + 1)
+            keras_model_units.append(num_trial.hyperparameters["units"])
+            keras_model_dropout_rate.append(num_trial.hyperparameters["dropout_rate"])
+            keras_model_learning_rates.append(num_trial.hyperparameters["learning_rate"])
+            keras_model_score.append(num_trial.score)
+
+        # Define a dataframe
+        df = pd.DataFrame(list(zip(keras_model_trials, keras_model_units, keras_model_dropout_rate,
+                                   keras_model_learning_rates, keras_model_score)),
+                          columns=["Trial", "Units", "Dropout Rate", "Learning Rate", "Validation Accuracy"])
+
+        # Sort the dataframe by trial values
+        df.sort_values(by=["Trial"], ascending=True, inplace=True)
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        df.to_csv(file_path, index=False, float_format="%.3f")
 
 
 # Print Test Accuracy and Test Loss
@@ -72,6 +234,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
     general.makedir(dirpath=const.DATA_PATH)
     file_path = os.path.join(const.DATA_PATH, model_name + "_classification_report.csv")
     df.to_csv(file_path, index=True, float_format="%.2f")
+
     return df
 
 
@@ -90,20 +253,20 @@ def evaluate_model(model, model_name, x_test, y_test):
     print("\n> " + model_name + " Model Evaluation:")
 
     # Compute a simple evaluation report on the model performances
-    accuracy_loss_model(model=model,  x_test=x_test, y_test=y_test)
+    accuracy_loss_model(model=model, x_test=x_test, y_test=y_test)
 
     # Compute the classification_report of the model
     compute_evaluation_metrics(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
 
     # Plot Confusion Matrix
     plot_functions.plot_confusion_matrix(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                         show_on_screen=True, store_in_folder=True)
+                                         show_on_screen=False, store_in_folder=True)
 
     # Plot a representation of the prediction
     plot_functions.plot_model_predictions_evaluation(model=model, model_name=model_name, class_list=const.CLASS_LIST,
                                                      x_test=x_test, y_test=y_test,
-                                                     show_on_screen=True, store_in_folder=True)
+                                                     show_on_screen=False, store_in_folder=True)
 
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                          show_on_screen=True, store_in_folder=True)
+                                          show_on_screen=False, store_in_folder=True)

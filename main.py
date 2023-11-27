@@ -4,6 +4,8 @@ import plot_functions
 import constants as const
 import prepare_dataset as prepare
 import models_evaluation as evaluate
+from utils.pre_processing import checking_dataset
+from classifiers import classification_and_evaluation
 
 # Imported to get package version info.
 import sklearn
@@ -16,14 +18,6 @@ warnings.filterwarnings("ignore")
 # ************************ #
 # ********* MAIN ********* #
 # ************************ #
-
-
-# ESEGUIRE IL REFACTORING NELLE FUNZIONI DI TUNING E KFOLD:
-# - impostare il corretto nome del file json e best_model con
-#   check generale-
-# - Implementare le funzioni di plot per il kfold -> conf_matrix_per_fold
-# - Implementare metodi per estrazione di info.
-#   Di valutazione kfold e test set finale
 
 # Main class of the project
 if __name__ == '__main__':
@@ -50,17 +44,17 @@ if __name__ == '__main__':
     print("- Tensorflow version is: {}".format(tf.__version__))
     print("______________________________________________________________________________")
 
-    # # Checking the dataset
-    # check_dataset = input("> Preprocessing: Is it necessary to check the dataset? [Y/N]: ")
-    # if check_dataset.upper() == "Y":
-    #     pre_processing.checking_dataset(dataset_path=const.DATASET_PATH,
-    #                                     train_dir_path=const.TRAIN_DIR,
-    #                                     test_dir_path=const.TEST_DIR,
-    #                                     show_plot=False, save_plot=False)
-    # print("______________________________________________________________________________")
+    # Checking the dataset
+    check_dataset = input("> Preprocessing: Is it necessary to check the dataset? [Y/N]: ")
+    if check_dataset.upper() == "Y":
+        checking_dataset(dataset_path=const.DATASET_PATH,
+                         train_dir_path=const.TRAIN_DIR,
+                         test_dir_path=const.TEST_DIR,
+                         show_plot=False, save_plot=False)
+    print("______________________________________________________________________________")
 
     # Classification and Evaluation of the Models
-    classifiers.classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
+    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
 
     # # Load keras datasets
     # train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,
@@ -88,13 +82,13 @@ if __name__ == '__main__':
     # X_train, y_train = prepare.image_to_array(train_ds)
     # X_val, y_val = prepare.image_to_array(val_ds)
     # X_test, y_test = prepare.image_to_array(test_ds)
-
+    #
     # # NN Model Tuning
     # nn_model = classifiers.build_nn_model
     # classifiers.tuning_hyperparameters(model=nn_model, model_name="NN",
     #                                    x_train=X_train, y_train=y_train,
     #                                    x_val=X_val, y_val=y_val)
-    # NN KFold cross-validation
+    # # NN KFold cross-validation
     # kfold_nn_model = classifiers.kfold_cross_validation(model_name="NN",
     #                                                     x_train=X_train, y_train=y_train,
     #                                                     x_val=X_val, y_val=y_val,
