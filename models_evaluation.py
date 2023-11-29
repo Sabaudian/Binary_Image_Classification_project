@@ -71,7 +71,6 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
         nn_units_1 = []
         nn_units_2 = []
         nn_learning_rates = []
-        nn_epoch = []
         nn_score = []
 
         for num_trial in tuner.oracle.trials.values():
@@ -79,12 +78,11 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
             nn_units_1.append(num_trial.hyperparameters["units_1"])
             nn_units_2.append(num_trial.hyperparameters["units_2"])
             nn_learning_rates.append(num_trial.hyperparameters["learning_rate"])
-            nn_epoch.append(num_trial.hyperparameters["tuner/epochs"])
             nn_score.append(num_trial.score)
 
         # Define a dataframe
-        df = pd.DataFrame(list(zip(nn_trials, nn_units_1, nn_units_1, nn_learning_rates, nn_epoch, nn_score)),
-                          columns=["Trial", "Units_1", "Units_2", "Learning Rate", "Epochs", "Validation Accuracy"])
+        df = pd.DataFrame(list(zip(nn_trials, nn_units_1, nn_units_1, nn_learning_rates, nn_score)),
+                          columns=["Trial", "Units_1", "Units_2", "Learning Rate", "Validation Accuracy"])
         # Sort the dataframe by trial values
         df.sort_values(by=["Trial"], ascending=True, inplace=True)
 

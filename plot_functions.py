@@ -367,6 +367,7 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
         plot_extension=const.FILE_EXTENSION
     )
 
+
 # Plot test images with prediction
 def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=True, store_in_folder=True):
     """
@@ -453,7 +454,7 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
     """
     Visualize the training history of a model during KFold cross-validation
 
-    :param fold_history: The training history of the model (e.g., history = model.fit()).
+    :param fold_history: The training history of the model (e.g., history = model.fit()), collected during KFold.
     :param model_name: The name of the model for labeling the plot.
     :param show_on_screen: If True, display the plot on the screen.
         Default is True.

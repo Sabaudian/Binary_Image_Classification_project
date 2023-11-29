@@ -13,29 +13,23 @@ import platform
 import tensorflow as tf
 
 import warnings
+
 warnings.filterwarnings("ignore")
+
 
 # ************************ #
 # ********* MAIN ********* #
 # ************************ #
 
-# Main class of the project
-if __name__ == '__main__':
+def main():
     """
-    EXPERIMENTAL PROJECTS - NEURAL NETWORK
-    Use Keras to train a neural network for the binary classification of muffins and Chihuahuas 
-    based on images from this dataset.
-    Images must be transformed from JPG to RGB (or Grayscale) pixel values and scaled down. 
+    Main function.
 
-    The student is asked to:
-        - experiment with different network architectures (at least 3) and training hyperparameters,
-        - use 5-fold cross validation to compute your risk estimates,
-        - thoroughly discuss the obtained results, documenting the influence of the choice of
-          the network architecture and the tuning of the hyperparameters on the final
-          cross-validated risk estimate.
+    This function provides information about the versions of Python and relevant packages
+    (Scikit-learn, Tensorflow), checks the dataset if required, and performs classification
+    and evaluation of models.
 
-    While the training loss can be chosen freely, the reported cross-validated estimates must be 
-    computed according to the zero-one loss.
+    :return: None
     """
     # Python Packages Version info.
     print("\n> Version control")
@@ -52,6 +46,31 @@ if __name__ == '__main__':
                          test_dir_path=const.TEST_DIR,
                          show_plot=False, save_plot=False)
     print("______________________________________________________________________________")
+
+    # Classification and Evaluation of the Models
+    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
+
+
+# Main class of the project
+if __name__ == '__main__':
+
+    # main()
+
+    # Python Packages Version info.
+    print("\n> Version control")
+    print("- Python version is: {}".format(platform.python_version()))
+    print("- Scikit-learn version is: {}".format(sklearn.__version__))
+    print("- Tensorflow version is: {}".format(tf.__version__))
+    print("______________________________________________________________________________")
+
+    # # Checking the dataset
+    # check_dataset = input("> Preprocessing: Is it necessary to check the dataset? [Y/N]: ")
+    # if check_dataset.upper() == "Y":
+    #     checking_dataset(dataset_path=const.DATASET_PATH,
+    #                      train_dir_path=const.TRAIN_DIR,
+    #                      test_dir_path=const.TEST_DIR,
+    #                      show_plot=False, save_plot=False)
+    # print("______________________________________________________________________________")
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
@@ -82,13 +101,13 @@ if __name__ == '__main__':
     # X_train, y_train = prepare.image_to_array(train_ds)
     # X_val, y_val = prepare.image_to_array(val_ds)
     # X_test, y_test = prepare.image_to_array(test_ds)
-    #
-    # # NN Model Tuning
+
+    # NN Model Tuning
     # nn_model = classifiers.build_nn_model
     # classifiers.tuning_hyperparameters(model=nn_model, model_name="NN",
     #                                    x_train=X_train, y_train=y_train,
     #                                    x_val=X_val, y_val=y_val)
-    # # NN KFold cross-validation
+    # NN KFold cross-validation
     # kfold_nn_model = classifiers.kfold_cross_validation(model_name="NN",
     #                                                     x_train=X_train, y_train=y_train,
     #                                                     x_val=X_val, y_val=y_val,
