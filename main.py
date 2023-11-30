@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore")
 # ********* MAIN ********* #
 # ************************ #
 
-# Main
+# Main class of the project
 def main():
     """
     Main function.
@@ -47,7 +47,6 @@ def main():
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR, show_plot=False, save_plot=True)
 
 
-# Main class of the project
 if __name__ == '__main__':
 
     main()

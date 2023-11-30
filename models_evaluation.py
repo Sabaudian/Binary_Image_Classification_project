@@ -179,12 +179,13 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
 
 
 # Print Test Accuracy and Test Loss
-def accuracy_loss_model(model, x_test, y_test):
+def accuracy_loss_model(model, model_name, x_test, y_test):
     """
     Compute a simple evaluation of the model,
     printing the loss and accuracy for the test set.
 
     :param model: Model in input.
+    :param model_name: Name of the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
     """
@@ -199,6 +200,23 @@ def accuracy_loss_model(model, x_test, y_test):
     print("\n- Test Loss: {:.4f}".format(test_loss))
     print("- Test Accuracy: {:.4f}%".format(test_accuracy * 100))
     print("- Teso zero-one loss: {:.4f}\n".format(test_zero_one_loss))
+
+    # # Init
+    # data_list = []
+    #
+    # data_list.append({
+    #     "Model": model_name,
+    #     "Loss": test_loss,
+    #     "Accuracy (%)": test_accuracy,
+    #     "Zero-one Loss": test_zero_one_loss
+    # })
+    #
+    # # Create a pandas Dataframe from the collected data
+    # df = pd.DataFrame(data_list)
+    #
+    # # Save fold data to csv file
+    # csv_file_path = os.path.join(const.DATA_PATH, model_name + "_simple_test_data.csv")
+    # df.to_csv(csv_file_path, index=False, float_format="%.3f")
 
 
 def compute_evaluation_metrics(model, model_name, x_test, y_test):
@@ -231,7 +249,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
     # Save the report
     general.makedir(dirpath=const.DATA_PATH)
     file_path = os.path.join(const.DATA_PATH, model_name + "_classification_report.csv")
-    df.to_csv(file_path, index=True, float_format="%.2f")
+    df.to_csv(file_path, index=True, float_format="%.3f")
 
     return df
 
@@ -255,7 +273,7 @@ def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=
     print("\n> " + model_name + " Model Evaluation:")
 
     # Compute a simple evaluation report on the model performances
-    accuracy_loss_model(model=model, x_test=x_test, y_test=y_test)
+    accuracy_loss_model(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
 
     # Compute the classification_report of the model
     compute_evaluation_metrics(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
