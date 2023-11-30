@@ -1,0 +1,6 @@
+,precision,recall,f1-score,support
+chihuahua,0.94,0.71,0.81,640.00
+muffin,0.74,0.95,0.83,544.00
+accuracy,,,0.82,1184.00
+macro avg,0.84,0.83,0.82,1184.00
+weighted avg,0.85,0.82,0.82,1184.00
