@@ -237,7 +237,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
 
 
 # Model evaluation with extrapolation of data and information plot
-def evaluate_model(model, model_name, x_test, y_test):
+def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=True):
     """
     Evaluate the Performance of the model on the test set.
 
@@ -245,6 +245,10 @@ def evaluate_model(model, model_name, x_test, y_test):
     :param model_name: Name of the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
+    :param show_plot: If True, displays the plot on the screen.
+        Default is True.
+    :param save_plot: If True, save the plot.
+        Default is True.
     """
 
     # Evaluate the model
@@ -258,13 +262,13 @@ def evaluate_model(model, model_name, x_test, y_test):
 
     # Plot Confusion Matrix
     plot_functions.plot_confusion_matrix(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                         show_on_screen=False, store_in_folder=True)
+                                         show_on_screen=show_plot, store_in_folder=save_plot)
 
     # Plot a representation of the prediction
     plot_functions.plot_model_predictions_evaluation(model=model, model_name=model_name, class_list=const.CLASS_LIST,
                                                      x_test=x_test, y_test=y_test,
-                                                     show_on_screen=False, store_in_folder=True)
+                                                     show_on_screen=show_plot, store_in_folder=save_plot)
 
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                          show_on_screen=False, store_in_folder=True)
+                                          show_on_screen=show_plot, store_in_folder=save_plot)

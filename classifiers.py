@@ -534,7 +534,8 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
 
 # Organize the various procedures
-def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_test, y_test, kfold):
+def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_test, y_test, kfold,
+                                      show_plot, save_plot):
     """
     Tune hyperparameters for a dictionary of classification models,
     apply KFold cross-validation and then evaluate the various models
@@ -547,6 +548,8 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
     :param x_test: Test data features.
     :param y_test: Test data labels.
     :param kfold: Number of folds for k-fold cross-validation (default is 5).
+    :param show_plot: If True, displays the plot on the screen.
+    :param save_plot: If True, save the plot.
     """
 
     # Scroll through the dictionary
@@ -567,14 +570,25 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
                                    x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
 
         # Apply Kfold Cross-validation
-        result = kfold_cross_validation(model_name=model_name,
-                                        x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, k_folds=kfold)
-        # Evaluation on the Test set
-        evaluate_model(model=result, model_name=model_name, x_test=x_test, y_test=y_test)
+        kfold_result = kfold_cross_validation(model_name=model_name,
+                                              x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, k_folds=kfold)
+
+        # Evaluate the results on the Test set
+        evaluate_model(model=kfold_result, model_name=model_name, x_test=x_test, y_test=y_test,
+                       show_plot=show_plot, save_plot=save_plot)
 
 
 # To be called in the main
-def classification_and_evaluation(train_path, test_path):
+def classification_and_evaluation(train_path, test_path, show_plot=True, save_plot=True):
+    """
+
+    :param train_path:
+    :param test_path:
+    :param show_plot: If True, displays the plot on the screen.
+        Default is True.
+    :param save_plot: If True, save the plot.
+        Default is True.
+    """
     # Load keras datasets
     train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=train_path,
                                                                     test_data_dir=test_path)
@@ -586,7 +600,7 @@ def classification_and_evaluation(train_path, test_path):
           "\n> Type specification:\n\t- {}\n".format(train_dataset.element_spec))
 
     # Visualize the dataset showing some images with corresponding labels
-    plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=False, store_in_folder=False)
+    plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=show_plot, store_in_folder=save_plot)
 
     # Scaling data
     train_ds = prepare.data_normalization(tf_dataset=train_dataset, augment=True)
@@ -595,7 +609,7 @@ def classification_and_evaluation(train_path, test_path):
 
     # Visualize the data_augmentation process effect
     plot_functions.plot_data_augmentation(train_ds=train_dataset, data_augmentation=prepare.perform_data_augmentation(),
-                                          show_on_screen=False, store_in_folder=True)
+                                          show_on_screen=show_plot, store_in_folder=save_plot)
 
     # dataset into array
     X_train, y_train = prepare.image_to_array(train_ds)
@@ -607,4 +621,5 @@ def classification_and_evaluation(train_path, test_path):
 
     # Tuning, apply KFold and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
-                                      y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.K_FOLD)
+                                      y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.K_FOLD,
+                                      show_plot=show_plot, save_plot=save_plot)

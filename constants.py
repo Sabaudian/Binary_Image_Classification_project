@@ -10,7 +10,6 @@ DATASET_PATH = "dataset"
 TRAIN_DIR = os.path.join(DATASET_PATH, "train")  # DATASET_PATH + "/train"
 TEST_DIR = os.path.join(DATASET_PATH, "test")  # DATASET_PATH + "/test"
 DATA_PATH = "data"
-REPORT_PATH = "report"
 
 # IMAGE VALUE AND DATA
 FILE_EXTENSION = ".jpg"
@@ -23,9 +22,6 @@ CHANNELS = 3
 # FOR PLOT AND SIMILAR
 PLOT_FOLDER = "plot"
 CLASS_LIST = ["chihuahua", "muffin"]
-
-# FOR NAMING FILE AND SIMILAR
-DATASET_VISUAL_INFO = "dataset_visualization_plot"
 
 # KERAS, HYPERPARAMETERS AND SIMILAR
 BATCH_SIZE = 32

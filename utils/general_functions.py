@@ -1,13 +1,8 @@
 # Import
 import os
-import re
-import fnmatch
-import numpy as np
 import pandas as pd
-import tensorflow as tf
 
 from PIL import Image
-from sklearn.metrics import precision_score, recall_score, f1_score
 
 
 # ************************************* #
@@ -25,60 +20,6 @@ def makedir(dirpath):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath, exist_ok=True)
         print("\n> Directory [{}] has been created successfully!\n".format(dirpath))
-
-
-# # Return text as int if possible, or "text" unchanged
-# def convert(data):
-#     """
-#     Convert text into integer if possible
-#
-#     :param data: input data
-#
-#     :return: integer data, else data unchanged
-#     """
-#     return int(data) if data.isdigit() else data
-#
-#
-# # Turn a string into a list of strings and number chunks.
-# def alphanum_key(data):
-#     """
-#     Transform a string into a list of strings and number chunks
-#
-#     :param data: input data
-#
-#     :return: transformed data string
-#     """
-#     return [convert(c.replace("_", "")) for c in re.split("([0-9]+)", data)]
-#
-#
-# # Sort filenames as expected
-# def sort_files(file):
-#     """
-#     Sorting file as expected by human observer
-#
-#     :param file: input file
-#
-#     Example: img_file_0001, img_file_0002, ..., img_file_NNNN
-#     """
-#     # convert = lambda text: int(text) if text.isdigit() else text
-#     # alphanum_key = lambda key: [convert(c.replace("_", "")) for c in re.split("([0-9]+)", key)]
-#     file.sort(key=alphanum_key)
-
-
-# # Count files given a path
-# def count_files(file_path):
-#     """
-#     Count the number of files with extensions in the specified directory.
-#
-#     :param file_path: (str) The path to the directory for which file count is required.
-#
-#     :return: (int) The number of files with extensions in the specified directory.
-#
-#     Example: count_files("/path/to/directory") -> 12
-#     """
-#     counter = len(fnmatch.filter(os.listdir(file_path), "*.*"))
-#
-#     return counter
 
 
 def count_files(file_path, extensions="jpg"):
@@ -169,35 +110,16 @@ def define_dataframe(train_dir_path, test_dir_path):
 
     # Define dataframe for the train set
     train_data = (
-        load_and_construct_df(os.path.join(train_dir_path, "chihuahua"), "chihuahua") +
-        load_and_construct_df(os.path.join(train_dir_path, "muffin"), "muffin")
+        load_and_construct_df(dir_path=os.path.join(train_dir_path, "chihuahua"), label="chihuahua") +
+        load_and_construct_df(dir_path=os.path.join(train_dir_path, "muffin"), label="muffin")
     )
     train_df = pd.DataFrame(train_data)
 
     # Define dataframe for the test set
     test_data = (
-        load_and_construct_df(os.path.join(test_dir_path, "chihuahua"), "chihuahua") +
-        load_and_construct_df(os.path.join(test_dir_path, "muffin"), "muffin")
+        load_and_construct_df(dir_path=os.path.join(test_dir_path, "chihuahua"), label="chihuahua") +
+        load_and_construct_df(dir_path=os.path.join(test_dir_path, "muffin"), label="muffin")
     )
     test_df = pd.DataFrame(test_data)
 
     return train_df, test_df
-
-
-def get_labels_from_dataset(tf_dataset):
-    """
-    Extract true labels from a TensorFlow dataset.
-
-    :param tf_dataset: (tf.data.Dataset) The TensorFlow dataset containing data and labels.
-
-    :return: (list) A list of true labels extracted from the dataset.
-    """
-    # True labels array
-    true_labels = []
-
-    # Get labels
-    for _, labels in tf_dataset:
-        for label in labels:
-            true_labels.append(label.numpy())
-    # return labels
-    return true_labels

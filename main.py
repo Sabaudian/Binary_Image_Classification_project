@@ -1,9 +1,5 @@
 # My import
-import classifiers
-import plot_functions
 import constants as const
-import prepare_dataset as prepare
-import models_evaluation as evaluate
 from utils.pre_processing import checking_dataset
 from classifiers import classification_and_evaluation
 
@@ -21,6 +17,7 @@ warnings.filterwarnings("ignore")
 # ********* MAIN ********* #
 # ************************ #
 
+# Main
 def main():
     """
     Main function.
@@ -44,24 +41,24 @@ def main():
         checking_dataset(dataset_path=const.DATASET_PATH,
                          train_dir_path=const.TRAIN_DIR,
                          test_dir_path=const.TEST_DIR,
-                         show_plot=False, save_plot=False)
+                         show_plot=False, save_plot=True)
     print("______________________________________________________________________________")
 
     # Classification and Evaluation of the Models
-    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
+    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR, show_plot=False, save_plot=True)
 
 
 # Main class of the project
 if __name__ == '__main__':
 
-    # main()
+    main()
 
-    # Python Packages Version info.
-    print("\n> Version control")
-    print("- Python version is: {}".format(platform.python_version()))
-    print("- Scikit-learn version is: {}".format(sklearn.__version__))
-    print("- Tensorflow version is: {}".format(tf.__version__))
-    print("______________________________________________________________________________")
+    # # Python Packages Version info.
+    # print("\n> Version control")
+    # print("- Python version is: {}".format(platform.python_version()))
+    # print("- Scikit-learn version is: {}".format(sklearn.__version__))
+    # print("- Tensorflow version is: {}".format(tf.__version__))
+    # print("______________________________________________________________________________")
 
     # # Checking the dataset
     # check_dataset = input("> Preprocessing: Is it necessary to check the dataset? [Y/N]: ")
@@ -72,8 +69,8 @@ if __name__ == '__main__':
     #                      show_plot=False, save_plot=False)
     # print("______________________________________________________________________________")
 
-    # Classification and Evaluation of the Models
-    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
+    # # Classification and Evaluation of the Models
+    # classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR)
 
     # # Load keras datasets
     # train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=const.TRAIN_DIR,

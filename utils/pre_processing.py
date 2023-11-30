@@ -136,7 +136,7 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path, show_plot, sav
           .format(count_files(file_path=train_muffin_path)))
     find_out_duplicate(dataset_path=train_muffin_path, hash_size=32)
 
-    print("\n> Last check at the Number of file:")
+    print("\n> Final check to confirm the total file count:")
     print_file_counts(dataset_path=dataset_path)
 
     # Defines a dataframe
