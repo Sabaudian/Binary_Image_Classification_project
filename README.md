@@ -8,13 +8,13 @@ Use Keras to train a neural network for the binary classification of muffins and
 - Tensorflow version is: 2.14.0
 
 ## How to Set your Workspace:
-Download this [dataset_folder](https://www.kaggle.com/datasets/samuelcortinhas/muffin-vs-chihuahua-image-classification)
+Download this [dataset](https://www.kaggle.com/datasets/samuelcortinhas/muffin-vs-chihuahua-image-classification)
 and put in inside your project folder.
 
 ### Example:
 ```
 ├── my_project_folder
-│   ├── dataset_folder
+│   ├── dataset
 │   ├── classifier.py
 │   ├── constants.py
 │   ├── main.py
