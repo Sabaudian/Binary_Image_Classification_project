@@ -551,6 +551,8 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
     :param show_plot: If True, displays the plot on the screen.
     :param save_plot: If True, save the plot.
     """
+    # List to collect models data
+    all_models_data = []
 
     # Scroll through the dictionary
     for key, value in models.items():
@@ -574,8 +576,17 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
                                               x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val, k_folds=kfold)
 
         # Evaluate the results on the Test set
-        evaluate_model(model=kfold_result, model_name=model_name, x_test=x_test, y_test=y_test,
-                       show_plot=show_plot, save_plot=save_plot)
+        data = evaluate_model(model=kfold_result, model_name=model_name, x_test=x_test, y_test=y_test,
+                              show_plot=show_plot, save_plot=save_plot)
+        all_models_data.append(data)
+
+    # Create a pandas DataFrame
+    df = pd.DataFrame(all_models_data)
+
+    # Save the data
+    general.makedir(dirpath=const.DATA_PATH)
+    file_path = os.path.join(const.DATA_PATH, "models_simple_test_evaluation_table.csv")
+    df.to_csv(file_path, index=False, float_format="%.3f")
 
 
 # To be called in the main
