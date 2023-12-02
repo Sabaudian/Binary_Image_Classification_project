@@ -1,4 +1,5 @@
 # Statistical Methods for Machine Learning: experimental project
+https://img.shields.io/badge/PyCharm-000000.svg?&style=for-the-badge&logo=PyCharm&logoColor=white
 Use Keras to train a neural network for the binary classification of muffins and Chihuahuas.
 
 ## General Information
