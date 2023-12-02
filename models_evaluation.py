@@ -23,15 +23,8 @@ def print_hyperparameters_search_info(model_name, best_hyperparameters):
     :param model_name: The name of the model.
     :param best_hyperparameters: The best hyperparameters.
     """
-    if model_name == "NN":
-        print("\n> The hyperparameter search is complete!")
-        for i in range(1, 2):
-            print("- The optimal number of units in hidden_layer_{} is: {}"
-                  .format(i, best_hyperparameters[f"units_{i}"]))
 
-        print("- The optimal learning rate for the optimizer is: {}"
-              .format(best_hyperparameters.get("learning_rate")))
-    elif model_name == "MLP":
+    if model_name == "MLP":
         # Print Info.
         print("\n> The hyperparameter search is complete!")
         for i in range(1, 6):
@@ -47,7 +40,7 @@ def print_hyperparameters_search_info(model_name, best_hyperparameters):
               .format(best_hyperparameters.get("units")) +
               "\n- The optimal learning rate for the optimizer is: {}"
               .format(best_hyperparameters.get("learning_rate")))
-    else:
+    else:  # VGG16 and MobileNet
         # Print info.
         print("\n> The hyperparameter search is complete!"
               "\n- The optimal number of units in the densely-connected layer is: {}"
@@ -64,34 +57,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
     general.makedir(dirpath=const.DATA_PATH)
 
     # Neural Network model
-    if model_name == "NN":
-
-        # NN data
-        nn_trials = []
-        nn_units_1 = []
-        nn_units_2 = []
-        nn_learning_rates = []
-        nn_score = []
-
-        for num_trial in tuner.oracle.trials.values():
-            nn_trials.append(int(num_trial.trial_id) + 1)
-            nn_units_1.append(num_trial.hyperparameters["units_1"])
-            nn_units_2.append(num_trial.hyperparameters["units_2"])
-            nn_learning_rates.append(num_trial.hyperparameters["learning_rate"])
-            nn_score.append(num_trial.score)
-
-        # Define a dataframe
-        df = pd.DataFrame(list(zip(nn_trials, nn_units_1, nn_units_1, nn_learning_rates, nn_score)),
-                          columns=["Trial", "Units_1", "Units_2", "Learning Rate", "Validation Accuracy"])
-        # Sort the dataframe by trial values
-        df.sort_values(by=["Trial"], ascending=True, inplace=True)
-
-        # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
-        df.to_csv(file_path, index=False)
-
-    # Neural Network model
-    elif model_name == "MLP":
+    if model_name == "MLP":
 
         # MLP data
         mlp_trials = []

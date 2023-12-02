@@ -5,11 +5,13 @@ import os
 # ---------- USEFUL CONSTANTS ---------- #
 # -------------------------------------- #
 
-# DATASET AND DATA LOCATION
+# DATASET, PATH AND SIMILAR
 DATASET_PATH = "dataset"
 TRAIN_DIR = os.path.join(DATASET_PATH, "train")  # DATASET_PATH + "/train"
 TEST_DIR = os.path.join(DATASET_PATH, "test")  # DATASET_PATH + "/test"
 DATA_PATH = "data"
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))  # The project root
+DRIVE_URL = "https://drive.google.com/drive/folders/1Cd3KdUZ77dV7lPmpnhDDf6lXKFgFOa1u?usp=sharing"  # Google Drive link
 
 # IMAGE VALUE AND DATA
 FILE_EXTENSION = ".jpg"
@@ -23,9 +25,9 @@ CHANNELS = 3
 PLOT_FOLDER = "plot"
 CLASS_LIST = ["chihuahua", "muffin"]
 
-# KERAS, HYPERPARAMETERS AND SIMILAR
+# KERAS AND SIMILAR
 BATCH_SIZE = 32
 INPUT_SHAPE = (IMG_HEIGHT, IMG_WIDTH, CHANNELS)
 
 # KFOLD CROSS-VALIDATION AND SIMILAR
-K_FOLD = 5
+KFOLD = 5

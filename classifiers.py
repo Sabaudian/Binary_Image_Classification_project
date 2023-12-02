@@ -26,50 +26,6 @@ from models_evaluation import collect_hyperparameters_tuning_data, print_hyperpa
 # *********************************************************************** #
 
 
-# NN Model
-def build_nn_model(hp):
-    """
-    Build a simple Neural Network (NN) model with tunable hyperparameters for image binary classification.
-
-    :param hp: Keras.utils.HyperParameters.
-        Hyperparameters for model tuning.
-
-    :return: Keras.Model
-        The compiled MLP model.
-    """
-
-    model = tf.keras.Sequential()
-    model.add(layers.Flatten(input_shape=const.INPUT_SHAPE))
-
-    # Tune the number of units in the dense layer
-    # Choose an optimal value between 32-512
-    for i in range(1, 3):
-        units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
-        model.add(layers.Dense(units=units, activation="relu", name=f"hidden_layer_{i}"))
-
-    # Output layer
-    model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
-
-    # Tune the learning rate for the optimizer
-    # Choose an optimal value from 0.01, 0.001, or 0.0001
-    hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
-
-    # Compile
-    model.compile(
-        optimizer=keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
-        loss="binary_crossentropy",
-        metrics=["accuracy"]
-    )
-
-    # Store and Display the model's architecture
-    general.makedir(os.path.join("plot", "NN"))  # Create the directory
-    plot_path = os.path.join("plot", "NN", "NN_model_summary_plot.jpg")  # Path to store the plot
-    model.summary()
-    keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
-
-    return model
-
-
 # MLP model
 def build_mlp_model(hp):
     """
@@ -276,18 +232,13 @@ def get_classifier():
     Retrieves a dictionary of pre-built classification models.
 
     :return: A dictionary containing the following classification models:
-             - 'NN': Neural Network model
              - 'MLP': Multi-layer Perceptron model
              - 'CNN': Convolutional Neural Network model
-             - 'MobileNet': MobileNet model
              - 'VGG16': VGG16 model
+             - 'MobileNet': MobileNet model
     """
     # models dictionary
-    models = {"NN": [], "MLP": [], "CNN": [], "MobileNet": [], "VGG16": []}
-
-    # Neural Network model
-    nn_model = build_nn_model
-    models.update({"NN": nn_model})
+    models = {"MLP": [], "CNN": [], "VGG16": [], "MobileNet": []}
 
     # Multi-layer Perceptron model
     mlp_model = build_mlp_model
@@ -297,13 +248,13 @@ def get_classifier():
     cnn_model = build_cnn_model
     models.update({"CNN": cnn_model})
 
+    # VGG16 model
+    vgg16_model = build_vgg16_model
+    models.update({"VGG16": vgg16_model})
+
     # MobileNet model
     mobilenet_model = build_mobilenet_model
     models.update({"MobileNet": mobilenet_model})
-
-    # MobileNet model
-    vgg16_model = build_vgg16_model
-    models.update({"VGG16": vgg16_model})
 
     return models
 
@@ -556,7 +507,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
     # Scroll through the dictionary
     for key, value in models.items():
-        # NN, MLP, CNN and MobileNet
+        # MLP, CNN, VGG16 and MobileNet
         model_name = key
         # Models
         model_type = value
@@ -632,5 +583,5 @@ def classification_and_evaluation(train_path, test_path, show_plot=True, save_pl
 
     # Tuning, apply KFold and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
-                                      y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.K_FOLD,
+                                      y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.KFOLD,
                                       show_plot=show_plot, save_plot=save_plot)

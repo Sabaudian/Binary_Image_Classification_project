@@ -1,5 +1,6 @@
 # Import
 import os
+import gdown
 import pandas as pd
 
 from PIL import Image
@@ -8,6 +9,28 @@ from PIL import Image
 # ************************************* #
 # ********* GENERAL FUNCTIONS ********* #
 # ************************************* #
+
+
+def download_models_save_from_drive(drive_url, root_dir):
+    """
+    Download from Google Drive the models folder, that contains the models saved from the previous run of the project.
+    This will speed up the entire process.
+
+    :param drive_url: Link to Google drive folder.
+    :param root_dir: Root directory of the project, for saving the downloaded folder.
+    :return: if successful, return the list of files downloaded.
+    """
+    # download model folder if not already present in the workspace
+    if not os.path.exists("models"):
+        # Checking folder
+        check_input = input("\n> The 'models' folder is not present in the workspace, "
+                            "do you want to download it from Google Drive? [Y/N]: ")
+        if check_input.upper() == "Y":
+            # Download "models" folder
+            gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
+    else:
+        print("\n> The 'models' folder is present in the workspace! \n")
+
 
 # create a new directory
 def makedir(dirpath):
@@ -92,6 +115,7 @@ def define_dataframe(train_dir_path, test_dir_path):
 
     :return: Pandas.Dataframe (train_df, test_df)
     """
+
     def load_and_construct_df(dir_path, label):
         """
         Load image files from the specified directory and construct a dataframe.
@@ -110,15 +134,15 @@ def define_dataframe(train_dir_path, test_dir_path):
 
     # Define dataframe for the train set
     train_data = (
-        load_and_construct_df(dir_path=os.path.join(train_dir_path, "chihuahua"), label="chihuahua") +
-        load_and_construct_df(dir_path=os.path.join(train_dir_path, "muffin"), label="muffin")
+            load_and_construct_df(dir_path=os.path.join(train_dir_path, "chihuahua"), label="chihuahua") +
+            load_and_construct_df(dir_path=os.path.join(train_dir_path, "muffin"), label="muffin")
     )
     train_df = pd.DataFrame(train_data)
 
     # Define dataframe for the test set
     test_data = (
-        load_and_construct_df(dir_path=os.path.join(test_dir_path, "chihuahua"), label="chihuahua") +
-        load_and_construct_df(dir_path=os.path.join(test_dir_path, "muffin"), label="muffin")
+            load_and_construct_df(dir_path=os.path.join(test_dir_path, "chihuahua"), label="chihuahua") +
+            load_and_construct_df(dir_path=os.path.join(test_dir_path, "muffin"), label="muffin")
     )
     test_df = pd.DataFrame(test_data)
 
