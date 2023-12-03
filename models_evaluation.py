@@ -156,7 +156,7 @@ def accuracy_loss_model(model, model_name, x_test, y_test):
     :param y_test: Target values of the test dataset.
     """
     # Compute loss and accuracy
-    test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test)
+    test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test, verbose=0)
 
     predict = model.predict(x_test)
     y_pred = (predict >= 0.5).astype("int32")
@@ -249,5 +249,8 @@ def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
                                           show_on_screen=show_plot, store_in_folder=save_plot)
+
+    # Print a separator line to separate better the output
+    print("__________________________________________________________________________________________")
 
     return data

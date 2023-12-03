@@ -357,7 +357,7 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
 
     # Plot history after tuning
     plot_functions.plot_history(history=hypermodel_history, model_name=model_name,
-                                show_on_screen=True, store_in_folder=True)
+                                show_on_screen=False, store_in_folder=True)
 
 
 # KFold cross validation function
@@ -385,8 +385,10 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     general.makedir(dir_path)
     file_path = os.path.join(dir_path, model_name + "_kfold_model.h5")
 
-    # Load model if exist and evaluate it
+    # Check if the 'models' folder exists
     if os.path.exists(file_path):
+
+        # Load model from the right folder
         model = keras.models.load_model(file_path)
         print("- Model Loaded Successfully!")
     else:
@@ -431,7 +433,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
                 X_train, Y_train,
                 epochs=10,
                 validation_data=(X_val, Y_val),
-                verbose=1
+                verbose=2
             )
 
             fold_history.append(history)
@@ -507,7 +509,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
     # Scroll through the dictionary
     for key, value in models.items():
-        # MLP, CNN, VGG16 and MobileNet
+        # MLP, CNN, VGG16 and MobileNet String
         model_name = key
         # Models
         model_type = value
@@ -517,10 +519,21 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
         # Best model filepath
         tuned_file_path = os.path.join(tuned_model_folder, "best_model.h5")
 
+        # Redo Tuning or not
         if not os.path.exists(tuned_file_path):
-            # Tuning Hyperparameters
+
+            # Tuning Hyperparameters -> Save not present
             tuning_hyperparameters(model=model_type, model_name=model_name,
                                    x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
+        else:
+            check_tuning = input(
+                "\n> " + model_name + " hyperparameter tuning has already been completed,"
+                                      " do you still want to redo this process? [Y/N]: ")
+
+            if check_tuning.upper() == "Y":
+                # Tuning Hyperparameters -> Redo tuning
+                tuning_hyperparameters(model=model_type, model_name=model_name,
+                                       x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
 
         # Apply Kfold Cross-validation
         kfold_result = kfold_cross_validation(model_name=model_name,
@@ -558,8 +571,7 @@ def classification_and_evaluation(train_path, test_path, show_plot=True, save_pl
     # Printing information about the datasets
     print("\n> Class Names:"
           "\n\t- classe 0 = {}"
-          "\n\t- classe 1 = {}".format(train_dataset.class_names[0], train_dataset.class_names[1]) +
-          "\n> Type specification:\n\t- {}\n".format(train_dataset.element_spec))
+          "\n\t- classe 1 = {}".format(train_dataset.class_names[0], train_dataset.class_names[1]))
 
     # Visualize the dataset showing some images with corresponding labels
     plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=show_plot, store_in_folder=save_plot)

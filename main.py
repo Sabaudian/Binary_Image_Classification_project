@@ -36,7 +36,7 @@ def main():
     print("______________________________________________________________________________")
 
     # Checking the dataset
-    check_dataset = input("> Preprocessing: Is it necessary to check the dataset? [Y/N]: ")
+    check_dataset = input("> Preprocessing: is it necessary to check the dataset? [Y/N]: ")
     if check_dataset.upper() == "Y":
         checking_dataset(dataset_path=const.DATASET_PATH,
                          train_dir_path=const.TRAIN_DIR,

@@ -29,7 +29,7 @@ def download_models_save_from_drive(drive_url, root_dir):
             # Download "models" folder
             gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
     else:
-        print("\n> The 'models' folder is present in the workspace! \n")
+        print("\n> The 'models' folder is in the workspace!")
 
 
 # create a new directory
