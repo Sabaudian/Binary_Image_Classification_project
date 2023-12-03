@@ -52,10 +52,10 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
         The training data as a Pandas DataFrame.
     :param test_data: Pandas.DataFrame.
         The test data as a Pandas DataFrame.
-    :param show_on_screen: bool, optional
-        If True, displays the plot on the screen. Defaults to True.
-    :param store_in_folder: bool, optional
-        If True, save the plot. Defaults to True.
+    :param show_on_screen: If True, display the plot on the screen.
+        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Defaults to True.
 
     Notes:
         The histogram illustrates the number of images for each class in both the training and test sets.
@@ -108,10 +108,10 @@ def plot_view_dataset(train_ds, show_on_screen=True, store_in_folder=True):
 
     :param train_ds: tf.data.Dataset
         A TensorFlow dataset object corresponding to the training data.
-    :param show_on_screen: bool, optional
-        If True, displays the plot on the screen. Defaults to True.
-    :param store_in_folder: bool, optional
-        If True, save the plot in a specified folder. Defaults to True.
+    :param show_on_screen: If True, display the plot on the screen.
+        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Defaults to True.
 
     :notes:
         The function plots a 3x3 grid of images from the dataset's first batch, along with their corresponding labels.
@@ -162,8 +162,8 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
     :param data_augmentation: The data augmentation pipeline applied to the images.
     :param show_on_screen: If True, display the plot on the screen.
         Default is True.
-    :param store_in_folder: If True, save the plot in a folder.
-        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Defaults to True.
     """
 
     # Plot
@@ -198,24 +198,14 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
 
 def plot_history(history, model_name, show_on_screen=True, store_in_folder=True):
     """
-    Visualize the training history of a model.
+    Visualize the training history of the model.
 
     :param history: The training history of the model (e.g., history = model.fit()).
     :param model_name: The name of the model for labeling the plot.
     :param show_on_screen: If True, display the plot on the screen.
-    Default is True.
-    :param store_in_folder: If True, save the plot in a folder.
-    Default is True.
-
-    Examples:
-    - To plot the training history with default options:
-      plot_history(my_model_history, "MyModel")
-
-    - To plot the history and only display on screen:
-      plot_history(my_model_history, "MyModel", show_on_screen=True, store_in_folder=False)
-
-    - To plot the history and save the plot without displaying:
-      plot_history(my_model_history, "MyModel", show_on_screen=False, store_in_folder=True)
+        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Defaults to True.
     """
     # Plot
     plt.figure(figsize=(16, 8))
@@ -261,8 +251,10 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     :param model_name: Name assigned to the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
-    :param show_on_screen: Boolean value, if True, shows the plot.
-    :param store_in_folder: Boolean value, if True, saves the plot.
+    :param show_on_screen: If True, display the plot on the screen.
+        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Defaults to True.
     """
     # Predict
     predict = model.predict(x_test)
@@ -308,12 +300,10 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
         Input values of the test dataset.
     :param y_test: numpy.ndarray
         Target values of the test dataset.
-    :param show_on_screen: bool, optional
-        If True, displays the plot on the screen.
-        Defaults to True.
-    :param store_in_folder: bool, optional
-        If True, save the plot.
-        Defaults to True.
+    :param show_on_screen: If True, display the plot on the screen.
+        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Default is True.
     """
     # Predict
     predict = model.predict(x_test)
@@ -381,12 +371,10 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         Input test data (images).
     :param y_test: numpy.ndarray
         True labels for the test data.
-    :param show_on_screen: bool, optional
-        Whether to display the plot on the screen.
-         Defaults to True.
-    :param store_in_folder: bool, optional
-        Whether to save the plot in a folder.
-        Defaults to True.
+    :param show_on_screen: If True, display the plot on the screen.
+        Default is True.
+    :param store_in_folder: If True, save the plot in a specified folder.
+        Default is True.
     """
     # # NOTE: -> (If you want to pick random images, comment out these lines and the random import at the start)
     # # Select random indices from x_test
@@ -458,7 +446,7 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
     :param model_name: The name of the model for labeling the plot.
     :param show_on_screen: If True, display the plot on the screen.
         Default is True.
-    :param store_in_folder: If True, save the plot in a folder.
+    :param store_in_folder: If True, save the plot in a specified folder.
         Default is True.
     """
     # Plot the training history for each fold

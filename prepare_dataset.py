@@ -7,14 +7,6 @@ import tensorflow as tf
 import constants as const
 
 
-# # Perform data augmentation
-# data_augmentation = keras.Sequential([
-#     keras.layers.RandomFlip("horizontal"),
-#     keras.layers.RandomRotation(0.1),
-#     keras.layers.RandomZoom(0.1),
-# ])
-
-
 # load data into keras dataset
 def load_dataset(train_data_dir, test_data_dir):
     """
@@ -53,7 +45,6 @@ def perform_data_augmentation():
     Performs data augmentation using Keras Sequential model with specific layers.
 
     :return: Keras Sequential model representing the data augmentation operations.
-    :rtype: tensorflow.keras.Sequential
 
     - RandomFlip: str, Specifies the type of random flip to be applied.
 
@@ -97,22 +88,25 @@ def data_normalization(tf_dataset, augment):
     return ds
 
 
+# Convert tensorflow dataset object into an array
 def image_to_array(tf_dataset):
     """
-    Transform a Tensorflow dataset object into a split array form.
+    Transform a tf.Dataset.data object into a split array form.
 
     :param tf_dataset: tf.Dataset.data object.
 
     :return: X (Input values), y (target values).
     """
-    X_array = []  # store images
-    y_array = []  # store class labels
+    X_array = []  # Images
+    y_array = []  # Class labels
 
     for image, label in tf_dataset.unbatch().map(lambda x, y: (x, y)):
         X_array.append(image)
         y_array.append(label)
 
+    # Input values
     X_array = np.array(X_array)
+    # Target values
     y_array = np.array(y_array)
 
     return X_array, y_array

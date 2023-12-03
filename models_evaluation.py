@@ -18,37 +18,86 @@ import utils.general_functions as general
 # Print info about the hyperparameter search
 def print_hyperparameters_search_info(model_name, best_hyperparameters):
     """
-    Print information about the optimal hyperparameter found during the tuning process.
+    Print information about the optimal hyperparameter found during the tuning process,
+    and store them into a .csv file
 
     :param model_name: The name of the model.
     :param best_hyperparameters: The best hyperparameters.
     """
 
+    # For MLP model
     if model_name == "MLP":
         # Print Info.
         print("\n> The hyperparameter search is complete!")
         for i in range(1, 6):
+            # Dense layer units
             print("\t- The optimal number of units in hidden_layer_{} is: {}"
                   .format(i, best_hyperparameters[f"units_{i}"]))
 
+        # Learning rate
         print("- The optimal learning rate for the optimizer is: {}"
               .format(best_hyperparameters.get("learning_rate")))
+
+        # Define a dictionary
+        mlp_best_hp_dict = {
+            "Units_1": best_hyperparameters["units_1"],
+            "Units_2": best_hyperparameters["units_2"],
+            "Units_3": best_hyperparameters["units_3"],
+            "Units_4": best_hyperparameters["units_4"],
+            "Units_5": best_hyperparameters["units_5"],
+            "Learning Rate": best_hyperparameters["learning_rate"]
+        }
+        # Turn it into a dataframe
+        df = pd.DataFrame(mlp_best_hp_dict, index=[model_name])
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_best_hyperparameters.csv")
+        df.to_csv(file_path, index=True, float_format="%.3f")
+
+    # For CNN model
     elif model_name == "CNN":
         # Print Info.
         print("\n> The hyperparameter search is complete!"
               "\n- The optimal number of units in the densely-connected layer is: {}"
-              .format(best_hyperparameters.get("units")) +
+              .format(best_hyperparameters.get("units")) +  # Dense layer units
               "\n- The optimal learning rate for the optimizer is: {}"
-              .format(best_hyperparameters.get("learning_rate")))
-    else:  # VGG16 and MobileNet
+              .format(best_hyperparameters.get("learning_rate")))  # learning rate
+
+        # Define a dictionary
+        cnn_best_hp_dict = {
+            "Units": best_hyperparameters["units"],
+            "Learning Rate": best_hyperparameters["learning_rate"]
+        }
+        # Turn it into a dataframe
+        df = pd.DataFrame(cnn_best_hp_dict, index=[model_name])
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_best_hyperparameters.csv")
+        df.to_csv(file_path, index=True, float_format="%.3f")
+
+    # For VGG16 and MobileNet
+    else:
         # Print info.
         print("\n> The hyperparameter search is complete!"
               "\n- The optimal number of units in the densely-connected layer is: {}"
-              .format(best_hyperparameters.get("units")) +
-              "\n- The optimal dropout rate is: {}"
+              .format(best_hyperparameters.get("units")) +  # Dense layer units
+              "\n- The optimal dropout rate is: {}"  # Dropout-rate
               .format(best_hyperparameters.get("dropout_rate")) +
               "\n- The optimal learning rate for the optimizer is: {}"
-              .format(best_hyperparameters.get("learning_rate")))
+              .format(best_hyperparameters.get("learning_rate")))  # Learning rate
+
+        # Define a dataframe
+        vgg16_or_mobilenet_best_hp_dict = {
+            "Units": best_hyperparameters["units"],
+            "Dropout Rate": best_hyperparameters["dropout_rate"],
+            "Learning Rate": best_hyperparameters["learning_rate"]
+        }
+        # Turn it into a dataframe
+        df = pd.DataFrame(vgg16_or_mobilenet_best_hp_dict, index=[model_name])
+
+        # Save data to csv file
+        file_path = os.path.join(const.DATA_PATH, model_name + "_best_hyperparameters.csv")
+        df.to_csv(file_path, index=True, float_format="%.3f")
 
 
 # Collect data about the search
