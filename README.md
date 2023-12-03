@@ -13,7 +13,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 Download this [dataset](https://www.kaggle.com/datasets/samuelcortinhas/muffin-vs-chihuahua-image-classification)
 and put in inside your project folder.
 
-### Example:
+#### Example:
 ```
 ├── my_project_folder
 │   ├── dataset
@@ -28,5 +28,10 @@ and put in inside your project folder.
 > If you want to just run it, the dataset it is not really necessary,
 because through the project you can download from *Google Drive* a directory named *models*, where there are the saves of the pre-trained models and kfold result.
 
-# Who ate my Chihuahua?
-Work in progress...
+## Who ate my Chihuahua?
+
+Artificial Neural Networks (ANNs) constitute a fundamental paradigm within the realm of artificial intelligence, inspired by the intricate structure and functioning of the human brain. Comprising interconnected neurons, ANNs excel in learning complex patterns and relationships from data, offering unparalleled versatility across various domains.
+
+In this context, ANNs are adopted in the context of image classification, a fundamental task within computer vision, that involves assigning predefined labels or categories to input images.
+
+This project explores binary image classification, a subset of image classification, focusing on the Muffins vs. Chihuahua dataset. The implementation involves leveraging Multilayer perceptron (MLP), Convolutional Neural Network (CNN), MobileNet, and VGG16 models within the Keras framework.
