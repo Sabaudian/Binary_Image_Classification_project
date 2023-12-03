@@ -23,8 +23,9 @@ and put in inside your project folder.
 │   └── etc.
 ```
 
-If you want to just run it, the dataset it is not really necessary,
-because in the **models** folder there are the saves of the models used in this project.
+> [!NOTE]
+> If you want to just run it, the dataset it is not really necessary,
+because through the project you can download from *Google Drive* a directory named *models*, where there are the saves of the pre-trained models and kfold result.
 
 # Who ate my Chihuahua?
 Work in progress...
