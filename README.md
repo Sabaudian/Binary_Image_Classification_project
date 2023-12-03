@@ -9,7 +9,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 - Tensorflow version is: 2.14.0
 - Scikit-learn version is: 1.3.1
 
-## How to Set your Workspace:
+## How to Set up your Workspace:
 Download this [dataset](https://www.kaggle.com/datasets/samuelcortinhas/muffin-vs-chihuahua-image-classification)
 and put in inside your project folder.
 
