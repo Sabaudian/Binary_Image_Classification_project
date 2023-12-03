@@ -17,6 +17,7 @@ and put in inside your project folder.
 ```
 ├── my_project_folder
 │   ├── dataset
+│   ├── models
 │   ├── classifier.py
 │   ├── constants.py
 │   ├── main.py
