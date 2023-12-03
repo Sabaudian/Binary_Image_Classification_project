@@ -36,7 +36,7 @@ Here ANNs are adopted in the context of image classification, a fundamental task
 
 This project explores binary image classification, a subset of image classification, focusing on the Muffins vs. Chihuahua dataset. The implementation involves leveraging Multilayer perceptron (MLP), Convolutional Neural Network (CNN), MobileNet, and VGG16 models within the Keras framework.
 
-## Brief Result Summary
+### Brief Result Summary
 
 | MODEL  | LOSS | ACCURACY (%) | 
 | ------ | ---- | ------------ |
