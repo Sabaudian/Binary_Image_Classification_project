@@ -32,7 +32,7 @@ because through the project you can download from *Google Drive* a directory nam
 
 Artificial Neural Networks (ANNs) constitute a fundamental paradigm within the realm of artificial intelligence, inspired by the intricate structure and functioning of the human brain. Comprising interconnected neurons, ANNs excel in learning complex patterns and relationships from data, offering unparalleled versatility across various domains.
 
-In this context, ANNs are adopted in the context of image classification, a fundamental task within computer vision, that involves assigning predefined labels or categories to input images.
+Here ANNs are adopted in the context of image classification, a fundamental task within computer vision, that involves assigning predefined labels or categories to input images.
 
 This project explores binary image classification, a subset of image classification, focusing on the Muffins vs. Chihuahua dataset. The implementation involves leveraging Multilayer perceptron (MLP), Convolutional Neural Network (CNN), MobileNet, and VGG16 models within the Keras framework.
 
