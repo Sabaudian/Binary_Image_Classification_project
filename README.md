@@ -35,3 +35,12 @@ Artificial Neural Networks (ANNs) constitute a fundamental paradigm within the r
 In this context, ANNs are adopted in the context of image classification, a fundamental task within computer vision, that involves assigning predefined labels or categories to input images.
 
 This project explores binary image classification, a subset of image classification, focusing on the Muffins vs. Chihuahua dataset. The implementation involves leveraging Multilayer perceptron (MLP), Convolutional Neural Network (CNN), MobileNet, and VGG16 models within the Keras framework.
+
+## Brief Result Summary
+
+| MODEL  | LOSS | ACCURACY (%) | 
+| ------ | ---- | ------------ |
+| MLP  | 1.287 | 76,94 |
+| CNN  | 0.678 | 92.48 | 
+| VGG16 | 0.071 | 97.80 |
+| MobileNet | 0.049 | 99.24 | 
