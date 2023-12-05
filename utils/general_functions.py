@@ -23,7 +23,7 @@ def download_models_save_from_drive(drive_url, root_dir):
     # download model folder if not already present in the workspace
     if not os.path.exists("models"):
         # Checking folder
-        check_input = input("\n> The 'models' folder is not present in the workspace, "
+        check_input = input("\n> [SUGGESTED] The 'models' folder is not present in the workspace, "
                             "do you want to download it from Google Drive? [Y/N]: ")
         if check_input.upper() == "Y":
             # Download "models" folder
