@@ -26,7 +26,7 @@ and put in inside your project folder.
 
 > [!NOTE]
 > If you want to just run it, the dataset it is not really necessary,
-because through the project you can download from *Google Drive* a directory named *models*, where there are the saves of the pre-trained models and kfold result.
+because through the project you can download from *Google Drive* a directory named *models*, where there are the saves of the pre-trained models and k-fold cross-validation result.
 
 ## Who ate my Chihuahua?
 
