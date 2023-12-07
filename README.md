@@ -26,21 +26,14 @@ and put in inside your project folder.
 
 > [!NOTE]
 > If you want to just run it, the dataset it is not really necessary,
-because through the project you can download from *Google Drive* a directory named *models*, where there are the saves of the pre-trained models and kfold result.
+because through the project you can download from *Google Drive* a directory named *models*, where there are the saves of the pre-trained models and k-fold cross-validation result.
 
 ## Who ate my Chihuahua?
 
-Artificial Neural Networks (ANNs) constitute a fundamental paradigm within the realm of artificial intelligence, inspired by the intricate structure and functioning of the human brain. Comprising interconnected neurons, ANNs excel in learning complex patterns and relationships from data, offering unparalleled versatility across various domains.
+Artificial Neural Networks (ANNs) stand as a foundational paradigm in artificial intelligence, inspired by the intricate architecture of the human brain. In this study, we delve into the realm of image classification, specifically addressing the challenge of binary classification—discerning between images of muffins and Chihuahuas within a given dataset. This task, though seemingly trivial for humans, poses a complex challenge for machines that require training to recognize nuanced differences between the two categories.
 
-Here ANNs are adopted in the context of image classification, a fundamental task within computer vision, that involves assigning predefined labels or categories to input images.
+Our investigation employs the versatile Keras framework to train neural networks on transformed images. The images undergo a crucial preprocessing step, transitioning from JPG format to RGB pixel values, and are subsequently scaled down. Prior to this, meticulous preprocessing tasks such as corruption file checks and duplicate file checks were applied to ensure data integrity and eliminate redundancies within the dataset.
 
-This project explores binary image classification, a subset of image classification, focusing on the Muffins vs. Chihuahua dataset. The implementation involves leveraging Multilayer perceptron (MLP), Convolutional Neural Network (CNN), MobileNet, and VGG16 models within the Keras framework.
+This preprocessing step sets the stage for the subsequent exploration of various network architectures and training hyperparameters. To address the task at hand, we experiment with four distinct network architectures: The Multilayer Perceptron (MLP), Convolutional Neural Network (CNN), MobileNet, and VGG16 models within the Keras framework serve as our tools for exploration. 
 
-### Brief Result Summary
-
-| MODEL  | LOSS | ACCURACY (%) | 
-| ------ | ---- | ------------ |
-| MLP  | 1.287 | 76,94 |
-| CNN  | 0.678 | 92.48 | 
-| VGG16 | 0.071 | 97.80 |
-| MobileNet | 0.049 | 99.24 | 
+In addition to architectural variations, our study incorporates the crucial element of hyperparameter training, in order to obtain optimal values and improve overall performance. To prevent the risk of overfitting hyperparameters to the validation set, we use 5-fold cross-validation to calculate risk estimates, considering the zero-one loss for the reported cross-validated estimates. This methodology ensures an in-depth evaluation of the models' performance across different subsets of the dataset, providing a comprehensive understanding of their generalization capabilities.
