@@ -11,7 +11,7 @@ from keras.applications.vgg16 import VGG16
 from keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
-from sklearn.metrics import zero_one_loss
+# from sklearn.metrics import zero_one_loss
 
 # My import
 import plot_functions
@@ -360,6 +360,39 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
                                 show_on_screen=False, store_in_folder=True)
 
 
+def zero_one_loss(y_true, y_pred):
+    """
+    Compute the zero-one loss metric.
+    Returns 1 when y_true != y_pred, 0 otherwise.
+
+    Parameters:
+    - y_true (tensor): True labels.
+    - y_pred (tensor): Predicted labels.
+
+    Returns:
+    - zero_one_loss_value (tensor): Computed zero-one loss.
+    """
+
+    # y_pred_binary = tf.round(y_pred)
+    # temp = tf.cast(tf.equal(y_pred_binary, y_true), tf.float32)
+    # accuracy = tf.reduce_mean(temp, 1)
+    # batch_loss = tf.reduce_sum(temp)
+
+    # Convert predicted values to integers
+    y_pred = tf.cast(y_pred + 0.5, tf.int16)
+    # Convert true labels to integers
+    y_true = tf.cast(y_true, tf.int16)
+
+    # Compute the absolute difference between true and predicted labels
+    diff = tf.math.abs(y_true - y_pred)
+
+    # Check if the absolute difference is not equal to 0
+    # Cast the boolean values to int16 to get 1 for mis-classification, 0 for correct classification
+    zero_one_loss_value = tf.cast(tf.math.not_equal(x=diff, y=0), tf.int16)
+
+    return zero_one_loss_value
+
+
 # KFold cross validation function
 def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     """
@@ -386,10 +419,10 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     file_path = os.path.join(dir_path, model_name + "_kfold_model.h5")
 
     # Check if the 'models' folder exists
-    if os.path.exists(file_path):
+    if os.path.exists(path=file_path):
 
         # Load model from the right folder
-        model = keras.models.load_model(file_path)
+        model = keras.models.load_model(filepath=file_path, custom_objects={"zero_one_loss": zero_one_loss})
         print("- Model Loaded Successfully!")
     else:
 
@@ -406,7 +439,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
         # Load weight into the model, i.e., the best hyperparameters
         model.load_weights(filepath=os.path.join(best_model_directory, "best_model.h5"))
-        print("-- Best Hyperparameters for " + model_name + " model have been Loaded Successfully!")
+        print("-- Best weights for " + model_name + " model have been Loaded Successfully!")
 
         # KFold Cross-Validation function
         kfold = KFold(n_splits=k_folds, shuffle=True, random_state=42)
@@ -425,26 +458,27 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             model.compile(
                 optimizer="adam",
                 loss="binary_crossentropy",
-                metrics=["accuracy"]
+                metrics=["accuracy", zero_one_loss]
             )
 
             # Train the model on the training set for this fold
             history = model.fit(
                 X_train, Y_train,
+                batch_size=const.BATCH_SIZE,
                 epochs=10,
                 validation_data=(X_val, Y_val),
-                verbose=2
+                verbose=1
             )
 
             fold_history.append(history)
 
-            # Evaluate the model on the validation set for this fold
-            predict = model.predict(X_val)
-            y_pred = (predict >= 0.5).astype("int32")
-
-            # Compute Zero-one loss and Evaluation
-            val_zero_one_loss = zero_one_loss(Y_val, y_pred)
-            val_loss, val_accuracy = model.evaluate(X_val, Y_val)
+            # # Evaluate the model on the validation set for this fold
+            # predict = model.predict(X_val)
+            # y_pred = (predict >= 0.5).astype("int32")
+            #
+            # # Compute Zero-one loss and Evaluation
+            # val_zero_one_loss = zero_one_loss(Y_val, y_pred)
+            val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
 
             # Print and store the results for this fold
             print("- Loss: {:.4f}\n"
@@ -521,19 +555,9 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
         # Redo Tuning or not
         if not os.path.exists(tuned_file_path):
-
             # Tuning Hyperparameters -> Save not present
             tuning_hyperparameters(model=model_type, model_name=model_name,
                                    x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
-        else:
-            check_tuning = input(
-                "\n> " + model_name + " hyperparameter tuning has already been completed,"
-                                      " do you still want to redo this process? [Y/N]: ")
-
-            if check_tuning.upper() == "Y":
-                # Tuning Hyperparameters -> Redo tuning
-                tuning_hyperparameters(model=model_type, model_name=model_name,
-                                       x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
 
         # Apply Kfold Cross-validation
         kfold_result = kfold_cross_validation(model_name=model_name,

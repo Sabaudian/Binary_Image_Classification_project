@@ -205,16 +205,12 @@ def accuracy_loss_model(model, model_name, x_test, y_test):
     :param y_test: Target values of the test dataset.
     """
     # Compute loss and accuracy
-    test_loss, test_accuracy = model.evaluate(x=x_test, y=y_test, verbose=0)
-
-    predict = model.predict(x_test)
-    y_pred = (predict >= 0.5).astype("int32")
-    test_zero_one_loss = zero_one_loss(y_test, y_pred)
+    test_loss, test_accuracy, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
 
     # Print evaluation info. about the model
     print("\n- Test Loss: {:.4f}".format(test_loss))
     print("- Test Accuracy: {:.4f}%".format(test_accuracy * 100))
-    print("- Teso zero-one loss: {:.4f}\n".format(test_zero_one_loss))
+    print("- Test zero-one loss: {:.4f}\n".format(test_zero_one_loss))
 
     # Collect data
     data_list = {

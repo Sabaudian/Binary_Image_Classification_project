@@ -390,7 +390,6 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
 
     # Convert the predictions to binary classes (0 or 1)
     predicted_classes = (predicts >= 0.5).astype("int")
-    # predicted_classes = predicted_classes.flatten()
 
     # Assign class name to class indices (chihuahua = 0, muffin = 1)
     predicted_class_labels = ["chihuahua" if pred_label == 0 else "muffin" for pred_label in predicted_classes]
@@ -452,28 +451,44 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
     # Plot the training history for each fold
     for fold in range(len(fold_history)):
         # Plot size
-        plt.figure(figsize=(16, 8))
+        plt.figure(figsize=(24, 10))
 
         # Add a title to the entire plot
         plt.suptitle("{} Fold {} Training History".format(model_name, fold + 1), fontsize=18)
 
         # Accuracy
-        plt.subplot(1, 2, 1)
+        plt.subplot(1, 3, 1)
         plt.plot(fold_history[fold].history["accuracy"], linewidth=3)
         plt.plot(fold_history[fold].history["val_accuracy"], linewidth=3)
         plt.title(label="Training and Validation Accuracy", fontsize=16)
         plt.ylabel(ylabel="accuracy", fontsize=14)
         plt.xlabel(xlabel="epoch", fontsize=14)
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
         plt.grid()
         plt.legend(["Train", "Validation"], loc="upper right")
 
         # Loss
-        plt.subplot(1, 2, 2)
+        plt.subplot(1, 3, 2)
         plt.plot(fold_history[fold].history["loss"], linewidth=3)
         plt.plot(fold_history[fold].history["val_loss"], linewidth=3)
         plt.title(label="Training and Validation Loss", fontsize=16)
         plt.ylabel(ylabel="Loss", fontsize=14)
         plt.xlabel(xlabel="epoch", fontsize=14)
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
+        plt.grid()
+        plt.legend(["Train", "Validation"], loc="upper right")
+
+        # Zero-one Loss
+        plt.subplot(1, 3, 3)
+        plt.plot(fold_history[fold].history["zero_one_loss"], linewidth=3)
+        plt.plot(fold_history[fold].history["val_zero_one_loss"], linewidth=3)
+        plt.title(label="Training and Validation Zero-one Loss", fontsize=16)
+        plt.ylabel(ylabel="Zero-one Loss", fontsize=14)
+        plt.xlabel(xlabel="epoch", fontsize=14)
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
         plt.grid()
         plt.legend(["Train", "Validation"], loc="upper right")
 
