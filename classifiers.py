@@ -580,9 +580,17 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 # To be called in the main
 def classification_and_evaluation(train_path, test_path, show_plot=True, save_plot=True):
     """
+    Perform classification and evaluation of image datasets.
 
-    :param train_path:
-    :param test_path:
+    This function loads image datasets, prints information about class names, visualizes the dataset, scales the data,
+    performs data augmentation, converts images to arrays,
+    retrieves classification models, and applies KFold tuning.
+    The classification models are evaluated on the training, validation,
+    and testing datasets, and the results are displayed
+    through plots if specified.
+
+    :param train_path: path to train data set.
+    :param test_path: path to test data set.
     :param show_plot: If True, displays the plot on the screen.
         Default is True.
     :param save_plot: If True, save the plot.
