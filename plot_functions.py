@@ -258,6 +258,7 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
     """
     # Predict
     predict = model.predict(x_test)
+
     # Convert the predictions to binary classes (0 or 1)
     y_pred = (predict >= 0.5).astype("int32")
 
@@ -389,7 +390,7 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
     predicts = model.predict(x_test)
 
     # Convert the predictions to binary classes (0 or 1)
-    predicted_classes = (predicts >= 0.5).astype("int")
+    predicted_classes = (predicts >= 0.5).astype("int32")
 
     # Assign class name to class indices (chihuahua = 0, muffin = 1)
     predicted_class_labels = ["chihuahua" if pred_label == 0 else "muffin" for pred_label in predicted_classes]

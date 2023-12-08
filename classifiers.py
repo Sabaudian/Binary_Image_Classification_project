@@ -470,14 +470,13 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
                 verbose=1
             )
 
+            # Collect training history data
             fold_history.append(history)
+            fold_history_df = pd.DataFrame.from_dict(history.history)
+            csv_file_path = os.path.join(const.DATA_PATH, model_name + "_fold_history_data.csv")
+            fold_history_df.to_csv(csv_file_path, index=True, float_format="%.3f")
 
-            # # Evaluate the model on the validation set for this fold
-            # predict = model.predict(X_val)
-            # y_pred = (predict >= 0.5).astype("int32")
-            #
-            # # Compute Zero-one loss and Evaluation
-            # val_zero_one_loss = zero_one_loss(Y_val, y_pred)
+            # Brief evaluation per epoch on validation set
             val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
 
             # Print and store the results for this fold
@@ -543,7 +542,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
     # Scroll through the dictionary
     for key, value in models.items():
-        # MLP, CNN, VGG16 and MobileNet String
+        # MLP, CNN, VGG16 and MobileNet name string
         model_name = key
         # Models
         model_type = value
@@ -602,8 +601,8 @@ def classification_and_evaluation(train_path, test_path, show_plot=True, save_pl
 
     # Printing information about the datasets
     print("\n> Class Names:"
-          "\n\t- classe 0 = {}"
-          "\n\t- classe 1 = {}".format(train_dataset.class_names[0], train_dataset.class_names[1]))
+          "\n\t- Class 0 = {}"
+          "\n\t- Class 1 = {}".format(train_dataset.class_names[0], train_dataset.class_names[1]))
 
     # Visualize the dataset showing some images with corresponding labels
     plot_functions.plot_view_dataset(train_ds=train_dataset, show_on_screen=show_plot, store_in_folder=save_plot)
