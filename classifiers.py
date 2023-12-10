@@ -259,6 +259,11 @@ def get_classifier():
     return models
 
 
+# *********************************************************************** #
+# ****************** HYPERPARAMETER TUNING AND K-FOLD  ****************** #
+# *********************************************************************** #
+
+
 # Perform hyperparameter Tuning
 def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     """

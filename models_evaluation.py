@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from IPython import display
-from sklearn.metrics import classification_report, zero_one_loss
+from sklearn.metrics import classification_report
 
 # My import
 import plot_functions
