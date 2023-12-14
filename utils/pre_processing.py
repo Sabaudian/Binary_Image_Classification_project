@@ -41,7 +41,6 @@ def corruption_filter(dataset_path):
                 if filename.endswith("jpg"):
                     # Get the file path
                     file_path = os.path.join(dirpath, filename)
-                    # Get the file extension
                     try:
                         with Image.open(file_path) as image:
                             image.verify()

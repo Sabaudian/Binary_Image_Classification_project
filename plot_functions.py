@@ -69,7 +69,7 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
     sns.countplot(data=test_data, x="label", ax=ax2, hue="label", edgecolor="black")
 
     # settings first plot
-    ax1.set_title("Train Set", fontsize=16, weight="bold")
+    ax1.set_title("Training Set", fontsize=16, weight="bold")
     ax1.set_xlabel(xlabel="Label", fontsize=14)
     ax1.set_ylabel(ylabel="Count", fontsize=14)
 
