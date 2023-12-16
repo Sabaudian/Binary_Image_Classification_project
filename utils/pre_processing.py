@@ -53,7 +53,7 @@ def corruption_filter(dataset_path):
         if doc_message.upper() == "Y":
             for bad_file in bad_files:
                 # delete duplicate
-                os.remove(os.path.join(dataset_path, bad_file))
+                os.remove(bad_file)
                 print("- {} Corrupted File Deleted Successfully!".format(bad_file))
 
             # Print count

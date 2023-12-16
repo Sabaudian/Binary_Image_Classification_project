@@ -15,8 +15,9 @@ import utils.general_functions as general
 # ************* MODEL EVALUATION ************* #
 # ******************************************** #
 
+
 # Print info about the hyperparameter search
-def print_hyperparameters_search_info(model_name, best_hyperparameters):
+def get_hyperparameters_search_info(model_name, best_hyperparameters):
     """
     Print information about the optimal hyperparameter found during the tuning process,
     and store them into a .csv file
@@ -40,6 +41,7 @@ def print_hyperparameters_search_info(model_name, best_hyperparameters):
 
         # Define a dictionary
         mlp_best_hp_dict = {
+            "Model": model_name,
             "Units_1": best_hyperparameters["units_1"],
             "Units_2": best_hyperparameters["units_2"],
             "Units_3": best_hyperparameters["units_3"],
@@ -48,56 +50,36 @@ def print_hyperparameters_search_info(model_name, best_hyperparameters):
             "Learning Rate": best_hyperparameters["learning_rate"]
         }
         # Turn it into a dataframe
-        df = pd.DataFrame(mlp_best_hp_dict, index=[model_name])
+        df = pd.DataFrame(data=mlp_best_hp_dict)
 
         # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_best_hyperparameters.csv")
-        df.to_csv(file_path, index=True, float_format="%.3f")
+        file_path = os.path.join(const.DATA_PATH, f"{model_name}_best_hyperparameters.csv")
+        df.to_csv(file_path, index=False, float_format="%.3f")
 
-    # For CNN model
-    elif model_name == "CNN":
-        # Print Info.
-        print("\n> The hyperparameter search is complete!"
-              "\n- The optimal number of units in the densely-connected layer is: {}"
-              .format(best_hyperparameters.get("units")) +  # Dense layer units
-              "\n- The optimal learning rate for the optimizer is: {}"
-              .format(best_hyperparameters.get("learning_rate")))  # learning rate
-
-        # Define a dictionary
-        cnn_best_hp_dict = {
-            "Units": best_hyperparameters["units"],
-            "Learning Rate": best_hyperparameters["learning_rate"]
-        }
-        # Turn it into a dataframe
-        df = pd.DataFrame(cnn_best_hp_dict, index=[model_name])
-
-        # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_best_hyperparameters.csv")
-        df.to_csv(file_path, index=True, float_format="%.3f")
-
-    # For VGG16 and MobileNet
+    # For CNN, VGG16 and MobileNet
     else:
         # Print info.
         print("\n> The hyperparameter search is complete!"
               "\n- The optimal number of units in the densely-connected layer is: {}"
               .format(best_hyperparameters.get("units")) +  # Dense layer units
-              "\n- The optimal dropout rate is: {}"  # Dropout-rate
-              .format(best_hyperparameters.get("dropout_rate")) +
+              "\n- The optimal dropout rate is: {}"
+              .format(best_hyperparameters.get("dropout_rate")) +  # Dropout-rate
               "\n- The optimal learning rate for the optimizer is: {}"
               .format(best_hyperparameters.get("learning_rate")))  # Learning rate
 
         # Define a dataframe
         vgg16_or_mobilenet_best_hp_dict = {
+            "Model": model_name,
             "Units": best_hyperparameters["units"],
             "Dropout Rate": best_hyperparameters["dropout_rate"],
             "Learning Rate": best_hyperparameters["learning_rate"]
         }
         # Turn it into a dataframe
-        df = pd.DataFrame(vgg16_or_mobilenet_best_hp_dict, index=[model_name])
+        df = pd.DataFrame(data=vgg16_or_mobilenet_best_hp_dict)
 
         # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_best_hyperparameters.csv")
-        df.to_csv(file_path, index=True, float_format="%.3f")
+        file_path = os.path.join(const.DATA_PATH, f"{model_name}_best_hyperparameters.csv")
+        df.to_csv(file_path, index=False, float_format="%.3f")
 
 
 # Collect data about the search
@@ -138,31 +120,33 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
         df.sort_values(by=["Trial"], ascending=True, inplace=True)
 
         # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        file_path = os.path.join(const.DATA_PATH, f"{model_name}_hyperparameter_tuning_data.csv")
         df.to_csv(file_path, index=False, float_format="%.3f")
 
     elif model_name == "CNN":
         # CNN
         cnn_trials = []
         cnn_units = []
+        cnn_dropout_rate = []
         cnn_learning_rates = []
         cnn_score = []
 
         for num_trial in tuner.oracle.trials.values():
             cnn_trials.append(int(num_trial.trial_id) + 1)
             cnn_units.append(num_trial.hyperparameters["units"])
+            cnn_dropout_rate.append(num_trial.hyperparameters["dropout_rate"])
             cnn_learning_rates.append(num_trial.hyperparameters["learning_rate"])
             cnn_score.append(num_trial.score)
 
         # Define a dataframe
-        df = pd.DataFrame(list(zip(cnn_trials, cnn_units, cnn_learning_rates, cnn_score)),
-                          columns=["Trial", "Units", "Learning Rate", "Validation Accuracy"])
+        df = pd.DataFrame(list(zip(cnn_trials, cnn_units, cnn_dropout_rate, cnn_learning_rates, cnn_score)),
+                          columns=["Trial", "Units", "Dropout Rate", "Learning Rate", "Validation Accuracy"])
 
         # Sort the dataframe by trial values
         df.sort_values(by=["Trial"], ascending=True, inplace=True)
 
         # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        file_path = os.path.join(const.DATA_PATH, f"{model_name}_hyperparameter_tuning_data.csv")
         df.to_csv(file_path, index=False, float_format="%.3f")
 
     else:
@@ -189,7 +173,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
         df.sort_values(by=["Trial"], ascending=True, inplace=True)
 
         # Save data to csv file
-        file_path = os.path.join(const.DATA_PATH, model_name + "_hyperparameter_tuning_data.csv")
+        file_path = os.path.join(const.DATA_PATH, f"{model_name}_hyperparameter_tuning_data.csv")
         df.to_csv(file_path, index=False, float_format="%.3f")
 
 
@@ -252,7 +236,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
 
     # Save the report
     general.makedir(dirpath=const.DATA_PATH)
-    file_path = os.path.join(const.DATA_PATH, model_name + "_classification_report.csv")
+    file_path = os.path.join(const.DATA_PATH, f"{model_name}_classification_report.csv")
     df.to_csv(file_path, index=True, float_format="%.3f")
 
     return df
@@ -272,7 +256,6 @@ def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=
     :param save_plot: If True, save the plot.
         Default is True.
     """
-
     # Evaluate the model
     print("\n> " + model_name + " Model Evaluation:")
 

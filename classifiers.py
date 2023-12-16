@@ -11,14 +11,13 @@ from keras.applications.vgg16 import VGG16
 from keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
-# from sklearn.metrics import zero_one_loss
 
 # My import
 import plot_functions
 import constants as const
 import prepare_dataset as prepare
 import utils.general_functions as general
-from models_evaluation import collect_hyperparameters_tuning_data, print_hyperparameters_search_info, evaluate_model
+from models_evaluation import collect_hyperparameters_tuning_data, get_hyperparameters_search_info, evaluate_model
 
 
 # *********************************************************************** #
@@ -45,9 +44,9 @@ def build_mlp_model(hp):
         units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
         model.add(layers.Dense(units=units, activation="relu", name=f"hidden_layer_{i}"))
         # Batch Normalization for stabilization and acceleration
-        model.add(layers.BatchNormalization())
+        model.add(layers.BatchNormalization(), name=f"batch_normalization_{i}")
         # Add dropout for regularization to prevent overfitting
-        model.add(layers.Dropout(0.25))
+        model.add(layers.Dropout(0.25), name=f"dropout_{i}")
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -88,23 +87,23 @@ def build_cnn_model(hp):
     model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu",
                             input_shape=const.INPUT_SHAPE, name="convolution_1"))
     # Batch Normalization for stabilization and acceleration
-    model.add(layers.BatchNormalization())
+    model.add(layers.BatchNormalization(), name="batch_normalization_1")
     # MaxPooling layer to reduce spatial dimensions
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_1"))
     # Add dropout for regularization to prevent overfitting
-    model.add(layers.Dropout(0.25))
+    model.add(layers.Dropout(0.25), name="dropout_1")
 
     # Convolutional layer with 64 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_2"))
-    model.add(layers.BatchNormalization())
+    model.add(layers.BatchNormalization(), name="batch_normalization_2")
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_2"))
-    model.add(layers.Dropout(0.25))
+    model.add(layers.Dropout(0.25), name="dropout_2")
 
     # Convolutional layer with 128 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_3"))
-    model.add(layers.BatchNormalization())
+    model.add(layers.BatchNormalization(), name="batch_normalization_3")
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_3"))
-    model.add(layers.Dropout(0.25))
+    model.add(layers.Dropout(0.25), name="dropout_3")
 
     # Flatten layer to transition from convolutional layers to dense layer
     model.add(layers.Flatten(name="flatten"))
@@ -112,7 +111,9 @@ def build_cnn_model(hp):
     # Tune the number of units in the dense layer
     hp_units = hp.Int("units", min_value=32, max_value=512, step=32)
     model.add(layers.Dense(units=hp_units, activation="relu", name="hidden_layer"))
-    model.add(layers.Dropout(0.5))
+    # model.add(layers.Dropout(0.5), name="dropout_4")
+    # Tune the dropout rate
+    layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1))
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -319,8 +320,8 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     # Retrieve the best hyperparameters
     best_hyperparameters = tuner.get_best_hyperparameters()[0]
 
-    # Print information about the optimal hyperparameter found during the tuning process
-    print_hyperparameters_search_info(model_name=model_name, best_hyperparameters=best_hyperparameters)
+    # Information about the optimal hyperparameter found during the tuning process
+    get_hyperparameters_search_info(model_name=model_name, best_hyperparameters=best_hyperparameters)
 
     # Build the model with the optimal hyperparameters and train it on the data for 10 epochs
     print("\n> Build the model with the optimal hyperparameters and train it on the data for 10 epochs")
@@ -377,12 +378,6 @@ def zero_one_loss(y_true, y_pred):
     Returns:
     - zero_one_loss_value (tensor): Computed zero-one loss.
     """
-
-    # y_pred_binary = tf.round(y_pred)
-    # temp = tf.cast(tf.equal(y_pred_binary, y_true), tf.float32)
-    # accuracy = tf.reduce_mean(temp, 1)
-    # batch_loss = tf.reduce_sum(temp)
-
     # Convert predicted values to integers
     y_pred = tf.cast(y_pred + 0.5, tf.int16)
     # Convert true labels to integers
@@ -478,8 +473,8 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             # Collect training history data
             fold_history.append(history)
             fold_history_df = pd.DataFrame.from_dict(history.history)
-            csv_file_path = os.path.join(const.DATA_PATH, model_name + "_fold_history_data.csv")
-            fold_history_df.to_csv(csv_file_path, index=True, float_format="%.3f")
+            csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_history_data.csv")
+            fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, float_format="%.3f")
 
             # Brief evaluation per epoch on validation set
             val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
@@ -512,7 +507,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         fold_df = pd.concat([fold_df, pd.DataFrame([avg_values])], ignore_index=True)
 
         # Save fold data to csv file
-        csv_file_path = os.path.join(const.DATA_PATH, model_name + "_fold_data.csv")
+        csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_data.csv")
         fold_df.to_csv(csv_file_path, index=False, float_format="%.3f")
 
         # Plot fold history
