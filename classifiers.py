@@ -36,7 +36,7 @@ def build_mlp_model(hp):
     :return: Keras.Model
         The compiled MLP model.
     """
-    model = tf.keras.Sequential()
+    model = tf.keras.Sequential(name="MultiLayer_Perceptron")
 
     model.add(layers.Flatten(input_shape=const.INPUT_SHAPE))
 
@@ -44,9 +44,9 @@ def build_mlp_model(hp):
         units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
         model.add(layers.Dense(units=units, activation="relu", name=f"hidden_layer_{i}"))
         # Batch Normalization for stabilization and acceleration
-        model.add(layers.BatchNormalization(), name=f"batch_normalization_{i}")
+        model.add(layers.BatchNormalization(name=f"batch_normalization_{i}"))
         # Add dropout for regularization to prevent overfitting
-        model.add(layers.Dropout(0.25), name=f"dropout_{i}")
+        model.add(layers.Dropout(rate=0.25, name=f"dropout_{i}"))
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -81,29 +81,29 @@ def build_cnn_model(hp):
         The compiled CNN model.
     """
     # Create a Sequential model
-    model = tf.keras.Sequential()
+    model = tf.keras.Sequential(name="Convolutional_Neural_Network")
 
     # Convolutional layer with 32 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu",
                             input_shape=const.INPUT_SHAPE, name="convolution_1"))
     # Batch Normalization for stabilization and acceleration
-    model.add(layers.BatchNormalization(), name="batch_normalization_1")
+    model.add(layers.BatchNormalization(name="batch_normalization_1"))
     # MaxPooling layer to reduce spatial dimensions
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_1"))
     # Add dropout for regularization to prevent overfitting
-    model.add(layers.Dropout(0.25), name="dropout_1")
+    model.add(layers.Dropout(rate=0.25, name="dropout_1"))
 
     # Convolutional layer with 64 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_2"))
-    model.add(layers.BatchNormalization(), name="batch_normalization_2")
+    model.add(layers.BatchNormalization(name="batch_normalization_2"))
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_2"))
-    model.add(layers.Dropout(0.25), name="dropout_2")
+    model.add(layers.Dropout(rate=0.25, name="dropout_2"))
 
     # Convolutional layer with 128 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_3"))
-    model.add(layers.BatchNormalization(), name="batch_normalization_3")
+    model.add(layers.BatchNormalization(name="batch_normalization_3"))
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_3"))
-    model.add(layers.Dropout(0.25), name="dropout_3")
+    model.add(layers.Dropout(rate=0.25, name="dropout_3"))
 
     # Flatten layer to transition from convolutional layers to dense layer
     model.add(layers.Flatten(name="flatten"))
@@ -111,9 +111,9 @@ def build_cnn_model(hp):
     # Tune the number of units in the dense layer
     hp_units = hp.Int("units", min_value=32, max_value=512, step=32)
     model.add(layers.Dense(units=hp_units, activation="relu", name="hidden_layer"))
-    # model.add(layers.Dropout(0.5), name="dropout_4")
     # Tune the dropout rate
-    layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1))
+    hp_dropout_rate = hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
+    model.add(layers.Dropout(rate=hp_dropout_rate, name="dropout_4"))
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -157,11 +157,12 @@ def build_vgg16_model(hp):
     # Create a Sequential model with the VGG16 base model
     model = tf.keras.Sequential([
         base_model,
-        layers.Flatten(),
-        layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128), activation="relu"),
+        layers.Flatten(name="flatten"),
+        layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128),
+                     activation="relu", name="hidden_layer"),
         layers.BatchNormalization(),
-        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)),
-        layers.Dense(1, activation="sigmoid")
+        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
+        layers.Dense(units=1, activation="sigmoid", name="output_layer")
     ])
 
     # Tune the learning rate for the optimizer
@@ -472,17 +473,17 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
             # Collect training history data
             fold_history.append(history)
-            fold_history_df = pd.DataFrame.from_dict(history.history)
+            fold_history_df = pd.DataFrame.from_dict(data=history.history)
             csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_history_data.csv")
-            fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, float_format="%.3f")
+            fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, index_label="epoch", float_format="%.3f")
 
             # Brief evaluation per epoch on validation set
             val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
 
             # Print and store the results for this fold
-            print("- Loss: {:.4f}\n"
-                  "- Accuracy: {:.4f}\n"
-                  "- Zero-one Loss: {:.4f}".format(val_loss, val_accuracy, val_zero_one_loss))
+            print("- Loss: {}\n"
+                  "- Accuracy: {}\n"
+                  "- Zero-one Loss: {}".format(val_loss, val_accuracy, val_zero_one_loss))
             print("__________________________________________________________________________________________")
 
             fold_data.append({
@@ -552,9 +553,9 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
         # Best model filepath
         tuned_file_path = os.path.join(tuned_model_folder, "best_model.h5")
 
-        # Redo Tuning or not
+        # Redo Tuning if not already done it
         if not os.path.exists(tuned_file_path):
-            # Tuning Hyperparameters -> Save not present
+            # Tuning Hyperparameters and Save the Best
             tuning_hyperparameters(model=model_type, model_name=model_name,
                                    x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
 

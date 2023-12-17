@@ -50,11 +50,11 @@ def get_hyperparameters_search_info(model_name, best_hyperparameters):
             "Learning Rate": best_hyperparameters["learning_rate"]
         }
         # Turn it into a dataframe
-        df = pd.DataFrame(data=mlp_best_hp_dict)
+        df = pd.DataFrame(data=[mlp_best_hp_dict])
 
         # Save data to csv file
         file_path = os.path.join(const.DATA_PATH, f"{model_name}_best_hyperparameters.csv")
-        df.to_csv(file_path, index=False, float_format="%.3f")
+        df.to_csv(file_path, index=False, float_format="%.4f")
 
     # For CNN, VGG16 and MobileNet
     else:
@@ -68,18 +68,18 @@ def get_hyperparameters_search_info(model_name, best_hyperparameters):
               .format(best_hyperparameters.get("learning_rate")))  # Learning rate
 
         # Define a dataframe
-        vgg16_or_mobilenet_best_hp_dict = {
+        other_model_best_hp_dict = {
             "Model": model_name,
             "Units": best_hyperparameters["units"],
             "Dropout Rate": best_hyperparameters["dropout_rate"],
             "Learning Rate": best_hyperparameters["learning_rate"]
         }
         # Turn it into a dataframe
-        df = pd.DataFrame(data=vgg16_or_mobilenet_best_hp_dict)
+        df = pd.DataFrame(data=[other_model_best_hp_dict])
 
         # Save data to csv file
         file_path = os.path.join(const.DATA_PATH, f"{model_name}_best_hyperparameters.csv")
-        df.to_csv(file_path, index=False, float_format="%.3f")
+        df.to_csv(file_path, index=False, float_format="%.4f")
 
 
 # Collect data about the search
@@ -121,7 +121,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
 
         # Save data to csv file
         file_path = os.path.join(const.DATA_PATH, f"{model_name}_hyperparameter_tuning_data.csv")
-        df.to_csv(file_path, index=False, float_format="%.3f")
+        df.to_csv(file_path, index=False, float_format="%.4f")
 
     elif model_name == "CNN":
         # CNN
@@ -147,7 +147,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
 
         # Save data to csv file
         file_path = os.path.join(const.DATA_PATH, f"{model_name}_hyperparameter_tuning_data.csv")
-        df.to_csv(file_path, index=False, float_format="%.3f")
+        df.to_csv(file_path, index=False, float_format="%.4f")
 
     else:
         # MobileNet, VGG16
@@ -174,7 +174,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
 
         # Save data to csv file
         file_path = os.path.join(const.DATA_PATH, f"{model_name}_hyperparameter_tuning_data.csv")
-        df.to_csv(file_path, index=False, float_format="%.3f")
+        df.to_csv(file_path, index=False, float_format="%.4f")
 
 
 # Print Test Accuracy and Test Loss
@@ -237,7 +237,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
     # Save the report
     general.makedir(dirpath=const.DATA_PATH)
     file_path = os.path.join(const.DATA_PATH, f"{model_name}_classification_report.csv")
-    df.to_csv(file_path, index=True, float_format="%.3f")
+    df.to_csv(file_path, index=True, index_label="index", float_format="%.3f")
 
     return df
 
