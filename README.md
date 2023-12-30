@@ -6,7 +6,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 ## General Information
 
 - Python version is: 3.10.5
-- Tensorflow version is: 2.14.0
+- Tensorflow version is: 2.15.0
 - Scikit-learn version is: 1.3.1
 
 ## How to Set up your Workspace:
