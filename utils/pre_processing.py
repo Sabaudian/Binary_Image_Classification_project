@@ -6,7 +6,6 @@ from PIL import Image, UnidentifiedImageError
 
 # My import
 import plot_functions
-# from utils.general_functions import sort_files
 from utils.general_functions import count_files
 from utils.general_functions import define_dataframe
 from utils.general_functions import print_file_counts
@@ -31,9 +30,6 @@ def corruption_filter(dataset_path):
 
         # Ensure we're processing a sub-folder level
         if dirpath is not dataset_path:
-
-            # # Properly sorted file as presented in the original dataset
-            # sort_files(filenames)
 
             # Loop through all files
             for filename in filenames:
@@ -129,11 +125,11 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path, show_plot, sav
     # Check for duplicates in training dataset: train/chihuahua and train /muffin
     print("\n> Checking duplicates in train/chihuahua directory...[current num. of file: {}]"
           .format(count_files(file_path=train_chihuahua_path)))
-    find_out_duplicate(dataset_path=train_chihuahua_path, hash_size=32)
+    find_out_duplicate(dataset_path=train_chihuahua_path, hash_size=8)
 
     print("\n> Checking duplicates in train/muffin directory...[current num. of file: {}]"
           .format(count_files(file_path=train_muffin_path)))
-    find_out_duplicate(dataset_path=train_muffin_path, hash_size=32)
+    find_out_duplicate(dataset_path=train_muffin_path, hash_size=8)
 
     print("\n> Final check to confirm the total file count:")
     print_file_counts(dataset_path=dataset_path)

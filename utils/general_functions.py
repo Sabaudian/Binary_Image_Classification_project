@@ -5,6 +5,12 @@ import pandas as pd
 
 from PIL import Image
 
+# My import
+from classifiers import build_mlp_model
+from classifiers import build_cnn_model
+from classifiers import build_vgg16_model
+from classifiers import build_mobilenet_model
+
 
 # ************************************* #
 # ********* GENERAL FUNCTIONS ********* #
@@ -147,3 +153,36 @@ def define_dataframe(train_dir_path, test_dir_path):
     test_df = pd.DataFrame(test_data)
 
     return train_df, test_df
+
+
+# Organize models in a dictionary
+def get_classifier():
+    """
+    Retrieves a dictionary of pre-built classification models.
+
+    :return: A dictionary containing the following classification models:
+             - 'MLP': Multi-layer Perceptron model
+             - 'CNN': Convolutional Neural Network model
+             - 'VGG16': VGG16 model
+             - 'MobileNet': MobileNet model
+    """
+    # models dictionary
+    models = {"MLP": [], "CNN": [], "MobileNet": []}  # "VGG16": [],
+
+    # Multi-layer Perceptron model
+    mlp_model = build_mlp_model
+    models.update({"MLP": mlp_model})
+
+    # Convolutional Neural Network model
+    cnn_model = build_cnn_model
+    models.update({"CNN": cnn_model})
+
+    # # VGG16 model
+    # vgg16_model = build_vgg16_model
+    # models.update({"VGG16": vgg16_model})
+
+    # MobileNet model
+    mobilenet_model = build_mobilenet_model
+    models.update({"MobileNet": mobilenet_model})
+
+    return models

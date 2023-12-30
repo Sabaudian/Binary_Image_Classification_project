@@ -1,14 +1,14 @@
 # Import
 import os
-import keras
 import numpy as np
 import pandas as pd
 import tensorflow as tf
 import keras_tuner as kt
 
-from keras import layers
-from keras.applications.vgg16 import VGG16
-from keras.applications.mobilenet import MobileNet
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.applications.vgg16 import VGG16
+from tensorflow.keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
 
@@ -17,6 +17,7 @@ import plot_functions
 import constants as const
 import prepare_dataset as prepare
 import utils.general_functions as general
+
 from models_evaluation import collect_hyperparameters_tuning_data, get_hyperparameters_search_info, evaluate_model
 
 
@@ -64,7 +65,7 @@ def build_mlp_model(hp):
     general.makedir(os.path.join("plot", "MLP"))  # Create the directory
     plot_path = os.path.join("plot", "MLP", "MLP_model_summary_plot.jpg")  # Path to store the plot
     model.summary()
-    keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
+    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
 
@@ -123,7 +124,7 @@ def build_cnn_model(hp):
 
     # Compile the model
     model.compile(
-        optimizer=keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
+        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
         loss="binary_crossentropy",
         metrics=["accuracy"]
     )
@@ -132,7 +133,7 @@ def build_cnn_model(hp):
     general.makedir(os.path.join("plot", "CNN"))  # Create the directory
     plot_path = os.path.join("plot", "CNN", "CNN_model_summary_plot.jpg")  # Path to store the plot
     model.summary()
-    keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
+    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
 
@@ -155,7 +156,7 @@ def build_vgg16_model(hp):
     base_model.trainable = False
 
     # Create a Sequential model with the VGG16 base model
-    model = tf.keras.Sequential([
+    model = tf.keras.Sequential(layers=[
         base_model,
         layers.Flatten(name="flatten"),
         layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128),
@@ -163,13 +164,13 @@ def build_vgg16_model(hp):
         layers.BatchNormalization(),
         layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
-    ])
+    ], name="vgg16")
 
     # Tune the learning rate for the optimizer
     hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
 
     model.compile(
-        optimizer=keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
+        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
         loss="binary_crossentropy",
         metrics=["accuracy"]
     )
@@ -178,7 +179,7 @@ def build_vgg16_model(hp):
     general.makedir(os.path.join("plot", "VGG16"))  # Create the directory
     plot_path = os.path.join("plot", "VGG16", "VGG16_model_summary_plot.jpg")  # Path to store the plot
     model.summary()
-    keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
+    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
 
@@ -201,20 +202,21 @@ def build_mobilenet_model(hp):
     base_model.trainable = False
 
     # Create a Sequential model with the MobileNet base model
-    model = tf.keras.Sequential([
+    model = tf.keras.Sequential(layers=[
         base_model,
-        layers.GlobalAveragePooling2D(),
-        layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128), activation="relu"),
+        layers.Flatten(),
+        layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128),
+                     activation="relu", name="hidden_layer"),
         layers.BatchNormalization(),
-        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)),
-        layers.Dense(1, activation="sigmoid")
-    ])
+        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
+        layers.Dense(units=1, activation="sigmoid", name="output_layer")
+    ], name="mobilenet")
 
     # Tune the learning rate for the optimizer
     hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
 
     model.compile(
-        optimizer=keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
+        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
         loss="binary_crossentropy",
         metrics=["accuracy"]
     )
@@ -223,42 +225,9 @@ def build_mobilenet_model(hp):
     general.makedir(os.path.join("plot", "MobileNet"))  # Create the directory
     plot_path = os.path.join("plot", "MobileNet", "MobileNet_model_summary_plot.jpg")  # Path to store the plot
     model.summary()
-    keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
+    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
-
-
-# Organize models in a dictionary
-def get_classifier():
-    """
-    Retrieves a dictionary of pre-built classification models.
-
-    :return: A dictionary containing the following classification models:
-             - 'MLP': Multi-layer Perceptron model
-             - 'CNN': Convolutional Neural Network model
-             - 'VGG16': VGG16 model
-             - 'MobileNet': MobileNet model
-    """
-    # models dictionary
-    models = {"MLP": [], "CNN": [], "VGG16": [], "MobileNet": []}
-
-    # Multi-layer Perceptron model
-    mlp_model = build_mlp_model
-    models.update({"MLP": mlp_model})
-
-    # Convolutional Neural Network model
-    cnn_model = build_cnn_model
-    models.update({"CNN": cnn_model})
-
-    # VGG16 model
-    vgg16_model = build_vgg16_model
-    models.update({"VGG16": vgg16_model})
-
-    # MobileNet model
-    mobilenet_model = build_mobilenet_model
-    models.update({"MobileNet": mobilenet_model})
-
-    return models
 
 
 # *********************************************************************** #
@@ -305,7 +274,7 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     tuner.search_space_summary()
 
     # Monitor "val_loss" and stop early if not improving
-    stop_early = keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
+    stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
 
     # Performs a search for best hyperparameter configurations.
     tuner.search(
@@ -338,7 +307,7 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     # Compute best epoch value
     val_accuracy_per_epochs = history.history["val_accuracy"]
     best_epoch = val_accuracy_per_epochs.index(max(val_accuracy_per_epochs)) + 1
-    print("\n> Best Epoch: {}\n".format(best_epoch, ))
+    print("\n> Best Epoch: {}\n".format(best_epoch))
 
     # Rerun the model with the optimal value for the epoch
     hypermodel = tuner.hypermodel.build(best_hyperparameters)
@@ -423,7 +392,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     if os.path.exists(path=file_path):
 
         # Load model from the right folder
-        model = keras.models.load_model(filepath=file_path, custom_objects={"zero_one_loss": zero_one_loss})
+        model = tf.keras.models.load_model(filepath=file_path, custom_objects={"zero_one_loss": zero_one_loss})
         print("- Model Loaded Successfully!")
     else:
 
@@ -436,7 +405,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         json_file.close()
 
         # This is the structure of the best model obtained after tuning
-        model = keras.models.model_from_json(load_model_json)
+        model = tf.keras.models.model_from_json(load_model_json)
 
         # Load weight into the model, i.e., the best hyperparameters
         model.load_weights(filepath=os.path.join(best_model_directory, "best_model.h5"))
@@ -623,7 +592,7 @@ def classification_and_evaluation(train_path, test_path, show_plot=True, save_pl
     X_test, y_test = prepare.image_to_array(test_ds)
 
     # Get the classification models
-    classification_models = get_classifier()
+    classification_models = general.get_classifier()
 
     # Tuning, apply KFold and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,

@@ -1,7 +1,8 @@
 # Import
-import keras
 import numpy as np
 import tensorflow as tf
+
+from tensorflow import keras
 
 # My import
 import constants as const
@@ -10,7 +11,8 @@ import constants as const
 # load data into keras dataset
 def load_dataset(train_data_dir, test_data_dir):
     """
-    Load data as a Keras dataset and perform tuning and rescaling processes
+    Load data from directory as a Keras dataset
+
     :param train_data_dir: the path to the training data
     :param test_data_dir: the path to the test data
     :return: tf.Dataset.data object
@@ -44,24 +46,25 @@ def perform_data_augmentation():
     """
     Performs data augmentation using Keras Sequential model with specific layers.
 
-    :return: Keras Sequential model representing the data augmentation operations.
-
     - RandomFlip: str, Specifies the type of random flip to be applied.
 
     - RandomRotation: float, Specifies the maximum angle of rotation in degrees.
 
     - RandomZoom: float, Specifies the maximum zoom factor.
+
+    :return: Keras Sequential model representing the data augmentation operations.
     """
     # Perform data augmentation
-    data_augmentation = keras.Sequential([
-        keras.layers.RandomFlip("horizontal"),
-        keras.layers.RandomRotation(0.1),
-        keras.layers.RandomZoom(0.2),
+    data_augmentation = tf.keras.Sequential([
+        tf.keras.layers.RandomFlip("horizontal"),
+        tf.keras.layers.RandomRotation(0.1),
+        tf.keras.layers.RandomZoom(0.2),
     ])
 
     return data_augmentation
 
 
+# Data Normalization
 def data_normalization(tf_dataset, augment):
     """
     Scale the keras dataset and perform prefetch.

@@ -49,7 +49,8 @@ def main():
     download_models_save_from_drive(drive_url=const.DRIVE_URL, root_dir=const.PROJECT_ROOT)
 
     # Classification and Evaluation of the Models
-    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR, show_plot=False, save_plot=True)
+    classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,
+                                  show_plot=False, save_plot=True)
 
 
 if __name__ == '__main__':
@@ -75,13 +76,19 @@ if __name__ == '__main__':
     # val_ds = prepare.data_normalization(tf_dataset=val_dataset, augment=False)
     # test_ds = prepare.data_normalization(tf_dataset=test_dataset, augment=False)
     #
+    # plot_functions.plot_data_augmentation(train_ds=train_ds, data_augmentation=prepare.perform_data_augmentation(),
+    #                                       show_on_screen=True, store_in_folder=True)
+    #
     # # dataset into array
     # X_train, y_train = prepare.image_to_array(train_ds)
     # X_val, y_val = prepare.image_to_array(val_ds)
     # X_test, y_test = prepare.image_to_array(test_ds)
     #
     # # NN Model Tuning
-    # vgg16_model = classifiers.build_vgg16_model
-    # classifiers.tuning_hyperparameters(model=vgg16_model, model_name="VGG16",
+    # cnn_model = classifiers.build_cnn_model
+    # classifiers.tuning_hyperparameters(model=cnn_model, model_name="CNN",
     #                                    x_train=X_train, y_train=y_train,
     #                                    x_val=X_val, y_val=y_val)
+    #
+    # evaluate.evaluate_model(model=cnn_model, model_name="CNN",
+    #                         x_test=X_test, y_test=y_test, show_plot=False, save_plot=True)
