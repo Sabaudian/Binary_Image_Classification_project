@@ -123,7 +123,7 @@ def plot_view_dataset(train_ds, show_on_screen=True, store_in_folder=True):
     plt.figure(figsize=(16, 8))
 
     # Add a title to the entire plot
-    plt.suptitle("Dataset Snapshot: Visualizing Images with Class Labels", fontsize=18, weight="bold")
+    plt.suptitle(t="Dataset Snapshot: Visualizing Images with Class Labels", fontsize=18, weight="bold")
 
     # Take the first batch of images and labels from the dataset
     for images, labels in train_ds.take(1):
@@ -170,7 +170,7 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
     plt.figure(figsize=(10, 8))
 
     # Add a title to the entire plot
-    plt.suptitle("Data Augmentation Example", fontsize=22, weight="bold")
+    plt.suptitle(t="Data Augmentation Example", fontsize=22, weight="bold")
 
     # Take the first batch of images from the dataset
     for images, _ in train_ds.take(1):
@@ -257,7 +257,7 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
         Defaults to True.
     """
     # Predict
-    predict = model.predict(x_test)
+    predict = model.predict(x=x_test, verbose=0)
 
     # Convert the predictions to binary classes (0 or 1)
     y_pred = (predict >= 0.5).astype("int32")
@@ -307,7 +307,7 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
         Default is True.
     """
     # Predict
-    predict = model.predict(x_test)
+    predict = model.predict(x=x_test, verbose=0)
     # Convert the predictions to binary classes (0 or 1)
     y_pred = (predict >= 0.5).astype("int32")
 
@@ -387,7 +387,7 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
     # y_test = y_test[random_indices]
 
     # Predict
-    predicts = model.predict(x_test)
+    predicts = model.predict(x=x_test, verbose=0)
 
     # Convert the predictions to binary classes (0 or 1)
     predicted_classes = (predicts >= 0.5).astype("int32")
@@ -467,6 +467,7 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
         plt.xticks(fontsize=12)
         plt.yticks(fontsize=12)
         plt.grid()
+        plt.minorticks_on()
         plt.legend(["Train", "Validation"], loc="upper right")
 
         # Loss

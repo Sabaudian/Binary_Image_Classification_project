@@ -7,7 +7,7 @@ from utils.general_functions import download_models_save_from_drive
 # Imported to get package version info.
 import sklearn
 import platform
-import tensorflow as tf
+import tensorflow
 
 import warnings
 
@@ -33,7 +33,7 @@ def main():
     print("\n> Version control")
     print("- Python version is: {}".format(platform.python_version()))
     print("- Scikit-learn version is: {}".format(sklearn.__version__))
-    print("- Tensorflow version is: {}".format(tf.__version__))
+    print("- Tensorflow version is: {}".format(tensorflow.__version__))
     print("______________________________________________________________________________")
 
     # Checking the dataset

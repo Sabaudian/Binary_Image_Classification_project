@@ -84,7 +84,7 @@ def build_cnn_model(hp):
     # Create a Sequential model
     model = tf.keras.Sequential(name="Convolutional_Neural_Network")
 
-    # Convolutional layer with 32 filters and a kernel size of (3, 3)
+    # First Convolutional layer with 32 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu",
                             input_shape=const.INPUT_SHAPE, name="convolution_1"))
     # Batch Normalization for stabilization and acceleration
@@ -94,27 +94,39 @@ def build_cnn_model(hp):
     # Add dropout for regularization to prevent overfitting
     model.add(layers.Dropout(rate=0.25, name="dropout_1"))
 
-    # Convolutional layer with 64 filters and a kernel size of (3, 3)
-    model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_2"))
+    # Second Convolutional layer with 32 filters and a kernel size of (3, 3)
+    model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu", name="convolution_2"))
     model.add(layers.BatchNormalization(name="batch_normalization_2"))
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_2"))
     model.add(layers.Dropout(rate=0.25, name="dropout_2"))
 
-    # Convolutional layer with 128 filters and a kernel size of (3, 3)
-    model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_3"))
+    # Third Convolutional layer with 32 filters and a kernel size of (3, 3)
+    model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_3"))
     model.add(layers.BatchNormalization(name="batch_normalization_3"))
     model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_3"))
     model.add(layers.Dropout(rate=0.25, name="dropout_3"))
+
+    # Fourth Convolutional layer with 32 filters and a kernel size of (3, 3)
+    model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_4"))
+    model.add(layers.BatchNormalization(name="batch_normalization_4"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_4"))
+    model.add(layers.Dropout(rate=0.25, name="dropout_4"))
+
+    # Fifth Convolutional layer with 128 filters and a kernel size of (3, 3)
+    model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_5"))
+    model.add(layers.BatchNormalization(name="batch_normalization_5"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_5"))
+    model.add(layers.Dropout(rate=0.25, name="dropout_5"))
 
     # Flatten layer to transition from convolutional layers to dense layer
     model.add(layers.Flatten(name="flatten"))
 
     # Tune the number of units in the dense layer
     hp_units = hp.Int("units", min_value=32, max_value=512, step=32)
-    model.add(layers.Dense(units=hp_units, activation="relu", name="hidden_layer"))
+    model.add(layers.Dense(units=hp_units, activation="relu", name="dense_layer"))
     # Tune the dropout rate
     hp_dropout_rate = hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
-    model.add(layers.Dropout(rate=hp_dropout_rate, name="dropout_4"))
+    model.add(layers.Dropout(rate=hp_dropout_rate, name="dropout_6"))
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -159,12 +171,13 @@ def build_vgg16_model(hp):
     model = tf.keras.Sequential(layers=[
         base_model,
         layers.Flatten(name="flatten"),
-        layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128),
-                     activation="relu", name="hidden_layer"),
+        layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
+                     # min_value=128, max_value=1024, step=128
+                     activation="relu", name="dense_layer"),
         layers.BatchNormalization(),
         layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
-    ], name="vgg16")
+    ], name="VGG16")
 
     # Tune the learning rate for the optimizer
     hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
@@ -205,12 +218,12 @@ def build_mobilenet_model(hp):
     model = tf.keras.Sequential(layers=[
         base_model,
         layers.Flatten(),
-        layers.Dense(units=hp.Int("units", min_value=128, max_value=1024, step=128),
+        layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
                      activation="relu", name="hidden_layer"),
         layers.BatchNormalization(),
         layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
-    ], name="mobilenet")
+    ], name="MobileNet")
 
     # Tune the learning rate for the optimizer
     hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
@@ -230,9 +243,9 @@ def build_mobilenet_model(hp):
     return model
 
 
-# *********************************************************************** #
-# ****************** HYPERPARAMETER TUNING AND K-FOLD  ****************** #
-# *********************************************************************** #
+# ************************************************************* #
+# ****************** HYPERPARAMETER TUNING   ****************** #
+# ************************************************************* #
 
 
 # Perform hyperparameter Tuning
@@ -336,6 +349,10 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
                                 show_on_screen=False, store_in_folder=True)
 
 
+# *************************************************************** #
+# ****************** K-FOLD CROSS-VALIDATION   ****************** #
+# *************************************************************** #
+
 def zero_one_loss(y_true, y_pred):
     """
     Compute the zero-one loss metric.
@@ -426,7 +443,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
             # Create and compile a new instance of the model
             model.compile(
-                optimizer="adam",
+                optimizer=tf.keras.optimizers.legacy.Adam(),
                 loss="binary_crossentropy",
                 metrics=["accuracy", zero_one_loss]
             )
@@ -542,7 +559,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
     # Save the data
     general.makedir(dirpath=const.DATA_PATH)
-    file_path = os.path.join(const.DATA_PATH, "models_simple_test_evaluation_table.csv")
+    file_path = os.path.join(const.DATA_PATH, "Models_Performances_on_Test_Set.csv")
     df.to_csv(file_path, index=False, float_format="%.3f")
 
 

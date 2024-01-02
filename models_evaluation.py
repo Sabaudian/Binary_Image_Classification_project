@@ -181,7 +181,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
 def accuracy_loss_model(model, model_name, x_test, y_test):
     """
     Compute a simple evaluation of the model,
-    printing the loss, accuracy and Zero-one loss for the test set.
+    printing the loss, accuracy for the test set.
 
     :param model: Model in input.
     :param model_name: Name of the model.
@@ -192,9 +192,9 @@ def accuracy_loss_model(model, model_name, x_test, y_test):
     test_loss, test_accuracy, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
 
     # Print evaluation info. about the model
-    print("\n- Test Loss: {:.4f}".format(test_loss))
-    print("- Test Accuracy: {:.4f}%".format(test_accuracy * 100))
-    print("- Test zero-one loss: {:.4f}\n".format(test_zero_one_loss))
+    print("- Test Loss: {:.4f}".format(test_loss))
+    print("- Test Accuracy: {:.4f} %".format(test_accuracy * 100))
+    print("- Test 0-1 Loss: {:.4f}".format(test_zero_one_loss))
 
     # Collect data
     data_list = {
@@ -217,22 +217,22 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
     :return: The Classification Report Dataframe of the model
     """
     # Predict
-    predict = model.predict(x_test)
+    predict = model.predict(x=x_test, verbose=0)
     # Convert the predictions to binary classes (0 or 1)
     y_pred = (predict >= 0.5).astype("int32")
 
     # Compute report
-    clf_report = classification_report(y_test, y_pred, target_names=const.CLASS_LIST, digits=2, output_dict=True)
+    clf_report = classification_report(y_true=y_test, y_pred=y_pred, target_names=const.CLASS_LIST, digits=2,
+                                       output_dict=True)
 
     # Update so in df is shown in the same way as standard print
     clf_report.update({"accuracy": {"precision": None, "recall": None, "f1-score": clf_report["accuracy"],
                                     "support": clf_report.get("macro avg")["support"]}})
-    df = pd.DataFrame(clf_report).transpose()
+    df = pd.DataFrame(data=clf_report).transpose()
 
     # Print report
     print("\n> Classification Report:")
     display.display(df)
-    print("\n")
 
     # Save the report
     general.makedir(dirpath=const.DATA_PATH)
