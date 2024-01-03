@@ -11,6 +11,7 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score
 
 # My import
 import plot_functions
@@ -126,7 +127,7 @@ def build_cnn_model(hp):
     model.add(layers.Dense(units=hp_units, activation="relu", name="dense_layer"))
     # Tune the dropout rate
     hp_dropout_rate = hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
-    model.add(layers.Dropout(rate=hp_dropout_rate, name="dropout_6"))
+    model.add(layers.Dropout(rate=hp_dropout_rate, name="dropout_layer"))
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -445,7 +446,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             model.compile(
                 optimizer=tf.keras.optimizers.legacy.Adam(),
                 loss="binary_crossentropy",
-                metrics=["accuracy", zero_one_loss]
+                metrics=[zero_one_loss]
             )
 
             # Train the model on the training set for this fold
@@ -464,7 +465,14 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, index_label="epoch", float_format="%.3f")
 
             # Brief evaluation per epoch on validation set
-            val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
+            val_loss, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
+
+            # Predict
+            predict = model.predict(x=X_val, verbose=0)
+            # Convert the predictions to binary classes (0 or 1)
+            y_pred = (predict >= 0.5).astype("int32")
+            # Accuracy Score
+            val_accuracy = accuracy_score(y_true=Y_val, y_pred=y_pred)
 
             # Print and store the results for this fold
             print("- Loss: {}\n"
@@ -472,6 +480,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
                   "- Zero-one Loss: {}".format(val_loss, val_accuracy, val_zero_one_loss))
             print("__________________________________________________________________________________________")
 
+            # Collect data per fold
             fold_data.append({
                 "Fold": fold + 1,
                 "Loss": val_loss,
@@ -508,7 +517,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
 # Organize the various procedures
 def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_test, y_test, kfold,
-                                      show_plot, save_plot):
+                                      random_prediction, show_plot, save_plot):
     """
     Tune hyperparameters for a dictionary of classification models,
     apply KFold cross-validation and then evaluate the various models
@@ -520,9 +529,14 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
     :param y_val: Validation data labels.
     :param x_test: Test data features.
     :param y_test: Test data labels.
-    :param kfold: Number of folds for k-fold cross-validation (default is 5).
+    :param kfold: Number of folds for K-Fold Cross-Validation.
+        Default is 5.
+    :param random_prediction: If True, pick random images for the prediction visualization plot.
+        Default is False.
     :param show_plot: If True, displays the plot on the screen.
+        Default is True.
     :param save_plot: If True, save the plot.
+        Default is True.
     """
     # List to collect models data
     all_models_data = []
@@ -551,7 +565,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
         # Evaluate the results on the Test set
         data = evaluate_model(model=kfold_result, model_name=model_name, x_test=x_test, y_test=y_test,
-                              show_plot=show_plot, save_plot=save_plot)
+                              random_prediction=random_prediction, show_plot=show_plot, save_plot=save_plot)
         all_models_data.append(data)
 
     # Create a pandas DataFrame
@@ -564,7 +578,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
 
 # To be called in the main
-def classification_and_evaluation(train_path, test_path, show_plot=True, save_plot=True):
+def classification_and_evaluation(train_path, test_path, random_prediction=False, show_plot=True, save_plot=True):
     """
     Perform classification and evaluation of image datasets.
 
@@ -577,6 +591,8 @@ def classification_and_evaluation(train_path, test_path, show_plot=True, save_pl
 
     :param train_path: path to train data set.
     :param test_path: path to test data set.
+    :param random_prediction: If True, pick random images for the prediction visualization plot.
+        Default is False.
     :param show_plot: If True, displays the plot on the screen.
         Default is True.
     :param save_plot: If True, save the plot.
@@ -614,4 +630,4 @@ def classification_and_evaluation(train_path, test_path, show_plot=True, save_pl
     # Tuning, apply KFold and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
                                       y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.KFOLD,
-                                      show_plot=show_plot, save_plot=save_plot)
+                                      random_prediction=random_prediction, show_plot=show_plot, save_plot=save_plot)

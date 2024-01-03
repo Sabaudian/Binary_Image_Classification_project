@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from IPython import display
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, accuracy_score
 
 # My import
 import plot_functions
@@ -188,13 +188,20 @@ def accuracy_loss_model(model, model_name, x_test, y_test):
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
     """
-    # Compute loss and accuracy
-    test_loss, test_accuracy, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
+    # Compute loss and 0-1 Loss
+    test_loss, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
+
+    # Predict
+    predict = model.predict(x=x_test, verbose=0)
+    # Convert the predictions to binary classes (0 or 1)
+    y_pred = (predict >= 0.5).astype("int32")
+    # Accuracy Score
+    test_accuracy = accuracy_score(y_true=y_test, y_pred=y_pred)
 
     # Print evaluation info. about the model
     print("- Test Loss: {:.4f}".format(test_loss))
     print("- Test Accuracy: {:.4f} %".format(test_accuracy * 100))
-    print("- Test 0-1 Loss: {:.4f}".format(test_zero_one_loss))
+    print("- Test Zero-one Loss: {:.4f}".format(test_zero_one_loss))
 
     # Collect data
     data_list = {
@@ -243,7 +250,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
 
 
 # Model evaluation with extrapolation of data and information plot
-def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=True):
+def evaluate_model(model, model_name, x_test, y_test, random_prediction=False, show_plot=True, save_plot=True):
     """
     Evaluate the Performance of the model on the test set.
 
@@ -251,6 +258,8 @@ def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=
     :param model_name: Name of the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
+    :param random_prediction: If True, pick random images for the prediction visualization plot.
+        Default is False.
     :param show_plot: If True, displays the plot on the screen.
         Default is True.
     :param save_plot: If True, save the plot.
@@ -276,9 +285,10 @@ def evaluate_model(model, model_name, x_test, y_test, show_plot=True, save_plot=
 
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,
-                                          show_on_screen=show_plot, store_in_folder=save_plot)
+                                          randomize=random_prediction, show_on_screen=show_plot,
+                                          store_in_folder=save_plot)
 
-    # Print a separator line to separate better the output
+    # Prints a separation line for cleaner output
     print("__________________________________________________________________________________________")
 
     return data

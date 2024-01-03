@@ -1,6 +1,6 @@
 # Import
 import os
-# import random
+import random
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -360,7 +360,7 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
 
 
 # Plot test images with prediction
-def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=True, store_in_folder=True):
+def plot_visual_prediction(model, model_name, x_test, y_test, randomize=False, show_on_screen=True, store_in_folder=True):
     """
     Plots a visual representation of the model predictions on a test dataset.
 
@@ -372,19 +372,23 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         Input test data (images).
     :param y_test: numpy.ndarray
         True labels for the test data.
+    :param randomize: If True, pick random images.
+        Default is False.
     :param show_on_screen: If True, display the plot on the screen.
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Default is True.
     """
-    # # NOTE: -> (If you want to pick random images, comment out these lines and the random import at the start)
-    # # Select random indices from x_test
-    # num_samples = min(9, len(x_test))  # Adjust the number of samples to display
-    # random_indices = random.sample(range(len(x_test)), num_samples)
-    #
-    # # Select a subset of x_test and y_test based on the random indices
-    # x_test = x_test[random_indices]
-    # y_test = y_test[random_indices]
+
+    if randomize:
+
+        # Select random indices from x_test
+        num_samples = min(9, len(x_test))  # Adjust the number of samples to display
+        random_indices = random.sample(range(len(x_test)), num_samples)
+
+        # Select a subset of x_test and y_test based on the random indices
+        x_test = x_test[random_indices]
+        y_test = y_test[random_indices]
 
     # Predict
     predicts = model.predict(x=x_test, verbose=0)
@@ -452,26 +456,13 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
     # Plot the training history for each fold
     for fold in range(len(fold_history)):
         # Plot size
-        plt.figure(figsize=(24, 10))
+        plt.figure(figsize=(16, 8))
 
         # Add a title to the entire plot
         plt.suptitle("{} Fold {} Training History".format(model_name, fold + 1), fontsize=18)
 
-        # Accuracy
-        plt.subplot(1, 3, 1)
-        plt.plot(fold_history[fold].history["accuracy"], linewidth=3)
-        plt.plot(fold_history[fold].history["val_accuracy"], linewidth=3)
-        plt.title(label="Training and Validation Accuracy", fontsize=16)
-        plt.ylabel(ylabel="accuracy", fontsize=14)
-        plt.xlabel(xlabel="epoch", fontsize=14)
-        plt.xticks(fontsize=12)
-        plt.yticks(fontsize=12)
-        plt.grid()
-        plt.minorticks_on()
-        plt.legend(["Train", "Validation"], loc="upper right")
-
         # Loss
-        plt.subplot(1, 3, 2)
+        plt.subplot(1, 2, 1)
         plt.plot(fold_history[fold].history["loss"], linewidth=3)
         plt.plot(fold_history[fold].history["val_loss"], linewidth=3)
         plt.title(label="Training and Validation Loss", fontsize=16)
@@ -483,7 +474,7 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
         plt.legend(["Train", "Validation"], loc="upper right")
 
         # Zero-one Loss
-        plt.subplot(1, 3, 3)
+        plt.subplot(1, 2, 2)
         plt.plot(fold_history[fold].history["zero_one_loss"], linewidth=3)
         plt.plot(fold_history[fold].history["val_zero_one_loss"], linewidth=3)
         plt.title(label="Training and Validation Zero-one Loss", fontsize=16)
