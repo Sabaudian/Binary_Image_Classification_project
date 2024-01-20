@@ -178,7 +178,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
 
 
 # Print Test Accuracy and Test Loss
-def accuracy_loss_model(model, model_name, x_test, y_test):
+def test_accuracy_loss_model(model, model_name, x_test, y_test):
     """
     Compute a simple evaluation of the model,
     printing the loss, accuracy for the test set.
@@ -189,14 +189,7 @@ def accuracy_loss_model(model, model_name, x_test, y_test):
     :param y_test: Target values of the test dataset.
     """
     # Compute loss and 0-1 Loss
-    test_loss, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
-
-    # Predict
-    predict = model.predict(x=x_test, verbose=0)
-    # Convert the predictions to binary classes (0 or 1)
-    y_pred = (predict >= 0.5).astype("int32")
-    # Accuracy Score
-    test_accuracy = accuracy_score(y_true=y_test, y_pred=y_pred)
+    test_loss, test_accuracy, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
 
     # Print evaluation info. about the model
     print("- Test Loss: {:.4f}".format(test_loss))
@@ -269,7 +262,7 @@ def evaluate_model(model, model_name, x_test, y_test, random_prediction=False, s
     print("\n> " + model_name + " Model Evaluation:")
 
     # Compute a simple evaluation report on the model performances
-    data = accuracy_loss_model(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
+    data = test_accuracy_loss_model(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
 
     # Compute the classification_report of the model
     compute_evaluation_metrics(model=model, model_name=model_name, x_test=x_test, y_test=y_test)
@@ -280,8 +273,8 @@ def evaluate_model(model, model_name, x_test, y_test, random_prediction=False, s
 
     # Plot a representation of the prediction
     plot_functions.plot_model_predictions_evaluation(model=model, model_name=model_name, class_list=const.CLASS_LIST,
-                                                     x_test=x_test, y_test=y_test,
-                                                     show_on_screen=show_plot, store_in_folder=save_plot)
+                                                     x_test=x_test, y_test=y_test, show_on_screen=show_plot,
+                                                     store_in_folder=save_plot)
 
     # Plot a visual representation of the classification model, predicting classes
     plot_functions.plot_visual_prediction(model=model, model_name=model_name, x_test=x_test, y_test=y_test,

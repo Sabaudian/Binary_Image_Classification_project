@@ -17,7 +17,7 @@ from classifiers import build_mobilenet_model
 # ************************************* #
 
 
-def download_models_save_from_drive(drive_url, root_dir):
+def download_models_saves_from_drive(drive_url, root_dir):
     """
     Download from Google Drive the models folder, that contains the models saved from the previous run of the project.
     This will speed up the entire process.
@@ -48,19 +48,19 @@ def makedir(dirpath):
     # check if dir exists
     if not os.path.exists(dirpath):
         os.makedirs(dirpath, exist_ok=True)
-        print("\n> Directory [{}] has been created successfully!\n".format(dirpath))
+        print("\n> Directory [{}] has been created successfully!".format(dirpath))
 
 
 def count_files(file_path, extensions="jpg"):
     """
     Count the number of files with specified extensions in the specified directory.
 
+    Example: count_files("/path/to/directory", extensions=["jpg", "png"]) -> 12
+
     :param file_path: (str) The path to the directory for which file count is required.
     :param extensions: (list or None) List of file extensions to count. If None, count all files.
 
     :return: (int) The number of files with specified extensions in the specified directory.
-
-    Example: count_files("/path/to/directory", extensions=["jpg", "png"]) -> 12
     """
     if extensions is None:
         extensions = ['']
@@ -74,7 +74,7 @@ def count_files(file_path, extensions="jpg"):
     return counter
 
 
-# Just a helper funtion
+# Just a helper function
 def print_file_counts(dataset_path):
     """
     A helper function t pint information about the number of files inside the directory.
@@ -119,7 +119,7 @@ def define_dataframe(train_dir_path, test_dir_path):
     :param train_dir_path: Training directory path.
     :param test_dir_path: Test directory path.
 
-    :return: Pandas.Dataframe (train_df, test_df)
+    :returns: Pandas.Dataframe (train_df, test_df)
     """
 
     def load_and_construct_df(dir_path, label):
@@ -161,13 +161,13 @@ def get_classifier():
     Retrieves a dictionary of pre-built classification models.
 
     :return: A dictionary containing the following classification models:
-             - 'MLP': Multi-layer Perceptron model
-             - 'CNN': Convolutional Neural Network model
-             - 'VGG16': VGG16 model
-             - 'MobileNet': MobileNet model
+             - 'MLP': Multi-layer Perceptron model.
+             - 'CNN': Convolutional Neural Network model.
+             - 'MobileNet': MobileNet model.
+             - 'VGG16': VGG16 model.
     """
     # models dictionary
-    models = {"MLP": [], "CNN": [], "MobileNet": []}  # "VGG16": [],
+    models = {"MLP": [], "CNN": [], "MobileNet": []}  # , "VGG16": []}
 
     # Multi-layer Perceptron model
     mlp_model = build_mlp_model
@@ -177,12 +177,12 @@ def get_classifier():
     cnn_model = build_cnn_model
     models.update({"CNN": cnn_model})
 
-    # # VGG16 model
-    # vgg16_model = build_vgg16_model
-    # models.update({"VGG16": vgg16_model})
-
     # MobileNet model
     mobilenet_model = build_mobilenet_model
     models.update({"MobileNet": mobilenet_model})
+
+    # # MobileNet model
+    # vgg16_model = build_vgg16_model
+    # models.update({"VGG16": vgg16_model})
 
     return models

@@ -11,7 +11,6 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score
 
 # My import
 import plot_functions
@@ -151,6 +150,52 @@ def build_cnn_model(hp):
     return model
 
 
+# MobileNet Model
+def build_mobilenet_model(hp):
+    """
+    Build a MobileNet model with tunable hyperparameters.
+
+    :param hp: Keras.utils.HyperParameters.
+        Hyperparameters for model tuning.
+
+    :return: Keras.Model
+        The compiled MobileNet model.
+    """
+    # Load the MobileNet base model without top layers (include_top=False)
+    base_model = MobileNet(weights="imagenet", include_top=False, input_shape=const.INPUT_SHAPE)
+
+    # Freeze the weights of the MobileNet base model
+    base_model.trainable = False
+
+    # Create a Sequential model with the MobileNet base model
+    model = tf.keras.Sequential(layers=[
+        base_model,
+        layers.Flatten(name="flatten"),
+        layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
+                     activation="relu", name="dense_layer"),
+        layers.BatchNormalization(),
+        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
+        layers.Dense(units=1, activation="sigmoid", name="output_layer")
+    ], name="MobileNet")
+
+    # Tune the learning rate for the optimizer
+    hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
+
+    model.compile(
+        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
+        loss="binary_crossentropy",
+        metrics=["accuracy"]
+    )
+
+    # Store and Display the model's architecture
+    general.makedir(os.path.join("plot", "MobileNet"))  # Create the directory
+    plot_path = os.path.join("plot", "MobileNet", "MobileNet_model_summary_plot.jpg")  # Path to store the plot
+    model.summary()
+    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
+
+    return model
+
+
 # VGG-16 Model
 def build_vgg16_model(hp):
     """
@@ -173,8 +218,7 @@ def build_vgg16_model(hp):
         base_model,
         layers.Flatten(name="flatten"),
         layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
-                     # min_value=128, max_value=1024, step=128
-                     activation="relu", name="dense_layer"),
+                     activation="relu", name="dense_layer"),  # min_value=128, max_value=1024, step=128
         layers.BatchNormalization(),
         layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
@@ -192,52 +236,6 @@ def build_vgg16_model(hp):
     # Store and Display the model's architecture
     general.makedir(os.path.join("plot", "VGG16"))  # Create the directory
     plot_path = os.path.join("plot", "VGG16", "VGG16_model_summary_plot.jpg")  # Path to store the plot
-    model.summary()
-    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
-
-    return model
-
-
-# MobileNet Model
-def build_mobilenet_model(hp):
-    """
-    Build a MobileNet model with tunable hyperparameters.
-
-    :param hp: Keras.utils.HyperParameters.
-        Hyperparameters for model tuning.
-
-    :return: Keras.Model
-        The compiled MobileNet model.
-    """
-    # Load the MobileNet base model without top layers (include_top=False)
-    base_model = MobileNet(weights="imagenet", include_top=False, input_shape=const.INPUT_SHAPE)
-
-    # Freeze the weights of the MobileNet base model
-    base_model.trainable = False
-
-    # Create a Sequential model with the MobileNet base model
-    model = tf.keras.Sequential(layers=[
-        base_model,
-        layers.Flatten(),
-        layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
-                     activation="relu", name="hidden_layer"),
-        layers.BatchNormalization(),
-        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
-        layers.Dense(units=1, activation="sigmoid", name="output_layer")
-    ], name="MobileNet")
-
-    # Tune the learning rate for the optimizer
-    hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
-
-    model.compile(
-        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
-        loss="binary_crossentropy",
-        metrics=["accuracy"]
-    )
-
-    # Store and Display the model's architecture
-    general.makedir(os.path.join("plot", "MobileNet"))  # Create the directory
-    plot_path = os.path.join("plot", "MobileNet", "MobileNet_model_summary_plot.jpg")  # Path to store the plot
     model.summary()
     tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
@@ -270,8 +268,8 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     best_model_directory = os.path.join("models", model_name, "best_model")
     general.makedir(best_model_directory)
 
-    # Best model filepath
-    file_path = os.path.join(best_model_directory, "best_model.h5")
+    # Best model weights filepath
+    file_path = os.path.join(best_model_directory, "best_model.weights.h5")
 
     # Tuning model
     tuner = kt.Hyperband(
@@ -397,14 +395,10 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     # Print about the model in input
     print("\n> " + model_name + " KFold Cross-Validation:")
 
-    # Initialize lists to save data
-    fold_data = []
-    fold_history = []
-
     # Define the path for storing the models
     dir_path = os.path.join("models", "KFold")
     general.makedir(dir_path)
-    file_path = os.path.join(dir_path, model_name + "_kfold_model.h5")
+    file_path = os.path.join(dir_path, model_name + "_kfold_model.keras")
 
     # Check if the 'models' folder exists
     if os.path.exists(path=file_path):
@@ -426,7 +420,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         model = tf.keras.models.model_from_json(load_model_json)
 
         # Load weight into the model, i.e., the best hyperparameters
-        model.load_weights(filepath=os.path.join(best_model_directory, "best_model.h5"))
+        model.load_weights(filepath=os.path.join(best_model_directory, "best_model.weights.h5"))
         print("-- Best weights for " + model_name + " model have been Loaded Successfully!")
 
         # KFold Cross-Validation function
@@ -435,6 +429,10 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         # Combine training and validation data for K-fold cross-validation
         X = np.concatenate((x_train, x_val), axis=0)
         Y = np.concatenate((y_train, y_val), axis=0)
+
+        # Initialize lists to save data
+        fold_data = []
+        fold_history = []
 
         for fold, (train_idx, val_idx) in enumerate(kfold.split(X)):
             print("\n> Fold {}/{}".format(fold + 1, k_folds))
@@ -446,7 +444,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             model.compile(
                 optimizer=tf.keras.optimizers.legacy.Adam(),
                 loss="binary_crossentropy",
-                metrics=[zero_one_loss]
+                metrics=["accuracy", zero_one_loss]
             )
 
             # Train the model on the training set for this fold
@@ -458,38 +456,29 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
                 verbose=1
             )
 
-            # Collect training history data
+            # Collect training history data for generate a plot later
             fold_history.append(history)
-            fold_history_df = pd.DataFrame.from_dict(data=history.history)
-            csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_history_data.csv")
-            fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, index_label="epoch", float_format="%.3f")
+
+            # # Collect training history per Fold
+            # fold_history_df = pd.DataFrame(data=history.history)
+            # # Save data to file
+            # csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_history_data.csv")
+            # fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, index_label="epoch", float_format="%.4f")
 
             # Brief evaluation per epoch on validation set
-            val_loss, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
-
-            # Predict
-            predict = model.predict(x=X_val, verbose=0)
-            # Convert the predictions to binary classes (0 or 1)
-            y_pred = (predict >= 0.5).astype("int32")
-            # Accuracy Score
-            val_accuracy = accuracy_score(y_true=Y_val, y_pred=y_pred)
-
-            # Print and store the results for this fold
-            print("- Loss: {}\n"
-                  "- Accuracy: {}\n"
-                  "- Zero-one Loss: {}".format(val_loss, val_accuracy, val_zero_one_loss))
-            print("__________________________________________________________________________________________")
+            val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
+            print("___________________________________________________________________________________________________")
 
             # Collect data per fold
             fold_data.append({
                 "Fold": fold + 1,
-                "Loss": val_loss,
-                "Accuracy (%)": val_accuracy * 100,
-                "Zero-one Loss": val_zero_one_loss
+                "Validation Loss": val_loss,
+                "Validation Accuracy (%)": val_accuracy * 100,
+                "Validation 0-1 Loss": val_zero_one_loss
             })
 
         # Create a pandas DataFrame from the collected data
-        fold_df = pd.DataFrame(fold_data)
+        fold_df = pd.DataFrame(data=fold_data)
 
         # Calculate average values
         avg_values = {
@@ -500,19 +489,25 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         }
 
         # Concatenate the average values to the DataFrame
-        fold_df = pd.concat([fold_df, pd.DataFrame([avg_values])], ignore_index=True)
+        fold_df = pd.concat(objs=[fold_df, pd.DataFrame([avg_values])], ignore_index=True)
 
         # Save fold data to csv file
-        csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_data.csv")
-        fold_df.to_csv(csv_file_path, index=False, float_format="%.3f")
+        fold_data_csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_data.csv")
+        fold_df.to_csv(fold_data_csv_file_path, index=False, float_format="%.3f")
 
         # Plot fold history
         plot_functions.plot_fold_history(fold_history=fold_history, model_name=model_name,
                                          show_on_screen=False, store_in_folder=True)
+
         # Save the model to the path
         model.save(file_path)
 
     return model
+
+
+# ******************************************************** #
+# ****************** PROCESS WORKFLOW   ****************** #
+# ******************************************************** #
 
 
 # Organize the various procedures
@@ -551,7 +546,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
         # Best model folder path
         tuned_model_folder = os.path.join("models", model_name, "best_model")
         # Best model filepath
-        tuned_file_path = os.path.join(tuned_model_folder, "best_model.h5")
+        tuned_file_path = os.path.join(tuned_model_folder, "best_model.weights.h5")
 
         # Redo Tuning if not already done it
         if not os.path.exists(tuned_file_path):
@@ -627,7 +622,7 @@ def classification_and_evaluation(train_path, test_path, random_prediction=False
     # Get the classification models
     classification_models = general.get_classifier()
 
-    # Tuning, apply KFold and then evaluate the models
+    # Tuning, apply K-Fold Cross-Validation and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
                                       y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.KFOLD,
                                       random_prediction=random_prediction, show_plot=show_plot, save_plot=save_plot)

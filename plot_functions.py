@@ -461,8 +461,20 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
         # Add a title to the entire plot
         plt.suptitle("{} Fold {} Training History".format(model_name, fold + 1), fontsize=18)
 
+        # Accuracy
+        plt.subplot(1, 3, 1)
+        plt.plot(fold_history[fold].history["accuracy"], linewidth=3)
+        plt.plot(fold_history[fold].history["val_accuracy"], linewidth=3)
+        plt.title(label="Training and Validation Accuracy", fontsize=16)
+        plt.ylabel(ylabel="accuracy", fontsize=14)
+        plt.xlabel(xlabel="epoch", fontsize=14)
+        plt.xticks(fontsize=12)
+        plt.yticks(fontsize=12)
+        plt.grid()
+        plt.legend(["Train", "Validation"], loc="upper right")
+
         # Loss
-        plt.subplot(1, 2, 1)
+        plt.subplot(1, 3, 2)
         plt.plot(fold_history[fold].history["loss"], linewidth=3)
         plt.plot(fold_history[fold].history["val_loss"], linewidth=3)
         plt.title(label="Training and Validation Loss", fontsize=16)
@@ -474,7 +486,7 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
         plt.legend(["Train", "Validation"], loc="upper right")
 
         # Zero-one Loss
-        plt.subplot(1, 2, 2)
+        plt.subplot(1, 3, 3)
         plt.plot(fold_history[fold].history["zero_one_loss"], linewidth=3)
         plt.plot(fold_history[fold].history["val_zero_one_loss"], linewidth=3)
         plt.title(label="Training and Validation Zero-one Loss", fontsize=16)

@@ -96,17 +96,20 @@ def find_out_duplicate(dataset_path, hash_size):
         print("> No Duplicate Found")
 
 
-def checking_dataset(dataset_path, train_dir_path, test_dir_path, show_plot, save_plot):
+# Preprocessing workflow
+def checking_dataset(dataset_path, train_dir_path, test_dir_path, show_plot=True, save_plot=True):
     """
     Preliminary check on dataset:
-        Calling corruption_filter, find_out_duplicate, collect_metadata and view_data function
+        Calling corruption_filter, find_out_duplicate and plot_class_distribution function
         to analyze and control the dataset.
 
     :param dataset_path: The path to the dataset.
     :param train_dir_path: The path to the train dataset.
     :param test_dir_path: The path to the test dataset.
-    :param show_plot: Decide if show data on screen or not.
-    :param save_plot: Decide if store data or not.
+    :param show_plot: If True, display the plot on the screen.
+        Default is True.
+    :param save_plot: If True, save the plot in a specified folder.
+        Default is True.
     """
     print("\n> CHECK THE DATASET")
     print("\n> Checking the Number of file before performing Pre-processing Task...")

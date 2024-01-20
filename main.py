@@ -2,7 +2,7 @@
 import constants as const
 
 from utils.pre_processing import checking_dataset
-from utils.general_functions import download_models_save_from_drive
+from utils.general_functions import download_models_saves_from_drive
 
 from classifiers import classification_and_evaluation
 
@@ -11,9 +11,9 @@ import sklearn
 import platform
 import tensorflow
 
-import warnings
-
-warnings.filterwarnings("ignore")
+# import warnings
+#
+# warnings.filterwarnings("ignore")
 
 
 # ************************ #
@@ -48,11 +48,11 @@ def main():
     print("______________________________________________________________________________")
 
     # Download the folder "models" from drive to speed up the process
-    download_models_save_from_drive(drive_url=const.DRIVE_URL, root_dir=const.PROJECT_ROOT)
+    download_models_saves_from_drive(drive_url=const.DRIVE_URL, root_dir=const.PROJECT_ROOT)
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,
-                                  random_prediction=True, show_plot=False, save_plot=True)
+                                  random_prediction=False, show_plot=False, save_plot=True)
 
 
 if __name__ == '__main__':
