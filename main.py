@@ -2,6 +2,7 @@
 import constants as const
 
 from utils.pre_processing import checking_dataset
+from utils.general_functions import download_dataset_from_kaggle
 from utils.general_functions import download_models_saves_from_drive
 
 from classifiers import classification_and_evaluation
@@ -11,9 +12,8 @@ import sklearn
 import platform
 import tensorflow
 
-# import warnings
-#
-# warnings.filterwarnings("ignore")
+import warnings
+warnings.filterwarnings(action="ignore")
 
 
 # ************************ #
@@ -38,8 +38,11 @@ def main():
     print("- Tensorflow version is: {}".format(tensorflow.__version__))
     print("______________________________________________________________________________")
 
+    # Download the dataset from Kaggle website
+    download_dataset_from_kaggle(dataset_id=const.DATASET_ID, dataset_path=const.DATASET_PATH)
+
     # Checking the dataset
-    check_dataset = input("> Preprocessing: is it necessary to check the dataset? [Y/N]: ")
+    check_dataset = input("\n> Preprocessing: is it necessary to check the dataset? [Y/N]: ")
     if check_dataset.upper() == "Y":
         checking_dataset(dataset_path=const.DATASET_PATH,
                          train_dir_path=const.TRAIN_DIR,
@@ -52,7 +55,7 @@ def main():
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,
-                                  random_prediction=False, show_plot=False, save_plot=True)
+                                  random_prediction=True, show_plot=False, save_plot=True)
 
 
 if __name__ == '__main__':

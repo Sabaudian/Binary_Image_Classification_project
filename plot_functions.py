@@ -433,12 +433,23 @@ def plot_visual_prediction(model, model_name, x_test, y_test, randomize=False, s
         plt.axis("off")
 
     # Show and/or store the plot
-    show_and_save_plot(
-        show=show_on_screen, save=store_in_folder,
-        plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
-        plot_name=model_name + "_visual_prediction_plot",
-        plot_extension=const.FILE_EXTENSION
-    )
+    if randomize:
+
+        show_and_save_plot(
+            show=show_on_screen, save=store_in_folder,
+            plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
+            plot_name=model_name + "_visual_random_prediction_plot",
+            plot_extension=const.FILE_EXTENSION
+        )
+
+    else:
+
+        show_and_save_plot(
+            show=show_on_screen, save=store_in_folder,
+            plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
+            plot_name=model_name + "_visual_prediction_plot",
+            plot_extension=const.FILE_EXTENSION
+        )
 
 
 # Plot the training history for each fold in kfold cross validation

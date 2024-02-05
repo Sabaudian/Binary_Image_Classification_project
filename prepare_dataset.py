@@ -82,7 +82,7 @@ def data_normalization(tf_dataset, augment):
     # Use data augmentation only on the training set.
     if augment:
         data_augmentation = perform_data_augmentation()
-        ds = ds.map(lambda x, y: (data_augmentation(x), y))
+        ds = ds.map(lambda x, y: (data_augmentation(x, training=True), y))
 
     # Configure the dataset for performance
     AUTOTUNE = tf.data.AUTOTUNE

@@ -1,6 +1,8 @@
 # Import
 import os
+
 import gdown
+import kaggle
 import pandas as pd
 
 from PIL import Image
@@ -8,7 +10,6 @@ from PIL import Image
 # My import
 from classifiers import build_mlp_model
 from classifiers import build_cnn_model
-from classifiers import build_vgg16_model
 from classifiers import build_mobilenet_model
 
 
@@ -17,6 +18,24 @@ from classifiers import build_mobilenet_model
 # ************************************* #
 
 
+def download_dataset_from_kaggle(dataset_id, dataset_path):
+    """
+    Download the muffin-vs-chihuahua-image-classification Dataset using Kaggle module
+
+    :param dataset_id: identify the dataset to download.
+        Format: dataset_owner_name/dataset_name
+    :param dataset_path: location to save the dataset
+
+    :return: None
+    """
+    # Download the dataset if not exist in the workplace
+    if not os.path.exists(dataset_path):
+        print("\n> Download the dataset from Kaggle...")
+        # Download dataset and unzip it
+        kaggle.api.dataset_download_files(dataset=dataset_id, path=dataset_path, quiet=False, unzip=True)
+
+
+# Download fromm Google Drive the pre-trained models
 def download_models_saves_from_drive(drive_url, root_dir):
     """
     Download from Google Drive the models folder, that contains the models saved from the previous run of the project.
@@ -29,8 +48,13 @@ def download_models_saves_from_drive(drive_url, root_dir):
     # download model folder if not already present in the workspace
     if not os.path.exists("models"):
         # Checking folder
-        check_input = input("\n> [SUGGESTED] The 'models' folder is not present in the workspace, "
-                            "do you want to download it from Google Drive? [Y/N]: ")
+        print("\n> The 'models' directory is not found in the workspace! "
+              "\n -- Would you like to download it from Google Drive?")
+        print("\n> [INFO] Choosing this option excludes the collection of data related to\n"
+              "\t\t the hyperparameter optimization and k-fold cross-validation process,\n"
+              "\t\t moving directly to the testing phase.")
+        check_input = input("\n> Would you like to procede [Y/N]: ")
+
         if check_input.upper() == "Y":
             # Download "models" folder
             gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
@@ -181,7 +205,7 @@ def get_classifier():
     mobilenet_model = build_mobilenet_model
     models.update({"MobileNet": mobilenet_model})
 
-    # # MobileNet model
+    # # VGG16 model
     # vgg16_model = build_vgg16_model
     # models.update({"VGG16": vgg16_model})
 

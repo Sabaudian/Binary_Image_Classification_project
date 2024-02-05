@@ -3,7 +3,7 @@ import os
 import pandas as pd
 
 from IPython import display
-from sklearn.metrics import classification_report, accuracy_score
+from sklearn.metrics import classification_report
 
 # My import
 import plot_functions
@@ -56,7 +56,7 @@ def get_hyperparameters_search_info(model_name, best_hyperparameters):
         file_path = os.path.join(const.DATA_PATH, f"{model_name}_best_hyperparameters.csv")
         df.to_csv(file_path, index=False, float_format="%.4f")
 
-    # For CNN, VGG16 and MobileNet
+    # For CNN and MobileNet
     else:
         # Print info.
         print("\n> The hyperparameter search is complete!"
@@ -150,7 +150,7 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
         df.to_csv(file_path, index=False, float_format="%.4f")
 
     else:
-        # MobileNet, VGG16
+        # MobileNet
         keras_model_trials = []
         keras_model_units = []
         keras_model_dropout_rate = []
@@ -177,43 +177,50 @@ def collect_hyperparameters_tuning_data(model_name, tuner):
         df.to_csv(file_path, index=False, float_format="%.4f")
 
 
-# Print Test Accuracy and Test Loss
+# Test Loss and Accuracy metrics
 def test_accuracy_loss_model(model, model_name, x_test, y_test):
     """
     Compute a simple evaluation of the model,
-    printing the loss, accuracy for the test set.
+    printing the loss and accuracy metrics for the test set.
 
     :param model: Model in input.
     :param model_name: Name of the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
+
+    •:return data_list: evaluation metrics dictionary
     """
-    # Compute loss and 0-1 Loss
-    test_loss, test_accuracy, test_zero_one_loss = model.evaluate(x=x_test, y=y_test, verbose=0)
+    # Collect evaluation metrics
+    test_score = model.evaluate(x=x_test, y=y_test, verbose=0)
+
+    # Loss and Accuracy for the test set
+    test_loss = test_score[0]
+    test_accuracy = test_score[1]
 
     # Print evaluation info. about the model
     print("- Test Loss: {:.4f}".format(test_loss))
     print("- Test Accuracy: {:.4f} %".format(test_accuracy * 100))
-    print("- Test Zero-one Loss: {:.4f}".format(test_zero_one_loss))
 
     # Collect data
     data_list = {
         "Model": model_name,
         "Loss": test_loss,
         "Accuracy (%)": test_accuracy * 100,
-        "Zero-one Loss": test_zero_one_loss
     }
 
+    # Return dictionary
     return data_list
 
 
 def compute_evaluation_metrics(model, model_name, x_test, y_test):
     """
     Get the classification report about the model in input.
+
     :param model: Model in input.
     :param model_name: Name of the model.
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
+
     :return: The Classification Report Dataframe of the model
     """
     # Predict
@@ -257,6 +264,8 @@ def evaluate_model(model, model_name, x_test, y_test, random_prediction=False, s
         Default is True.
     :param save_plot: If True, save the plot.
         Default is True.
+
+    •:return data: evaluation metrics dictionary per model
     """
     # Evaluate the model
     print("\n> " + model_name + " Model Evaluation:")
@@ -284,4 +293,5 @@ def evaluate_model(model, model_name, x_test, y_test, random_prediction=False, s
     # Prints a separation line for cleaner output
     print("__________________________________________________________________________________________")
 
+    # Return dictionary
     return data

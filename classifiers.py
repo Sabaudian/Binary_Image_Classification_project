@@ -39,7 +39,7 @@ def build_mlp_model(hp):
     """
     model = tf.keras.Sequential(name="MultiLayer_Perceptron")
 
-    model.add(layers.Flatten(input_shape=const.INPUT_SHAPE))
+    model.add(layers.Flatten(input_shape=const.INPUT_SHAPE, name="flatten_layer"))
 
     for i in range(1, 6):
         units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
@@ -173,7 +173,7 @@ def build_mobilenet_model(hp):
         layers.Flatten(name="flatten"),
         layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
                      activation="relu", name="dense_layer"),
-        layers.BatchNormalization(),
+        layers.BatchNormalization(name="batch_normalization"),
         layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
     ], name="MobileNet")
@@ -219,7 +219,7 @@ def build_vgg16_model(hp):
         layers.Flatten(name="flatten"),
         layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
                      activation="relu", name="dense_layer"),  # min_value=128, max_value=1024, step=128
-        layers.BatchNormalization(),
+        layers.BatchNormalization(name="batch_normalization"),
         layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
     ], name="VGG16")
@@ -316,35 +316,20 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
         validation_data=(x_val, y_val)
     )
 
-    # Compute best epoch value
-    val_accuracy_per_epochs = history.history["val_accuracy"]
-    best_epoch = val_accuracy_per_epochs.index(max(val_accuracy_per_epochs)) + 1
-    print("\n> Best Epoch: {}\n".format(best_epoch))
-
-    # Rerun the model with the optimal value for the epoch
-    hypermodel = tuner.hypermodel.build(best_hyperparameters)
-
-    # Retrain the model
-    hypermodel_history = hypermodel.fit(
-        x=x_train, y=y_train,
-        epochs=best_epoch,
-        validation_data=(x_val, y_val)
-    )
-
     # Serialize model to JSON
-    model_json = hypermodel.to_json()
+    model_json = optimal_hp_model.to_json()
     with open(os.path.join(best_model_directory, "best_model.json"), "w") as json_file:
         json_file.write(model_json)
 
     # Save the best model's weights to the created directory
-    hypermodel.save_weights(filepath=file_path)
+    optimal_hp_model.save_weights(filepath=file_path)
 
     # Check if weights have been saved
     if os.path.exists(file_path):
         print("\n> The best weights for " + model_name + " model were saved successfully!\n")
 
     # Plot history after tuning
-    plot_functions.plot_history(history=hypermodel_history, model_name=model_name,
+    plot_functions.plot_history(history=history, model_name=model_name,
                                 show_on_screen=False, store_in_folder=True)
 
 
@@ -400,7 +385,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     general.makedir(dir_path)
     file_path = os.path.join(dir_path, model_name + "_kfold_model.keras")
 
-    # Check if the 'models' folder exists
+    # Check if the model.keras already exist to speed up the process
     if os.path.exists(path=file_path):
 
         # Load model from the right folder
@@ -424,7 +409,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
         print("-- Best weights for " + model_name + " model have been Loaded Successfully!")
 
         # KFold Cross-Validation function
-        kfold = KFold(n_splits=k_folds, shuffle=True, random_state=42)
+        kfold = KFold(n_splits=k_folds, shuffle=True)
 
         # Combine training and validation data for K-fold cross-validation
         X = np.concatenate((x_train, x_val), axis=0)
@@ -459,22 +444,15 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             # Collect training history data for generate a plot later
             fold_history.append(history)
 
-            # # Collect training history per Fold
-            # fold_history_df = pd.DataFrame(data=history.history)
-            # # Save data to file
-            # csv_file_path = os.path.join(const.DATA_PATH, f"{model_name}_fold_history_data.csv")
-            # fold_history_df.to_csv(path_or_buf=csv_file_path, index=True, index_label="epoch", float_format="%.4f")
-
             # Brief evaluation per epoch on validation set
             val_loss, val_accuracy, val_zero_one_loss = model.evaluate(X_val, Y_val, verbose=0)
-            print("___________________________________________________________________________________________________")
 
             # Collect data per fold
             fold_data.append({
                 "Fold": fold + 1,
-                "Validation Loss": val_loss,
-                "Validation Accuracy (%)": val_accuracy * 100,
-                "Validation 0-1 Loss": val_zero_one_loss
+                "Loss": val_loss,
+                "Accuracy (%)": val_accuracy * 100,
+                "0-1 Loss": val_zero_one_loss
             })
 
         # Create a pandas DataFrame from the collected data
@@ -485,7 +463,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
             "Fold": "Average",
             "Loss": np.mean(fold_df["Loss"]),
             "Accuracy (%)": np.mean(fold_df["Accuracy (%)"]),
-            "Zero-one Loss": np.mean(fold_df["Zero-one Loss"])
+            "0-1 Loss": np.mean(fold_df["0-1 Loss"])
         }
 
         # Concatenate the average values to the DataFrame
@@ -538,7 +516,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
     # Scroll through the dictionary
     for key, value in models.items():
-        # MLP, CNN, VGG16 and MobileNet name string
+        # MLP, CNN and MobileNet name string
         model_name = key
         # Models
         model_type = value
