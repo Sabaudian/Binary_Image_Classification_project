@@ -13,10 +13,26 @@ Use Keras to train a neural network for the binary classification of muffins and
   > If you want to performe the tuning, you can simply delete the folder.
 
 
-## Who ate my Chihuahua?
+## Structure of the project
 
-The project primarily utilizes the **Keras** and **Tensorflow** frameworks to set up the work environment, construct, and train neural network models. Starting with crucial preprocessing steps to assess the quality of the data, identifying corrupted files, following by a check for the possible existence of duplicate files—both factors impacting the performance of the training models. Next to this quality assessment, the data undergo a preparation step, involving transformations such as adjusting size and color format of the images. Additionally, processes like data augmentation are applied to enhance results and overall performance.
+<p align="center">
+  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/811c0602-0796-4b03-9b85-3aa875a04bdd"/>
+</p>
 
-This preprocessing step sets the stage for the subsequent exploration of various network architectures. To address the task at hand, we experiment with three distinct network architectures: The **Multilayer Perceptron (MLP)**, **Convolutional Neural Network (CNN)** and **MobileNet** model. 
+#### A. Preprocessing
+In the preprocessing phase, the emphasis is on refining the dataset. The process involves systematically addressing corrupted files, detecting and managing duplicates through image hashing, and conducting a thorough dataset check.
 
-Beyond architectural variations, our study incorporates **hyperparameter tuning** to enhance overall performance. The resulting optimal parameters and weights are saved and utilized as the basis for **K-Fold Cross-Validation** to calculate risk estimates, employing the **zero-one loss** function. At the end, the models are evaluated on the test set to have a final understanding of their generalization capabilities.
+#### C. Classification
+In the classification phase, a robust image classification pipeline is established us- ing Keras and TensorFlow. The implementation introduces configurable models, in- cluding Multilayer Perceptron, Convolutional Neural Network and MobileNet. The workflow seamlessly integrates hyperparameter tuning and K-fold cross-validation for comprehensive model optimization.
+
+#### D. Evaluation
+In the evaluation phase, the model’s performance is systematically assessed through the presentation of insightful metrics, such as loss and accuracy. The module fur- ther generates detailed classification reports, produces confusion matrices, and offers intuitive plots for model predictions.
+
+## Performace Summary:
+
+|   | MLP | CNN | MOBILENET | 
+| - | --------------------- | ------------- | ------------------- |
+| Accuracy (%)  | 73.057 | 92.821 | 99.155 |
+| Loss  | 0.752 | 0.292 | 0.022 |
+| F1-Score | 0.713 | 0.928 | 0.992 |
+
