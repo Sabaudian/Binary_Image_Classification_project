@@ -14,7 +14,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 ## Structure of the project
 
 <p align="center">
-  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/811c0602-0796-4b03-9b85-3aa875a04bdd"/>
+  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/4b168037-0c91-4363-bcd5-cc720ae99e86"/>
 </p>
 
 #### A. Preprocessing
