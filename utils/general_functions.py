@@ -30,9 +30,12 @@ def download_dataset_from_kaggle(dataset_id, dataset_path):
     """
     # Download the dataset if not exist in the workplace
     if not os.path.exists(dataset_path):
-        print("\n> Download the dataset from Kaggle...")
-        # Download dataset and unzip it
-        kaggle.api.dataset_download_files(dataset=dataset_id, path=dataset_path, quiet=False, unzip=True)
+        # Checking the dataset
+        download_input = input("\n> Do you want to download the muffin-vs-chihuahua dataset from Kaggle? [Y/N]: ")
+        if download_input.upper() == "Y":
+            print("\n> Download the dataset from Kaggle...")
+            # Download dataset and unzip it
+            kaggle.api.dataset_download_files(dataset=dataset_id, path=dataset_path, quiet=False, unzip=True)
 
 
 # Download fromm Google Drive the pre-trained models
