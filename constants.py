@@ -8,8 +8,8 @@ import os
 # PATHS AND SIMILAR
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))  # The project root
 DATASET_PATH = "dataset"  # Path to dataset folder
-TRAIN_DIR = os.path.join(DATASET_PATH, "train")  # DATASET_PATH + "/train"
-TEST_DIR = os.path.join(DATASET_PATH, "test")  # DATASET_PATH + "/test"
+TRAIN_DIR = os.path.join(DATASET_PATH, "train")  # Path to train set folder
+TEST_DIR = os.path.join(DATASET_PATH, "test")   # Path to test set folder
 DATA_PATH = "data"  # Path to data folder
 MODELS_PATH = "models"  # Path to models folder
 PLOT_FOLDER = "plot"  # Path to plot folder
@@ -23,7 +23,7 @@ IMG_HEIGHT = 192
 IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
 CHANNELS = 3
 
-# FOR PLOT AND SIMILAR
+# PLOT AND SIMILAR
 CLASS_LIST = ["chihuahua", "muffin"]
 
 # KERAS AND SIMILAR

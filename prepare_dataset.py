@@ -11,11 +11,20 @@ import constants as const
 # load data into keras dataset
 def load_dataset(train_data_dir, test_data_dir):
     """
-    Load data from directory as a Keras dataset
+     Load data into Keras datasets.
+     Note:
+        - The function uses TensorFlow's `image_dataset_from_directory` utility to load the datasets.
+        - Training and validation datasets are split from the `train_data_dir` with a validation split of 0.2.
+        - The datasets are shuffled for training purposes.
+        - The image size and batch size are determined by constants defined in the `constant` module.
 
-    :param train_data_dir: the path to the training data
-    :param test_data_dir: the path to the test data
-    :return: tf.Dataset.data object
+    :param train_data_dir: The directory path containing the training data.
+    :param test_data_dir: The directory path containing the test data.
+
+    :returns: A tuple containing three datasets:
+            - The training dataset.
+            - The validation dataset.
+            - The test dataset.
     """
     # train and validation dataset
     print("\n> Training and Validation: ")
@@ -44,16 +53,17 @@ def load_dataset(train_data_dir, test_data_dir):
 # Data Augmentation
 def perform_data_augmentation():
     """
-    Performs data augmentation using Keras Sequential model with specific layers.
+    Perform data augmentation.
 
-    - RandomFlip: str, Specifies the type of random flip to be applied.
+    Note:
+        - It is performed using a TensorFlow Sequential model with the following transformations:
+        - RandomFlip: str, Specifies the type of random flip to be applied.
+        - RandomRotation: float, Specifies the maximum angle of rotation in degrees.
+        - RandomZoom: float, Specifies the maximum zoom factor.
 
-    - RandomRotation: float, Specifies the maximum angle of rotation in degrees.
-
-    - RandomZoom: float, Specifies the maximum zoom factor.
-
-    :return: Keras Sequential model representing the data augmentation operations.
+    :return: tf.keras.Sequential, A sequential model representing the data augmentation transformations.
     """
+
     # Perform data augmentation
     data_augmentation = tf.keras.Sequential([
         tf.keras.layers.RandomFlip("horizontal"),
@@ -67,14 +77,19 @@ def perform_data_augmentation():
 # Data Normalization
 def data_normalization(tf_dataset, augment):
     """
-    Scale the keras dataset and perform prefetch.
-    Apply also data augmentation on the training set.
+    Normalize the data and optionally apply data augmentation.
 
-    :param tf_dataset: tf.Dataset.data object.
-    :param augment: Boolean value, if True, performs data augmentation on dataset.
+    Note:
+        - Standardizes the data by rescaling pixel values to the range [0, 1].
+        - The dataset is configured for performance by prefetching data using TensorFlow's AUTOTUNE mechanism.
+
+    :param tf_dataset: tf.data.Dataset, The dataset to be normalized.
+    :param augment: bool, Whether to apply data augmentation.
+        If True, augmentation is performed only on the training set.
 
     :return: tf.Dataset.data object.
     """
+
     # Standardize the data
     normalization_layer = tf.keras.layers.Rescaling(1. / 255)
     ds = tf_dataset.map(lambda x, y: (normalization_layer(x), y))
@@ -94,14 +109,21 @@ def data_normalization(tf_dataset, augment):
 # Convert tensorflow dataset object into an array
 def image_to_array(tf_dataset):
     """
-    Transform a tf.Dataset.data object into a split array form.
+    Convert a TensorFlow dataset object into NumPy arrays.
+
+    Note:
+        - The function iterates through the TensorFlow dataset to extract images and labels.
+        - Images and labels are appended to separate lists and then converted into NumPy arrays.
 
     :param tf_dataset: tf.Dataset.data object.
 
-    :return: X (Input values), y (target values).
+    :return: A tuple containing two NumPy arrays:
+        - X_array: The input images.
+        - y_array: The corresponding class labels.
     """
+
     X_array = []  # Images
-    y_array = []  # Class labels
+    y_array = []  # Labels
 
     for image, label in tf_dataset.unbatch().map(lambda x, y: (x, y)):
         X_array.append(image)

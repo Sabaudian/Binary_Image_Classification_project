@@ -31,6 +31,7 @@ def main():
 
     :return: None
     """
+
     # Python Packages Version info.
     print("\n> Version control")
     print("- Python version is: {}".format(platform.python_version()))

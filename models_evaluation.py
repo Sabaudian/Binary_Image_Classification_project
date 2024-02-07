@@ -84,6 +84,15 @@ def get_hyperparameters_search_info(model_name, best_hyperparameters):
 
 # Collect data about the search
 def collect_hyperparameters_tuning_data(model_name, tuner):
+    """
+    Collects hyperparameter tuning data for different models and saves it as a CSV file.
+
+    :param model_name: (string) The name of the model being tuned.
+        Supported options: 'MLP', 'CNN', 'MobileNet'.
+    :param tuner: The hyperparameter tuner object.
+
+    :return: None
+    """
     # if not already present, create a folder to store data
     general.makedir(dirpath=const.DATA_PATH)
 
@@ -188,8 +197,9 @@ def test_accuracy_loss_model(model, model_name, x_test, y_test):
     :param x_test: Input values of the test dataset.
     :param y_test: Target values of the test dataset.
 
-    •:return data_list: evaluation metrics dictionary
+    :return data_list: evaluation metrics dictionary
     """
+
     # Collect evaluation metrics
     test_score = model.evaluate(x=x_test, y=y_test, verbose=0)
 
@@ -223,6 +233,7 @@ def compute_evaluation_metrics(model, model_name, x_test, y_test):
 
     :return: The Classification Report Dataframe of the model
     """
+
     # Predict
     predict = model.predict(x=x_test, verbose=0)
     # Convert the predictions to binary classes (0 or 1)
@@ -265,8 +276,9 @@ def evaluate_model(model, model_name, x_test, y_test, random_prediction=False, s
     :param save_plot: If True, save the plot.
         Default is True.
 
-    •:return data: evaluation metrics dictionary per model
+    :return data: evaluation metrics dictionary per model
     """
+
     # Evaluate the model
     print("\n> " + model_name + " Model Evaluation:")
 

@@ -36,6 +36,7 @@ def build_mlp_model(hp):
     :return: Keras.Model
         The compiled MLP model.
     """
+
     model = tf.keras.Sequential(name="MultiLayer_Perceptron")
 
     model.add(layers.Flatten(input_shape=const.INPUT_SHAPE, name="flatten_layer"))
@@ -63,7 +64,8 @@ def build_mlp_model(hp):
     # Store and Display the model's architecture
     general.makedir(os.path.join("plot", "MLP"))  # Create the directory
     plot_path = os.path.join("plot", "MLP", "MLP_model_summary_plot.jpg")  # Path to store the plot
-    model.summary()
+    model.summary()  # Print a summary of the network
+    # Plot the architecture of the model
     tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
@@ -80,6 +82,7 @@ def build_cnn_model(hp):
     :return: tf.keras.Model
         The compiled CNN model.
     """
+
     # Create a Sequential model
     model = tf.keras.Sequential(name="Convolutional_Neural_Network")
 
@@ -143,7 +146,8 @@ def build_cnn_model(hp):
     # Store and Display the model's architecture
     general.makedir(os.path.join("plot", "CNN"))  # Create the directory
     plot_path = os.path.join("plot", "CNN", "CNN_model_summary_plot.jpg")  # Path to store the plot
-    model.summary()
+    model.summary()  # Print a summary of the network
+    # Plot the architecture of the model
     tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
@@ -160,6 +164,7 @@ def build_mobilenet_model(hp):
     :return: Keras.Model
         The compiled MobileNet model.
     """
+
     # Load the MobileNet base model without top layers (include_top=False)
     base_model = MobileNet(weights="imagenet", include_top=False, input_shape=const.INPUT_SHAPE)
 
@@ -189,7 +194,8 @@ def build_mobilenet_model(hp):
     # Store and Display the model's architecture
     general.makedir(os.path.join("plot", "MobileNet"))  # Create the directory
     plot_path = os.path.join("plot", "MobileNet", "MobileNet_model_summary_plot.jpg")  # Path to store the plot
-    model.summary()
+    model.summary()  # Print a summary of the network
+    # Plot the architecture of the model
     tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 
     return model
@@ -214,6 +220,7 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     :param x_val: Input values of the validation dataset.
     :param y_val: Target values of the validation dataset.
     """
+
     # Print about the model in input
     print("\n> " + model_name + " Tuning Hyperparameters:")
 
@@ -302,6 +309,7 @@ def zero_one_loss(y_true, y_pred):
     Returns:
     - zero_one_loss_value (tensor): Computed zero-one loss.
     """
+
     # Convert predicted values to integers
     y_pred = tf.cast(y_pred + 0.5, tf.int16)
     # Convert true labels to integers
@@ -328,6 +336,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     :param x_val: Input values of the validation dataset.
     :param y_val: Target values of the validation dataset.
     :param k_folds: Number of folds for cross-validation.
+
     :return model: Model after performing KFold cross-validation.
     """
     # Print about the model in input
@@ -464,6 +473,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
     :param save_plot: If True, save the plot.
         Default is True.
     """
+
     # List to collect models data
     all_models_data = []
 
@@ -524,6 +534,7 @@ def classification_and_evaluation(train_path, test_path, random_prediction=False
     :param save_plot: If True, save the plot.
         Default is True.
     """
+
     # Load keras datasets
     train_dataset, val_dataset, test_dataset = prepare.load_dataset(train_data_dir=train_path,
                                                                     test_data_dir=test_path)

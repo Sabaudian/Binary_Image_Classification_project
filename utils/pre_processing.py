@@ -22,6 +22,7 @@ def corruption_filter(dataset_path):
 
     :param dataset_path: The path to the dataset.
     """
+
     # Initialize
     bad_files = []  # to store corrupted file
 
@@ -67,6 +68,7 @@ def find_out_duplicate(dataset_path, hash_size):
     :param dataset_path: the path to dataset.
     :param hash_size: images will be resized to a matrix with size by given value.
     """
+
     # Initialize
     hashes = {}
     duplicates = []
@@ -85,7 +87,7 @@ def find_out_duplicate(dataset_path, hash_size):
                 hashes[tmp_hash] = file
 
     if len(duplicates) != 0:
-        doc_message = input("\n> Do you want to delete these {} file? [Y/N]: ".format(len(duplicates)))
+        doc_message = input("\n> Do you want to delete these {} duplicate images? [Y/N]: ".format(len(duplicates)))
 
         if doc_message.upper() == "Y":
             for duplicate in duplicates:
@@ -93,7 +95,7 @@ def find_out_duplicate(dataset_path, hash_size):
                 os.remove(os.path.join(dataset_path, duplicate))
                 print("- {} Deleted Successfully!".format(duplicate))
     else:
-        print("> No Duplicate Found")
+        print("> No duplicate images found.")
 
 
 # Preprocessing workflow
@@ -111,6 +113,7 @@ def checking_dataset(dataset_path, train_dir_path, test_dir_path, show_plot=True
     :param save_plot: If True, save the plot in a specified folder.
         Default is True.
     """
+
     print("\n> CHECK THE DATASET")
     print("\n> Checking the Number of file before performing Pre-processing Task...")
 

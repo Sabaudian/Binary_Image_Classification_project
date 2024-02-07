@@ -28,7 +28,10 @@ def show_and_save_plot(show, save, plot_folder, plot_name, plot_extension, dpi=9
     :param plot_extension: The file extension of the plot (e.g., 'png', 'jpg').
     :param dpi: Dots per inch (resolution) for the saved image.
                 Default is 96.
+
+    :return: None
     """
+
     if show and save:  # show and store plot
         general.makedir(plot_folder)
         plt.savefig(os.path.join(plot_folder, plot_name + plot_extension), dpi=dpi)
@@ -62,6 +65,7 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
 
     :return: None
     """
+
     # plot dataframe, counting data in it
     fig, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(16, 8))
     fig.suptitle("DATA VISUALIZATION CHART", fontsize=18, weight="bold")
@@ -105,6 +109,10 @@ def plot_class_distribution(train_data, test_data, show_on_screen=True, store_in
 def plot_view_dataset(train_ds, show_on_screen=True, store_in_folder=True):
     """
     Visualize a subset of images from the dataset.
+    The function plots a 3x3 grid of images from the dataset's first batch,
+    along with their corresponding labels.
+    The images are displayed with labels, and the plot can be shown on screen and/or
+    saved to a specified folder.
 
     :param train_ds: tf.data.Dataset
         A TensorFlow dataset object corresponding to the training data.
@@ -113,12 +121,9 @@ def plot_view_dataset(train_ds, show_on_screen=True, store_in_folder=True):
     :param store_in_folder: If True, save the plot in a specified folder.
         Defaults to True.
 
-    :notes:
-        The function plots a 3x3 grid of images from the dataset's first batch, along with their corresponding labels.
-        The images are displayed with labels, and the plot can be shown on screen and/or saved to a specified folder.
-
     :returns: None
     """
+
     # Plot
     plt.figure(figsize=(16, 8))
 
@@ -164,6 +169,8 @@ def plot_data_augmentation(train_ds, data_augmentation, show_on_screen=True, sto
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Defaults to True.
+
+    :returns: None
     """
 
     # Plot
@@ -206,7 +213,10 @@ def plot_history(history, model_name, show_on_screen=True, store_in_folder=True)
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Defaults to True.
+
+    :return: None
     """
+
     # Plot
     plt.figure(figsize=(16, 8))
 
@@ -255,7 +265,10 @@ def plot_confusion_matrix(model, model_name, x_test, y_test, show_on_screen=True
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Defaults to True.
+
+    :return: None
     """
+
     # Predict
     predict = model.predict(x=x_test, verbose=0)
 
@@ -305,7 +318,10 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Default is True.
+
+    :returns: None
     """
+
     # Predict
     predict = model.predict(x=x_test, verbose=0)
     # Convert the predictions to binary classes (0 or 1)
@@ -362,7 +378,7 @@ def plot_model_predictions_evaluation(model, model_name, class_list, x_test, y_t
 # Plot test images with prediction
 def plot_visual_prediction(model, model_name, x_test, y_test, randomize=False, show_on_screen=True, store_in_folder=True):
     """
-    Plots a visual representation of the model predictions on a test dataset.
+    Plot test images with predictions made by the given model.
 
     :param model: tensorflow.keras.Model
         The trained model for making predictions.
@@ -372,14 +388,17 @@ def plot_visual_prediction(model, model_name, x_test, y_test, randomize=False, s
         Input test data (images).
     :param y_test: numpy.ndarray
         True labels for the test data.
-    :param randomize: If True, pick random images.
+    :param randomize: Whether to select random samples for plotting.
         Default is False.
     :param show_on_screen: If True, display the plot on the screen.
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Default is True.
+
+    :returns: None
     """
 
+    # if random is True
     if randomize:
 
         # Select random indices from x_test
@@ -434,7 +453,6 @@ def plot_visual_prediction(model, model_name, x_test, y_test, randomize=False, s
 
     # Show and/or store the plot
     if randomize:
-
         show_and_save_plot(
             show=show_on_screen, save=store_in_folder,
             plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
@@ -443,7 +461,6 @@ def plot_visual_prediction(model, model_name, x_test, y_test, randomize=False, s
         )
 
     else:
-
         show_and_save_plot(
             show=show_on_screen, save=store_in_folder,
             plot_folder=os.path.join(const.PLOT_FOLDER, model_name),
@@ -463,7 +480,10 @@ def plot_fold_history(fold_history, model_name, show_on_screen=True, store_in_fo
         Default is True.
     :param store_in_folder: If True, save the plot in a specified folder.
         Default is True.
+
+    :returns: None
     """
+
     # Plot the training history for each fold
     for fold in range(len(fold_history)):
         # Plot size

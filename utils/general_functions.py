@@ -19,6 +19,7 @@ from classifiers import build_mobilenet_model
 # ************************************* #
 
 
+# Download dataset from Kaggle website
 def download_dataset_from_kaggle(dataset_id, dataset_path):
     """
     Download the muffin-vs-chihuahua-image-classification Dataset using Kaggle module
@@ -29,6 +30,7 @@ def download_dataset_from_kaggle(dataset_id, dataset_path):
 
     :return: None
     """
+
     # Download the dataset if not exist in the workplace
     if not os.path.exists(dataset_path):
         print("\n> Download the dataset from Kaggle...")
@@ -43,6 +45,7 @@ def makedir(dirpath):
 
     :param dirpath: directory location
     """
+
     # check if dir exists
     if not os.path.exists(dirpath):
         os.makedirs(dirpath, exist_ok=True)
@@ -79,6 +82,7 @@ def count_files(file_path, extensions="jpg"):
 
     :return: (int) The number of files with specified extensions in the specified directory.
     """
+
     if extensions is None:
         extensions = ['']
 
@@ -128,7 +132,7 @@ def load_file(dir_path):
     return files
 
 
-# define train and test dataframe from dataset
+# Define train and test dataframe
 def define_dataframe(train_dir_path, test_dir_path):
     """
     Define two dataframe, one for the training set and the other for the test set.
@@ -148,6 +152,7 @@ def define_dataframe(train_dir_path, test_dir_path):
 
         :return: A list of dictionaries containing image paths and labels.
         """
+
         data = []
         with os.scandir(dir_path) as entries:
             for entry in entries:
@@ -182,6 +187,7 @@ def get_classifier():
              - 'CNN': Convolutional Neural Network model.
              - 'MobileNet': MobileNet model.
     """
+
     # models dictionary
     models = {"MLP": [], "CNN": [], "MobileNet": []}
 
