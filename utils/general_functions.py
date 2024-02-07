@@ -1,13 +1,14 @@
 # Import
 import os
 
-import gdown
 import kaggle
 import pandas as pd
 
 from PIL import Image
 
 # My import
+import constants as const
+
 from classifiers import build_mlp_model
 from classifiers import build_cnn_model
 from classifiers import build_mobilenet_model
@@ -30,42 +31,12 @@ def download_dataset_from_kaggle(dataset_id, dataset_path):
     """
     # Download the dataset if not exist in the workplace
     if not os.path.exists(dataset_path):
-        # Checking the dataset
-        download_input = input("\n> Do you want to download the muffin-vs-chihuahua dataset from Kaggle? [Y/N]: ")
-        if download_input.upper() == "Y":
-            print("\n> Download the dataset from Kaggle...")
-            # Download dataset and unzip it
-            kaggle.api.dataset_download_files(dataset=dataset_id, path=dataset_path, quiet=False, unzip=True)
+        print("\n> Download the dataset from Kaggle...")
+        # Download dataset and unzip it
+        kaggle.api.dataset_download_files(dataset=dataset_id, path=dataset_path, quiet=False, unzip=True)
 
 
-# Download fromm Google Drive the pre-trained models
-def download_models_saves_from_drive(drive_url, root_dir):
-    """
-    Download from Google Drive the models folder, that contains the models saved from the previous run of the project.
-    This will speed up the entire process.
-
-    :param drive_url: Link to Google drive folder.
-    :param root_dir: Root directory of the project, for saving the downloaded folder.
-    :return: if successful, return the list of files downloaded.
-    """
-    # download model folder if not already present in the workspace
-    if not os.path.exists("models"):
-        # Checking folder
-        print("\n> The 'models' directory is not found in the workspace! "
-              "\n -- Would you like to download it from Google Drive?")
-        print("\n> [INFO] Choosing this option excludes the collection of data related to\n"
-              "\t\t the hyperparameter optimization and k-fold cross-validation process,\n"
-              "\t\t moving directly to the testing phase.")
-        check_input = input("\n> Would you like to procede [Y/N]: ")
-
-        if check_input.upper() == "Y":
-            # Download "models" folder
-            gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
-    else:
-        print("\n> The 'models' folder is in the workspace!")
-
-
-# create a new directory
+# Create a new directory
 def makedir(dirpath):
     """
     Create a directory, given a path
@@ -78,6 +49,25 @@ def makedir(dirpath):
         print("\n> Directory [{}] has been created successfully!".format(dirpath))
 
 
+# Create a series of folder used for the project
+def define_workspace_folders():
+    """
+    Create a series of folders if not already present in the workspace:
+        - data: to store table '.csv' to collect data
+        - models: to store the models weights and pre-trained models saves.
+        - plot: to store the graphs generated to describe the processes.
+    """
+    # create data folder
+    makedir(const.DATA_PATH)
+
+    # create models folder
+    makedir(const.MODELS_PATH)
+
+    # create plot folder
+    makedir(const.PLOT_FOLDER)
+
+
+# Count the number of files
 def count_files(file_path, extensions="jpg"):
     """
     Count the number of files with specified extensions in the specified directory.

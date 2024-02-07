@@ -2,8 +2,8 @@
 import constants as const
 
 from utils.pre_processing import checking_dataset
+from utils.general_functions import define_workspace_folders
 from utils.general_functions import download_dataset_from_kaggle
-from utils.general_functions import download_models_saves_from_drive
 
 from classifiers import classification_and_evaluation
 
@@ -38,6 +38,9 @@ def main():
     print("- Tensorflow version is: {}".format(tensorflow.__version__))
     print("______________________________________________________________________________")
 
+    # Set up the project folders workspace
+    define_workspace_folders()
+
     # Download the dataset from Kaggle website
     download_dataset_from_kaggle(dataset_id=const.DATASET_ID, dataset_path=const.DATASET_PATH)
 
@@ -49,9 +52,6 @@ def main():
                          test_dir_path=const.TEST_DIR,
                          show_plot=False, save_plot=True)
     print("______________________________________________________________________________")
-
-    # Download the folder "models" from drive to speed up the process
-    download_models_saves_from_drive(drive_url=const.DRIVE_URL, root_dir=const.PROJECT_ROOT)
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,
