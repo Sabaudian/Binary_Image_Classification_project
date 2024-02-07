@@ -8,7 +8,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 - **Python** version is: **3.10.5**
 - **Scikit-learn** version is: **1.3.1**
 - **Tensorflow** version is: **2.15.0**
-- **requirements.txt** contains all the becessary python packages.
+- **requirements.txt** contains all the necessary python packages.
 - The **models folder** contains the saves of the hyperparameters tuning and k-fold cross-validation processes.
 
 ## Structure of the project
