@@ -8,15 +8,14 @@ Use Keras to train a neural network for the binary classification of muffins and
 - **Python** version is: **3.10.5**
 - **Scikit-learn** version is: **1.3.1**
 - **Tensorflow** version is: **2.15.0**
-- **requirements.txt** contains all the becessary python packages.
-- The **models folder** containes the saves of the hyperparameters tuning process.
-  > If you want to performe the tuning, you can simply delete the folder.
-
+- **requirements.txt** contains all the necessary python packages.
+- The **models folder** contains the saves of the hyperparameters tuning and k-fold cross-validation processes.
 
 ## Structure of the project
+the architecture of this project is fundamentally organized into four blocks. The initial two blocks are dedicated to preprocessing and data preparation tasks, whereas the latter two blocks are focused on model construction: classification and evaluation.
 
 <p align="center">
-  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/811c0602-0796-4b03-9b85-3aa875a04bdd"/>
+  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/4b168037-0c91-4363-bcd5-cc720ae99e86"/>
 </p>
 
 #### A. Preprocessing
@@ -31,7 +30,7 @@ In the evaluation phase, the model’s performance is systematically assessed th
 ## Performace Summary:
 
 |   | MLP | CNN | MOBILENET | 
-| - | --------------------- | ------------- | ------------------- |
+| - | --- | ------------- | ------------------- |
 | Accuracy (%)  | 73.057 | 92.821 | 99.155 |
 | Loss  | 0.752 | 0.292 | 0.022 |
 | F1-Score | 0.713 | 0.928 | 0.992 |
