@@ -7,7 +7,6 @@ import keras_tuner as kt
 
 from tensorflow import keras
 from tensorflow.keras import layers
-from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.mobilenet import MobileNet
 
 from sklearn.model_selection import KFold
@@ -190,52 +189,6 @@ def build_mobilenet_model(hp):
     # Store and Display the model's architecture
     general.makedir(os.path.join("plot", "MobileNet"))  # Create the directory
     plot_path = os.path.join("plot", "MobileNet", "MobileNet_model_summary_plot.jpg")  # Path to store the plot
-    model.summary()
-    tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
-
-    return model
-
-
-# VGG-16 Model
-def build_vgg16_model(hp):
-    """
-    Build a VGG16 model with tunable hyperparameters for image binary classification.
-
-    :param hp: Keras.utils.HyperParameters.
-        Hyperparameters for model tuning.
-
-    :return: Keras.Model
-        The compiled VGG16 model.
-    """
-    # Load the VGG16 base model without top layers (include_top=False)
-    base_model = VGG16(weights="imagenet", include_top=False, input_shape=const.INPUT_SHAPE)
-
-    # Freeze the weights of the VGG16 base model
-    base_model.trainable = False
-
-    # Create a Sequential model with the VGG16 base model
-    model = tf.keras.Sequential(layers=[
-        base_model,
-        layers.Flatten(name="flatten"),
-        layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
-                     activation="relu", name="dense_layer"),  # min_value=128, max_value=1024, step=128
-        layers.BatchNormalization(name="batch_normalization"),
-        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
-        layers.Dense(units=1, activation="sigmoid", name="output_layer")
-    ], name="VGG16")
-
-    # Tune the learning rate for the optimizer
-    hp_learning_rate = hp.Choice("learning_rate", values=[1e-2, 1e-3, 1e-4])
-
-    model.compile(
-        optimizer=tf.keras.optimizers.legacy.Adam(learning_rate=hp_learning_rate),
-        loss="binary_crossentropy",
-        metrics=["accuracy"]
-    )
-
-    # Store and Display the model's architecture
-    general.makedir(os.path.join("plot", "VGG16"))  # Create the directory
-    plot_path = os.path.join("plot", "VGG16", "VGG16_model_summary_plot.jpg")  # Path to store the plot
     model.summary()
     tf.keras.utils.plot_model(model=model, to_file=plot_path, dpi=96)
 

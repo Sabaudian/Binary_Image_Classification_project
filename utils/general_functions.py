@@ -188,10 +188,9 @@ def get_classifier():
              - 'MLP': Multi-layer Perceptron model.
              - 'CNN': Convolutional Neural Network model.
              - 'MobileNet': MobileNet model.
-             - 'VGG16': VGG16 model.
     """
     # models dictionary
-    models = {"MLP": [], "CNN": [], "MobileNet": []}  # , "VGG16": []}
+    models = {"MLP": [], "CNN": [], "MobileNet": []}
 
     # Multi-layer Perceptron model
     mlp_model = build_mlp_model
@@ -204,9 +203,5 @@ def get_classifier():
     # MobileNet model
     mobilenet_model = build_mobilenet_model
     models.update({"MobileNet": mobilenet_model})
-
-    # # VGG16 model
-    # vgg16_model = build_vgg16_model
-    # models.update({"VGG16": vgg16_model})
 
     return models
