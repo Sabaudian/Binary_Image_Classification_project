@@ -47,12 +47,17 @@ def build_mlp_model(hp):
         The built MLP model.
     """
 
+    # Construct the MLP model using a sequential architecture
     model = tf.keras.Sequential(name="MultiLayer_Perceptron")
 
+    # Add a flatten layer to convert input data into a one-dimensional array
     model.add(layers.Flatten(input_shape=const.INPUT_SHAPE, name="flatten_layer"))
 
+    # Iterate through a loop to add multiple hidden layers with specified number of units
     for i in range(1, 6):
+        # Define the number of units for the current hidden layer
         units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
+        # Add i-dense layer with ReLU activation and specified number of units
         model.add(layers.Dense(units=units, activation="relu", name=f"hidden_layer_{i}"))
         # Batch Normalization for stabilization and acceleration
         model.add(layers.BatchNormalization(name=f"batch_normalization_{i}"))
@@ -84,7 +89,7 @@ def build_mlp_model(hp):
 # CNN model
 def build_cnn_model(hp):
     """
-    Build a Convolutional Neural Network (CNN) model with tunable hyperparameters for image binary classification.
+    Build a Convolutional Neural Network (CNN) model with tunable hyperparameters.
 
     :param hp: Keras.utils.HyperParameters.
         Hyperparameters for model tuning.
