@@ -28,13 +28,23 @@ from models_evaluation import collect_hyperparameters_tuning_data, get_hyperpara
 # MLP model
 def build_mlp_model(hp):
     """
-    Build a Multi-Layer Perceptron (MLP) model with tunable hyperparameters for image binary classification.
+    Build a Multi-Layer Perceptron (MLP) model with hyperparameters defined by the provided HyperParameters object.
 
-    :param hp: Keras.utils.HyperParameters.
-        Hyperparameters for model tuning.
+    Note:
+        - The function constructs a sequential model with multiple hidden layers,
+            each consisting of dense, batch normalization, and dropout layers.
+        - The number of units in each hidden layer is determined by the hyperparameter search space.
+        - The output layer has a single unit with sigmoid activation for binary classification.
+        - The learning rate for the optimizer is tuned using the provided HyperParameters object.
+        - The model is compiled with the Adam optimizer, binary crossentropy loss, and accuracy metric.
+        - The model's architecture is stored and displayed,
+            including a summary printout and a plot of the network architecture.
 
-    :return: Keras.Model
-        The compiled MLP model.
+    :param hp: HyperParameters,
+        The hyperparameter tuning object.
+
+    :return: tf.keras.Sequential:
+        The built MLP model.
     """
 
     model = tf.keras.Sequential(name="MultiLayer_Perceptron")
