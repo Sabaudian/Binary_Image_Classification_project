@@ -28,7 +28,7 @@ from models_evaluation import collect_hyperparameters_tuning_data, get_hyperpara
 # MLP model
 def build_mlp_model(hp):
     """
-    Build a Multi-Layer Perceptron (MLP) model with tunable hyperparameters defined by the provided HyperParameters object.
+    Build a Multi-Layer Perceptron (MLP) model with tunable hyperparameters.
 
     Note:
         - The function constructs a sequential model with multiple hidden layers,
