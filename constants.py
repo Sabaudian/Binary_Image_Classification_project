@@ -17,7 +17,6 @@ DATASET_ID = "samuelcortinhas/muffin-vs-chihuahua-image-classification"  # Neces
 
 # IMAGE VALUE AND DATA
 FILE_EXTENSION = ".jpg"
-COLOR_MODE = "L"  # grayscale
 IMG_WIDTH = 192
 IMG_HEIGHT = 192
 IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
