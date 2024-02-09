@@ -29,18 +29,13 @@ def build_mlp_model(hp):
     """
     Build a Multi-Layer Perceptron (MLP) model with tunable hyperparameters.
 
-    Note:
+    Notes:
         - The function constructs a sequential model with multiple hidden layers, each consisting of dense,
           batch normalization, and dropout layers.
-
         - The number of units in each hidden layer is determined by the hyperparameter search space.
-
         - The output layer has a single unit with sigmoid activation for binary classification.
-
         - The learning rate for the optimizer is tuned using the provided HyperParameters object.
-
         - The model is compiled with the Adam optimizer, binary crossentropy loss, and accuracy metric.
-
         - The model's architecture is stored and displayed, including a summary printout and a plot of the network
           architecture.
 
@@ -95,11 +90,22 @@ def build_cnn_model(hp):
     """
     Build a Convolutional Neural Network (CNN) model with tunable hyperparameters.
 
-    :param hp: Keras.utils.HyperParameters.
-        Hyperparameters for model tuning.
+    Notes:
+        - The model is constructed using a sequential architecture with multiple convolutional layers followed
+          by batch normalization, max pooling, and dropout.
+        - The number of filters and kernel size for each convolutional layer is predefined.
+        - The number of units in the dense layer, dropout rate, and learning rate are tuned using the
+          provided HyperParameters object.
+        - The output layer consists of a single unit with sigmoid activation, suitable for binary classification tasks.
+        - The model is compiled with the Adam optimizer, binary crossentropy loss, and accuracy metric.
+        - The model's architecture is stored and displayed, including a summary printout and a plot of the network
+          architecture.
 
-    :return: tf.keras.Model
-        The compiled CNN model.
+    :param hp: HyperParameters,
+        The hyperparameter tuning object.
+
+    :return: tf.keras.Sequential:
+        The built CNN model.
     """
 
     # Create a Sequential model
@@ -177,11 +183,20 @@ def build_mobilenet_model(hp):
     """
     Build a MobileNet model with tunable hyperparameters.
 
-    :param hp: Keras.utils.HyperParameters.
-        Hyperparameters for model tuning.
+     Notes:
+        - The constructed model includes a flatten layer, a dense layer with tunable number of units,
+          batch normalization, dropout, and an output layer with sigmoid activation for binary classification.
+        - Hyperparameters for the dense layer units, dropout rate, and learning rate are tuned using the
+          provided HyperParameters object.
+        - The model is compiled with the Adam optimizer, binary crossentropy loss, and accuracy metric.
+        - The model's architecture is stored and displayed, including a summary printout and a plot of the network
+          architecture.
 
-    :return: Keras.Model
-        The compiled MobileNet model.
+    :param hp: HyperParameters,
+        The hyperparameter tuning object.
+
+    :return: tf.keras.Sequential:
+        The built MobileNet model.
     """
 
     # Load the MobileNet base model without top layers (include_top=False)
@@ -232,12 +247,20 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     The function performs hyperparameter tuning using Keras Tuner's Hyperband algorithm.
     It saves the best model, its hyperparameters, and training history in the "models" directory.
 
-    :param model: The Keras model to be tuned.
-    :param model_name: A string representing the name of the model.
-    :param x_train: Input values of the training dataset.
-    :param y_train: Target values of the training dataset.
-    :param x_val: Input values of the validation dataset.
-    :param y_val: Target values of the validation dataset.
+    Notes:
+        - This function performs hyperparameter tuning using Keras Tuner Hyperband.
+        - It prints information about the model being tuned and creates a directory for the best model.
+        - The best model's weights are saved to a file.
+        - History of training is plotted and saved.
+
+    :param model: tf.keras.Model, The model to be tuned.
+    :param model_name: str, The name of the model.
+    :param x_train: numpy.ndarray, The input training data.
+    :param y_train: numpy.ndarray, The target training data.
+    :param x_val: numpy.ndarray, The input validation data.
+    :param y_val: numpy.ndarray, The target validation data.
+
+    :returns: None
     """
 
     # Print about the model in input
@@ -321,12 +344,16 @@ def zero_one_loss(y_true, y_pred):
     Compute the zero-one loss metric.
     Returns 1 when y_true != y_pred, 0 otherwise.
 
-    Parameters:
-    - y_true (tensor): True labels.
-    - y_pred (tensor): Predicted labels.
+    Notes:
+        - This function computes the zero-one loss metric, which is commonly used for binary classification tasks.
+        - The function converts predicted values and true labels to integers.
+        - The zero-one loss value is computed as 1 when there is a misclassification (y_true != y_pred),
+          and 0 otherwise.
 
-    Returns:
-    - zero_one_loss_value (tensor): Computed zero-one loss.
+    :param y_true: tensor, True labels.
+    :param y_pred: tensor, Predicted labels.
+
+    :returns: zero_one_loss_value (tensor): Computed zero-one loss.
     """
 
     # Convert predicted values to integers
@@ -347,16 +374,25 @@ def zero_one_loss(y_true, y_pred):
 # KFold cross validation function
 def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
     """
-    Perform K-fold cross-validation on a Keras model using the zero-one loss.
+    Perform K-fold cross-validation on a Keras model using the zero-one loss metrics.
 
-    :param model_name: String, name of the model.
-    :param x_train: Input values of the training dataset.
-    :param y_train: Target values of the training dataset.
-    :param x_val: Input values of the validation dataset.
-    :param y_val: Target values of the validation dataset.
-    :param k_folds: Number of folds for cross-validation.
+    Notes:
+        - The function initializes directories for model storage
+          and handles loading existing models to speed up the process.
+        - It utilizes K-Fold Cross-Validation to assess model performance across multiple folds of the data.
+        - Training metrics such as loss, accuracy, and zero-one loss are computed and saved for each fold.
+        - The average performance metrics across all folds are calculated and saved to a CSV file.
+        - Training history plots for each fold are generated and optionally stored.
+        - The trained model is saved for future use.
 
-    :return model: Model after performing KFold cross-validation.
+    :param model_name: str, the name of the model.
+    :param x_train: numpy.ndarray, Training data features.
+    :param y_train: numpy.ndarray, Training data labels.
+    :param x_val: numpy.ndarray, Validation data features.
+    :param y_val: numpy.ndarray, Validation data labels.
+    :param k_folds: int, The number of folds for K-Fold Cross-Validation.
+
+    :return: model (tf.keras.Model): The trained model.
     """
     # Print about the model in input
     print("\n> " + model_name + " KFold Cross-Validation:")
@@ -473,24 +509,25 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_test, y_test, kfold,
                                       random_prediction, show_plot, save_plot):
     """
-    Tune hyperparameters for a dictionary of classification models,
-    apply KFold cross-validation and then evaluate the various models
+    Execute the classification procedure workflow.
 
     :param models: A dictionary containing classification models.
-    :param x_train: Training data features.
-    :param y_train: Training data labels.
-    :param x_val: Validation data features.
-    :param y_val: Validation data labels.
-    :param x_test: Test data features.
-    :param y_test: Test data labels.
-    :param kfold: Number of folds for K-Fold Cross-Validation.
+    :param x_train: numpy.ndarray, Training data features.
+    :param y_train: numpy.ndarray, Training data labels.
+    :param x_val: numpy.ndarray, Validation data features.
+    :param y_val: numpy.ndarray, Validation data labels.
+    :param x_test: numpy.ndarray, Test data features.
+    :param y_test: numpy.ndarray, Test data labels.
+    :param kfold: int, The number of folds for K-Fold Cross-Validation.
         Default is 5.
-    :param random_prediction: If True, pick random images for the prediction visualization plot.
+    :param random_prediction: bool, Flag indicating whether to perform random predictions during evaluation.
         Default is False.
-    :param show_plot: If True, displays the plot on the screen.
+    :param show_plot: bool, Flag indicating whether to display evaluation plots.
         Default is True.
-    :param save_plot: If True, save the plot.
+    :param save_plot: bool, Flag indicating whether to save evaluation plots.
         Default is True.
+
+    :returns: None
     """
 
     # List to collect models data
@@ -535,23 +572,24 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 # To be called in the main
 def classification_and_evaluation(train_path, test_path, random_prediction=False, show_plot=True, save_plot=True):
     """
-    Perform classification and evaluation of image datasets.
+    Perform classification and evaluation of models.
 
-    This function loads image datasets, prints information about class names, visualizes the dataset, scales the data,
-    performs data augmentation, converts images to arrays,
-    retrieves classification models, and applies KFold tuning.
-    The classification models are evaluated on the training, validation,
-    and testing datasets, and the results are displayed
-    through plots if specified.
+    This function orchestrates the entire process of classification and evaluation, including data loading,
+    visualization, data preprocessing, model training, hyperparameter tuning, K-Fold Cross-Validation, and evaluation
+    on the test set. It loads datasets, prints information about the classes, visualizes the dataset, scales the data,
+    performs data augmentation, converts datasets into arrays, obtains classification models, applies hyperparameter
+    tuning, K-Fold Cross-Validation, and evaluates the models. Finally, it saves the evaluation results to a CSV file.
 
-    :param train_path: path to train data set.
-    :param test_path: path to test data set.
-    :param random_prediction: If True, pick random images for the prediction visualization plot.
+    :param train_path: str, Path to the training dataset.
+    :param test_path: str, Path to the test dataset.
+    :param random_prediction: bool, Flag indicating whether to perform random predictions during evaluation.
         Default is False.
-    :param show_plot: If True, displays the plot on the screen.
+    :param show_plot: bool, Flag indicating whether to display evaluation plots.
         Default is True.
-    :param save_plot: If True, save the plot.
+    :param save_plot: bool, Flag indicating whether to save evaluation plots.
         Default is True.
+
+    :returns: None
     """
 
     # Load keras datasets
@@ -583,7 +621,7 @@ def classification_and_evaluation(train_path, test_path, random_prediction=False
     # Get the classification models
     classification_models = general.get_classifier()
 
-    # Tuning, apply K-Fold Cross-Validation and then evaluate the models
+    # Tuning, K-Fold Cross-Validation and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
                                       y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.KFOLD,
                                       random_prediction=random_prediction, show_plot=show_plot, save_plot=save_plot)
