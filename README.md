@@ -15,7 +15,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 the architecture of this project is fundamentally organized into four blocks. The initial two blocks are dedicated to preprocessing and data preparation tasks, whereas the latter two blocks are focused on model construction: classification and evaluation.
 
 <p align="center">
-  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/4b168037-0c91-4363-bcd5-cc720ae99e86"/>
+  <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/4b168037-0c91-4363-bcd5-cc720ae99e86">
 </p>
 
 #### A. Preprocessing
