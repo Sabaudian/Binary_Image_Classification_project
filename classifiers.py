@@ -24,21 +24,25 @@ from models_evaluation import collect_hyperparameters_tuning_data, get_hyperpara
 # ************* CLASSIFIER MODELS DEFINITION AND EVALUATION ************* #
 # *********************************************************************** #
 
-
 # MLP model
 def build_mlp_model(hp):
     """
     Build a Multi-Layer Perceptron (MLP) model with tunable hyperparameters.
 
     Note:
-        - The function constructs a sequential model with multiple hidden layers,
-            each consisting of dense, batch normalization, and dropout layers.
+        - The function constructs a sequential model with multiple hidden layers, each consisting of dense,
+          batch normalization, and dropout layers.
+
         - The number of units in each hidden layer is determined by the hyperparameter search space.
+
         - The output layer has a single unit with sigmoid activation for binary classification.
+
         - The learning rate for the optimizer is tuned using the provided HyperParameters object.
+
         - The model is compiled with the Adam optimizer, binary crossentropy loss, and accuracy metric.
-        - The model's architecture is stored and displayed,
-            including a summary printout and a plot of the network architecture.
+
+        - The model's architecture is stored and displayed, including a summary printout and a plot of the network
+          architecture.
 
     :param hp: HyperParameters,
         The hyperparameter tuning object.
