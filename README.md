@@ -22,10 +22,10 @@ the architecture of this project is fundamentally organized into four blocks. Th
 In the preprocessing phase, the emphasis is on refining the dataset. The process involves systematically addressing corrupted files, detecting and managing duplicates through image hashing, and conducting a thorough dataset check.
 
 #### C. Classification
-In the classification phase, a robust image classification pipeline is established us- ing Keras and TensorFlow. The implementation introduces configurable models, in- cluding Multilayer Perceptron, Convolutional Neural Network and MobileNet. The workflow seamlessly integrates hyperparameter tuning and K-fold cross-validation for comprehensive model optimization.
+In the classification phase, a robust image classification pipeline is established using Keras and TensorFlow. The implementation introduces configurable models, including Multilayer Perceptron, Convolutional Neural Network and MobileNet. The workflow seamlessly integrates hyperparameter tuning and K-fold cross-validation for comprehensive model optimization.
 
 #### D. Evaluation
-In the evaluation phase, the model’s performance is systematically assessed through the presentation of insightful metrics, such as loss and accuracy. The module fur- ther generates detailed classification reports, produces confusion matrices, and offers intuitive plots for model predictions.
+In the evaluation phase, the model’s performance is systematically assessed through the presentation of insightful metrics, such as loss and accuracy. The module further generates detailed classification reports, produces confusion matrices, and offers intuitive plots for model predictions.
 
 ## Performace Summary:
 
