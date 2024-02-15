@@ -56,7 +56,7 @@ def main():
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,
-                                  random_prediction=True, show_plot=False, save_plot=True)
+                                  show_plot=False, save_plot=True)
 
 
 if __name__ == '__main__':

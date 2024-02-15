@@ -52,16 +52,21 @@ def build_mlp_model(hp):
     # Add a flatten layer to convert input data into a one-dimensional array
     model.add(layers.Flatten(input_shape=const.INPUT_SHAPE, name="flatten_layer"))
 
-    # Iterate through a loop to add multiple hidden layers with specified number of units
-    for i in range(1, 6):
-        # Define the number of units for the current hidden layer
-        units = hp.Int(f"units_{i}", min_value=32, max_value=512, step=32)
-        # Add i-dense layer with ReLU activation and specified number of units
-        model.add(layers.Dense(units=units, activation="relu", name=f"hidden_layer_{i}"))
-        # Batch Normalization for stabilization and acceleration
-        model.add(layers.BatchNormalization(name=f"batch_normalization_{i}"))
-        # Add dropout for regularization to prevent overfitting
-        model.add(layers.Dropout(rate=0.25, name=f"dropout_{i}"))
+    # Add four dense layer with ReLU activation and specified number of units
+    model.add(layers.Dense(units=256, activation="relu", name="hidden_layer_1"))
+    model.add(layers.Dense(units=128, activation="relu", name="hidden_layer_2"))
+    model.add(layers.Dense(units=64, activation="relu", name="hidden_layer_3"))
+    model.add(layers.Dense(units=32, activation="relu", name="hidden_layer_4"))
+
+    # Define the number of units for the current hidden layer
+    units = hp.Int("units", min_value=32, max_value=512, step=32)
+    # Add a dense layer with ReLU activation and specified number of units
+    model.add(layers.Dense(units=units, activation="relu", name="hidden_layer_5"))
+
+    # Define the value of the dropout rate for the current hidden layer
+    dropout_rate = hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
+    # Add dropout for regularization to prevent overfitting
+    model.add(layers.Dropout(rate=dropout_rate, name="dropout_layer"))
 
     # Output layer with sigmoid activation for binary classification
     model.add(layers.Dense(units=1, activation="sigmoid", name="output_layer"))
@@ -148,11 +153,13 @@ def build_cnn_model(hp):
     # Flatten layer to transition from convolutional layers to dense layer
     model.add(layers.Flatten(name="flatten"))
 
-    # Tune the number of units in the dense layer
+    # Define the number of units for the current dense layer
     hp_units = hp.Int("units", min_value=32, max_value=512, step=32)
+    # Add a dense layer with ReLU activation and specified number of units
     model.add(layers.Dense(units=hp_units, activation="relu", name="dense_layer"))
-    # Tune the dropout rate
+    # Define the value of the dropout rate
     hp_dropout_rate = hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
+    # Add dropout for regularization to prevent overfitting
     model.add(layers.Dropout(rate=hp_dropout_rate, name="dropout_layer"))
 
     # Output layer with sigmoid activation for binary classification
@@ -507,7 +514,7 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
 # Organize the various procedures
 def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_test, y_test, kfold,
-                                      random_prediction, show_plot, save_plot):
+                                      show_plot, save_plot):
     """
     Execute the classification procedure workflow.
 
@@ -520,8 +527,6 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
     :param y_test: numpy.ndarray, Test data labels.
     :param kfold: int, The number of folds for K-Fold Cross-Validation.
         Default is 5.
-    :param random_prediction: bool, Flag indicating whether to perform random predictions during evaluation.
-        Default is False.
     :param show_plot: bool, Flag indicating whether to display evaluation plots.
         Default is True.
     :param save_plot: bool, Flag indicating whether to save evaluation plots.
@@ -557,7 +562,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
         # Evaluate the results on the Test set
         data = evaluate_model(model=kfold_result, model_name=model_name, x_test=x_test, y_test=y_test,
-                              random_prediction=random_prediction, show_plot=show_plot, save_plot=save_plot)
+                              show_plot=show_plot, save_plot=save_plot)
         all_models_data.append(data)
 
     # Create a pandas DataFrame
@@ -570,7 +575,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
 
 # To be called in the main
-def classification_and_evaluation(train_path, test_path, random_prediction=False, show_plot=True, save_plot=True):
+def classification_and_evaluation(train_path, test_path, show_plot=True, save_plot=True):
     """
     Perform classification and evaluation of models.
 
@@ -582,8 +587,6 @@ def classification_and_evaluation(train_path, test_path, random_prediction=False
 
     :param train_path: str, Path to the training dataset.
     :param test_path: str, Path to the test dataset.
-    :param random_prediction: bool, Flag indicating whether to perform random predictions during evaluation.
-        Default is False.
     :param show_plot: bool, Flag indicating whether to display evaluation plots.
         Default is True.
     :param save_plot: bool, Flag indicating whether to save evaluation plots.
@@ -624,4 +627,4 @@ def classification_and_evaluation(train_path, test_path, random_prediction=False
     # Tuning, K-Fold Cross-Validation and then evaluate the models
     classification_procedure_workflow(models=classification_models, x_train=X_train, y_train=y_train, x_val=X_val,
                                       y_val=y_val, x_test=X_test, y_test=y_test, kfold=const.KFOLD,
-                                      random_prediction=random_prediction, show_plot=show_plot, save_plot=save_plot)
+                                      show_plot=show_plot, save_plot=save_plot)

@@ -119,12 +119,15 @@ def print_file_counts(dataset_path):
 # Load data from a path
 def load_file(dir_path):
     """
-    Load file from a given path.
+    Load files from a directory path.
 
-    :param dir_path: Directory path.
+    This function loads files from the specified directory path and returns a list of file objects.
 
-    :return: A sorted array of file.
+    :param dir_path: Str, the directory path containing the files to be loaded.
+
+    :returns: files: A list of file objects loaded from the directory.
     """
+
     files = []
     for filename in os.listdir(dir_path):
         file = Image.open(os.path.join(dir_path, filename))
@@ -150,7 +153,7 @@ def define_dataframe(train_dir_path, test_dir_path):
         :param dir_path: The path to the directory containing image files.
         :param label: The label to assign to the images in the dataframe.
 
-        :return: A list of dictionaries containing image paths and labels.
+        :returns: A list of dictionaries containing image paths and labels.
         """
 
         data = []
@@ -191,7 +194,7 @@ def get_classifier():
     # models dictionary
     models = {"MLP": [], "CNN": [], "MobileNet": []}
 
-    # Multi-layer Perceptron model
+    # Multilayer Perceptron model
     mlp_model = build_mlp_model
     models.update({"MLP": mlp_model})
 
