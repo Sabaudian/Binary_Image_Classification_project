@@ -508,7 +508,7 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
         title_color = "green" if true_class_label == predicted_class_labels[i] else "red"
 
         # Adjust probability display for chihuahua predictions (more intuitive)
-        if true_class_label == "chihuahua":
+        if true_class_label == "chihuahua" or predicted_class_labels[i] == "chihuahua":
             probability_display = 100 - int(prediction_probability[i])
         else:
             probability_display = int(prediction_probability[i])
