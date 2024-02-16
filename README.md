@@ -31,7 +31,7 @@ In the evaluation phase, the model’s performance is systematically assessed th
 
 |   | MLP | CNN | MOBILENET | 
 | - | --- | ------------- | ------------------- |
-| Accuracy (%)  | 73.057 | 92.821 | 99.155 |
-| Loss  | 0.752 | 0.292 | 0.022 |
-| F1-Score | 0.713 | 0.928 | 0.992 |
+| Accuracy (%)  | 74.071 | 92.821 | 99.155 |
+| Loss  | 0.550 | 0.292 | 0.022 |
+| F1-Score | 0.738 | 0.928 | 0.992 |
 
