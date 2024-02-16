@@ -4,8 +4,6 @@ import os
 import kaggle
 import pandas as pd
 
-from PIL import Image
-
 # My import
 import constants as const
 
@@ -114,25 +112,6 @@ def print_file_counts(dataset_path):
           "- Number of file in train/muffin: {}\n".format(count_train_muffin) +
           "- Number of file in test/chihuahua: {}\n".format(count_test_chihuahua) +
           "- Number of file in test/muffin: {}\n".format(count_test_muffin))
-
-
-# Load data from a path
-def load_file(dir_path):
-    """
-    Load files from a directory path.
-
-    This function loads files from the specified directory path and returns a list of file objects.
-
-    :param dir_path: Str, the directory path containing the files to be loaded.
-
-    :returns: files: A list of file objects loaded from the directory.
-    """
-
-    files = []
-    for filename in os.listdir(dir_path):
-        file = Image.open(os.path.join(dir_path, filename))
-        files.append(file)
-    return files
 
 
 # Define train and test dataframe

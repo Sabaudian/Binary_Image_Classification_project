@@ -248,7 +248,7 @@ def build_mobilenet_model(hp):
 
 
 # Perform hyperparameter Tuning
-def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
+def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, show_plot=True, save_plot=True):
     """
     Tuning the hyperparameters of the input model using Keras Tuner (kerastuner).
     The function performs hyperparameter tuning using Keras Tuner's Hyperband algorithm.
@@ -266,6 +266,11 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
     :param y_train: numpy.ndarray, The target training data.
     :param x_val: numpy.ndarray, The input validation data.
     :param y_val: numpy.ndarray, The target validation data.
+    :param show_plot: bool, Flag indicating whether to display evaluation plots.
+        Default is True.
+    :param save_plot: bool, Flag indicating whether to save evaluation plots.
+        Default is True.
+
 
     :returns: None
     """
@@ -339,7 +344,7 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val):
 
     # Plot history after tuning
     plot_functions.plot_history(history=history, model_name=model_name,
-                                show_on_screen=False, store_in_folder=True)
+                                show_on_screen=show_plot, store_in_folder=save_plot)
 
 
 # *************************************************************** #
@@ -540,7 +545,7 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
 
     # Scroll through the dictionary
     for key, value in models.items():
-        # MLP, CNN and MobileNet name string
+        # MLP, CNN and MobileNet (String ID)
         model_name = key
         # Models
         model_type = value
@@ -554,7 +559,8 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
         if not os.path.exists(tuned_file_path):
             # Tuning Hyperparameters and Save the Best
             tuning_hyperparameters(model=model_type, model_name=model_name,
-                                   x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val)
+                                   x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val,
+                                   show_plot=show_plot, save_plot=save_plot)
 
         # Apply Kfold Cross-validation
         kfold_result = kfold_cross_validation(model_name=model_name,

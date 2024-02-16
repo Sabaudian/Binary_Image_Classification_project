@@ -25,7 +25,7 @@ def main():
     """
     Main function.
 
-    This function provides information about the versions of Python and relevant packages
+    Provides information about the versions of Python and relevant packages
     (Scikit-learn, Tensorflow), checks the dataset if required, and performs classification
     and evaluation of models.
 
