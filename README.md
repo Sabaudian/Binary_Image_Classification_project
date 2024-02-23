@@ -22,6 +22,9 @@ the architecture of this project is fundamentally organized into four blocks. Th
 #### A. Preprocessing
 In the preprocessing phase, the emphasis is on refining the dataset. The process involves systematically addressing corrupted files, detecting and managing duplicates through image hashing, and conducting a thorough dataset check.
 
+#### B. Data Preparation
+In the data preparation phase, the primary focus is on loading and enhancing the dataset. This involves using Keras and TensorFlow to load training, validation, and test datasets, applying data augmentation techniques such as flip, rotation, and zoom, and normalizing pixel values. The goal is to ensure the dataset is well-prepared and suitable for subsequent steps.
+
 #### C. Classification
 In the classification phase, a robust image classification pipeline is established using Keras and TensorFlow. The implementation introduces configurable models, including Multilayer Perceptron, Convolutional Neural Network and MobileNet. The workflow seamlessly integrates hyperparameter tuning and K-fold cross-validation for comprehensive model optimization.
 
