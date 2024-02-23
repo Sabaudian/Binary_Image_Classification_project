@@ -29,7 +29,7 @@ In the data preparation phase, the primary focus is on loading and enhancing the
 In the classification phase, a robust image classification pipeline is established using Keras and TensorFlow. The implementation introduces configurable models, including Multilayer Perceptron, Convolutional Neural Network and MobileNet. The workflow seamlessly integrates hyperparameter tuning and K-fold cross-validation for comprehensive model optimization.
 
 #### D. Evaluation
-In the evaluation phase, the model’s performance is systematically assessed through the presentation of insightful metrics, such as loss and accuracy. The module further generates detailed classification reports, produces confusion matrices, and offers intuitive plots for model predictions.
+In the evaluation phase, the model’s performance is tested through the presentation of insightful metrics, such as loss and accuracy. The module further generates classification reports, produces confusion matrices, and offers intuitive plots to analyze predictions.
 
 ## Performace Summary:
 
