@@ -35,3 +35,8 @@ In the evaluation phase, the model’s performance is systematically assessed th
 | Loss  | 0.752 | 0.292 | 0.022 |
 | F1-Score | 0.738 | 0.928 | 0.992 |
 
+The models exhibit varying degrees of performance, with MobileNet emerging as the
+standout performer, achieving near-perfect accuracy and classification proficiency.
+The CNN model also demonstrates notable results. The MLP model performs worse
+than its counterparts, exhibiting suboptimal performance characterized by higher loss
+resulting in a notable rate of misclassification, thus proving to be ineffective.
