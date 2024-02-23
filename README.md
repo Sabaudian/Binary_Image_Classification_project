@@ -10,6 +10,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 - **Tensorflow** version is: **2.15.0**
 - **requirements.txt** contains all the necessary python packages (_pip install -r requirements.txt_).
 - The **models folder** contains the saves of the hyperparameters tuning and k-fold cross-validation processes.
+- The file called "SMML_Project_Report" is the document describing the project
 
 ## Structure of the project
 the architecture of this project is fundamentally organized into four blocks. The initial two blocks are dedicated to preprocessing and data preparation tasks, whereas the latter two blocks are focused on model construction: classification and evaluation.
