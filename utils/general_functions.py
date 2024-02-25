@@ -96,7 +96,7 @@ def count_files(file_path, extensions="jpg"):
 # Just a helper function
 def print_file_counts(dataset_path):
     """
-    A helper function t pint information about the number of files inside the directory.
+    A helper function that print information about the number of files inside the directory.
 
     :param dataset_path: The path to training data
     """
