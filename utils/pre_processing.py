@@ -63,7 +63,7 @@ def corruption_filter(dataset_path):
 # Check dataset: control the presence of duplicate inside the training set
 def find_out_duplicate(dataset_path, hash_size):
     """
-    Find and delete Duplicates
+    Find and delete Duplicates inside the training set
 
     :param dataset_path: the path to dataset.
     :param hash_size: images will be resized to a matrix with size by given value.
