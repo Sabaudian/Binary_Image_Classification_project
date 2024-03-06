@@ -42,6 +42,7 @@ def get_hyperparameters_search_info(model_name, best_hyperparameters):
         "Dropout Rate": best_hyperparameters["dropout_rate"],
         "Learning Rate": best_hyperparameters["learning_rate"]
     }
+
     # Turn it into a dataframe
     df = pd.DataFrame(data=[model_best_hp_dict])
 
@@ -111,16 +112,19 @@ def test_accuracy_loss_model(model, model_name, x_test, y_test):
     # Loss and Accuracy for the test set
     test_loss = test_score[0]
     test_accuracy = test_score[1]
+    test_zero_one_loss = test_score[2]
 
     # Print evaluation info. about the model
     print("- Test Loss: {:.4f}".format(test_loss))
     print("- Test Accuracy: {:.4f} %".format(test_accuracy * 100))
+    print("- Test 0-1 Loss: {:.4f}".format(test_zero_one_loss))
 
     # Collect data
     data_list = {
         "Model": model_name,
         "Loss": test_loss,
         "Accuracy (%)": test_accuracy * 100,
+        "0-1 Loss": test_zero_one_loss
     }
 
     # Return dictionary

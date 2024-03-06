@@ -122,33 +122,42 @@ def build_cnn_model(hp):
     # Batch Normalization for stabilization and acceleration
     model.add(layers.BatchNormalization(name="batch_normalization_1"))
     # MaxPooling layer to reduce spatial dimensions
-    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_1"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="max_pooling_1"))
     # Add dropout for regularization to prevent overfitting
     model.add(layers.Dropout(rate=0.25, name="dropout_1"))
 
     # Second Convolutional layer with 32 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=32, kernel_size=(3, 3), activation="relu", name="convolution_2"))
     model.add(layers.BatchNormalization(name="batch_normalization_2"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_2"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="max_pooling_2"))
     model.add(layers.Dropout(rate=0.25, name="dropout_2"))
 
     # Third Convolutional layer with 32 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_3"))
     model.add(layers.BatchNormalization(name="batch_normalization_3"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_3"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="max_pooling_3"))
     model.add(layers.Dropout(rate=0.25, name="dropout_3"))
 
     # Fourth Convolutional layer with 32 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=64, kernel_size=(3, 3), activation="relu", name="convolution_4"))
     model.add(layers.BatchNormalization(name="batch_normalization_4"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_4"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="max_pooling_4"))
     model.add(layers.Dropout(rate=0.25, name="dropout_4"))
 
     # Fifth Convolutional layer with 128 filters and a kernel size of (3, 3)
     model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_5"))
     model.add(layers.BatchNormalization(name="batch_normalization_5"))
-    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="pooling_5"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="max_pooling_5"))
     model.add(layers.Dropout(rate=0.25, name="dropout_5"))
+
+    # Sixth Convolutional layer with 128 filters and a kernel size of (3, 3)
+    model.add(layers.Conv2D(filters=128, kernel_size=(3, 3), activation="relu", name="convolution_6"))
+    model.add(layers.BatchNormalization(name="batch_normalization_6"))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), name="max_pooling_6"))
+    model.add(layers.Dropout(rate=0.25, name="dropout_6"))
+
+    # GlobalMaxPooling2D layer for feature extraction and dimensionality reduction
+    model.add(layers.GlobalMaxPool2D(name="global_max_pooling"))
 
     # Flatten layer to transition from convolutional layers to dense layer
     model.add(layers.Flatten(name="flatten"))
@@ -156,7 +165,8 @@ def build_cnn_model(hp):
     # Define the number of units for the current dense layer
     hp_units = hp.Int("units", min_value=32, max_value=512, step=32)
     # Add a dense layer with ReLU activation and specified number of units
-    model.add(layers.Dense(units=hp_units, activation="relu", name="dense_layer"))
+    model.add(layers.Dense(units=hp_units, activation="relu", name="dense_layer_1"))
+
     # Define the value of the dropout rate
     hp_dropout_rate = hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
     # Add dropout for regularization to prevent overfitting
@@ -219,7 +229,7 @@ def build_mobilenet_model(hp):
         layers.Dense(units=hp.Int("units", min_value=32, max_value=512, step=32),
                      activation="relu", name="dense_layer"),
         layers.BatchNormalization(name="batch_normalization"),
-        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout"),
+        layers.Dropout(hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1), name="dropout_layer"),
         layers.Dense(units=1, activation="sigmoid", name="output_layer")
     ], name="MobileNet")
 
@@ -248,7 +258,8 @@ def build_mobilenet_model(hp):
 
 
 # Perform hyperparameter Tuning
-def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, show_plot=True, save_plot=True):
+def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, best_model_directory, model_weights_path,
+                           show_plot=True, save_plot=True):
     """
     Tuning the hyperparameters of the input model using Keras Tuner (kerastuner).
     The function performs hyperparameter tuning using Keras Tuner's Hyperband algorithm.
@@ -266,6 +277,8 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, sh
     :param y_train: numpy.ndarray, The target training data.
     :param x_val: numpy.ndarray, The input validation data.
     :param y_val: numpy.ndarray, The target validation data.
+    :param best_model_directory: str, Path to the best model folder.
+    :param model_weights_path: str, Path to the saved weights of the model.
     :param show_plot: bool, Flag indicating whether to display evaluation plots.
         Default is True.
     :param save_plot: bool, Flag indicating whether to save evaluation plots.
@@ -279,11 +292,10 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, sh
     print("\n> " + model_name + " Tuning Hyperparameters:")
 
     # Create a directory for the best model
-    best_model_directory = os.path.join("models", model_name, "best_model")
     general.makedir(best_model_directory)
 
-    # Best model weights filepath
-    file_path = os.path.join(best_model_directory, "best_model.weights.h5")
+    # CSV logger path
+    csv_path = os.path.join(const.DATA_PATH, f"{model_name}_tuning_history.csv")
 
     # Tuning model
     tuner = kt.Hyperband(
@@ -300,14 +312,15 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, sh
     tuner.search_space_summary()
 
     # Monitor "val_loss" and stop early if not improving
-    stop_early = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1)
+    early_stopping = tf.keras.callbacks.EarlyStopping(monitor="val_loss", patience=3, verbose=1,
+                                                      restore_best_weights=True)
 
     # Performs a search for best hyperparameter configurations.
     tuner.search(
         x_train, y_train,
         epochs=10,
         validation_data=(x_val, y_val),
-        callbacks=[stop_early]
+        callbacks=[early_stopping]
     )
 
     # Collect hyperparameter during the tuning process
@@ -319,28 +332,32 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, sh
     # Information about the optimal hyperparameter found during the tuning process
     get_hyperparameters_search_info(model_name=model_name, best_hyperparameters=best_hyperparameters)
 
-    # Build the model with the optimal hyperparameters and train it on the data for 10 epochs
     print("\n> Build the model with the optimal hyperparameters and train it on the data for 10 epochs")
-
+    # Build the model with the optimal hyperparameters
     optimal_hp_model = tuner.hypermodel.build(best_hyperparameters)
 
+    # Save history to csv file
+    csv_logger = tf.keras.callbacks.CSVLogger(filename=csv_path)
+
+    # Train the model for 10 epochs
     history = optimal_hp_model.fit(
         x=x_train, y=y_train,
         epochs=10,
-        validation_data=(x_val, y_val)
+        validation_data=(x_val, y_val),
+        callbacks=[csv_logger, early_stopping]
     )
 
-    # Serialize model to JSON
+    # Serialize model structure to JSON
     model_json = optimal_hp_model.to_json()
     with open(os.path.join(best_model_directory, "best_model.json"), "w") as json_file:
         json_file.write(model_json)
 
     # Save the best model's weights to the created directory
-    optimal_hp_model.save_weights(filepath=file_path)
+    optimal_hp_model.save_weights(filepath=model_weights_path)
 
     # Check if weights have been saved
-    if os.path.exists(file_path):
-        print("\n> The best weights for " + model_name + " model were saved successfully!\n")
+    if os.path.exists(path=model_weights_path):
+        print("\n> The best weights for " + f"{model_name} model were saved successfully!\n")
 
     # Plot history after tuning
     plot_functions.plot_history(history=history, model_name=model_name,
@@ -411,27 +428,29 @@ def kfold_cross_validation(model_name, x_train, y_train, x_val, y_val, k_folds):
 
     # Define the path for storing the models
     dir_path = os.path.join("models", "KFold")
+    # Create folder
     general.makedir(dir_path)
+    # Path to the models' file
     file_path = os.path.join(dir_path, model_name + "_kfold_model.keras")
 
-    # Check if the model.keras already exist to speed up the process
+    # Check if model.keras already exist to speed up the process (move on to evaluation)
     if os.path.exists(path=file_path):
 
         # Load model from the right folder
         model = tf.keras.models.load_model(filepath=file_path, custom_objects={"zero_one_loss": zero_one_loss})
         print("- Model Loaded Successfully!")
-    else:
+    else:  # if model.keras does not exist -> load model from json then execute k-fold cross-validation
 
         # Path to the model directory
         best_model_directory = os.path.join("models", model_name, "best_model")
 
         # Load json and define model
         json_file = open(os.path.join(best_model_directory, "best_model.json"), "r")
-        load_model_json = json_file.read()
+        load_model_from_json = json_file.read()
         json_file.close()
 
         # This is the structure of the best model obtained after tuning
-        model = tf.keras.models.model_from_json(load_model_json)
+        model = tf.keras.models.model_from_json(json_string=load_model_from_json)
 
         # Load weight into the model, i.e., the best hyperparameters
         model.load_weights(filepath=os.path.join(best_model_directory, "best_model.weights.h5"))
@@ -550,16 +569,17 @@ def classification_procedure_workflow(models, x_train, y_train, x_val, y_val, x_
         # Models
         model_type = value
 
-        # Best model folder path
+        # Best models' folder path
         tuned_model_folder = os.path.join("models", model_name, "best_model")
-        # Best model filepath
-        tuned_file_path = os.path.join(tuned_model_folder, "best_model.weights.h5")
+        # Best models' weights file path
+        weight_path = os.path.join(tuned_model_folder, "best_model.weights.h5")
 
-        # Redo Tuning if not already done it
-        if not os.path.exists(tuned_file_path):
+        # Do Tuning if not already done it
+        if not os.path.exists(weight_path):
             # Tuning Hyperparameters and Save the Best
             tuning_hyperparameters(model=model_type, model_name=model_name,
                                    x_train=x_train, y_train=y_train, x_val=x_val, y_val=y_val,
+                                   best_model_directory=tuned_model_folder, model_weights_path=weight_path,
                                    show_plot=show_plot, save_plot=save_plot)
 
         # Apply Kfold Cross-validation

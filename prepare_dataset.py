@@ -94,14 +94,13 @@ def data_normalization(tf_dataset, augment):
     normalization_layer = tf.keras.layers.Rescaling(1. / 255)
     ds = tf_dataset.map(lambda x, y: (normalization_layer(x), y))
 
-    # Use data augmentation only on the training set.
+    # Use data augmentation only on the training set
     if augment:
         data_augmentation = perform_data_augmentation()
         ds = ds.map(lambda x, y: (data_augmentation(x, training=True), y))
 
     # Configure the dataset for performance
-    AUTOTUNE = tf.data.AUTOTUNE
-    ds = ds.prefetch(buffer_size=AUTOTUNE)
+    ds = ds.prefetch(buffer_size=const.AUTOTUNE)
 
     return ds
 

@@ -1,5 +1,6 @@
 # import
 import os
+import tensorflow as tf
 
 # ************************************** #
 # ************** CONSTANTS ************* #
@@ -27,6 +28,7 @@ CLASS_LIST = ["chihuahua", "muffin"]
 
 # KERAS AND SIMILAR
 BATCH_SIZE = 32
+AUTOTUNE = tf.data.AUTOTUNE
 INPUT_SHAPE = (IMG_HEIGHT, IMG_WIDTH, CHANNELS)
 
 # K-FOLD CROSS-VALIDATION
