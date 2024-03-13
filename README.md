@@ -38,9 +38,8 @@ In the evaluation phase, the model’s performance is tested through the present
 
 |   | MLP | CNN | MOBILENET | 
 | - | --- | ------------- | ------------------- |
-| Accuracy (%)  | 73.057 | 92.821 | 99.155 |
-| Loss  | 0.752 | 0.292 | 0.022 |
-| F1-Score | 0.738 | 0.928 | 0.992 |
+| Accuracy (%)  | 74.831 | 94.510 | 99.493 |
+| Loss  | 0.560 | 0.222 | 0.019 |
 
 The models exhibit varying degrees of performance, with MobileNet emerging as the
 standout performer, achieving near-perfect accuracy and classification proficiency.
