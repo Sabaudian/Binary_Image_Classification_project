@@ -15,6 +15,8 @@ DATA_PATH = "data"  # Path to data folder
 MODELS_PATH = "models"  # Path to models folder
 PLOT_FOLDER = "plot"  # Path to plot folder
 DATASET_ID = "samuelcortinhas/muffin-vs-chihuahua-image-classification"  # Necessary for download dataset (Kaggle API)
+# Google Drive Link to models' saves
+GDRIVE_URL = "https://drive.google.com/drive/folders/1BiddEt8Fp_NUEuVB2k_PDQEg9jZsnqLi?usp=share_link"
 
 # IMAGE VALUE AND DATA
 FILE_EXTENSION = ".jpg"

@@ -4,6 +4,7 @@ import constants as const
 from utils.pre_processing import checking_dataset
 from utils.general_functions import define_workspace_folders
 from utils.general_functions import download_dataset_from_kaggle
+from utils.general_functions import download_models_saves_from_drive
 
 from classifiers import classification_and_evaluation
 
@@ -53,6 +54,9 @@ def main():
                          test_dir_path=const.TEST_DIR,
                          show_plot=False, save_plot=True)
     print("______________________________________________________________________________")
+
+    # Download models' saves from Google drive folder
+    download_models_saves_from_drive(drive_url=const.GDRIVE_URL, root_dir=const.PROJECT_ROOT)
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,

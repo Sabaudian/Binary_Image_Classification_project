@@ -1,6 +1,6 @@
 # Import
 import os
-
+import gdown
 import kaggle
 import pandas as pd
 
@@ -36,6 +36,30 @@ def download_dataset_from_kaggle(dataset_id, dataset_path):
         kaggle.api.dataset_download_files(dataset=dataset_id, path=dataset_path, quiet=False, unzip=True)
 
 
+# Download from Google Drive the pre-trained models
+def download_models_saves_from_drive(drive_url, root_dir):
+    """
+    Download from Google Drive the models folder that contains the saves from the previous run of the project.
+    This will speed up the entire process.
+
+    :param drive_url: Link to Google drive folder.
+    :param root_dir: Root directory of the project, for saving the downloaded folder at the right location.
+    :return: if successful, return the list of files downloaded.
+    """
+    # Check if model folder exist or it is empty
+    if not os.path.exists("models") or len(os.listdir("models")) == 0:
+        # Checking folder
+        print("\n> The 'models' directory does not exist or is empty! "
+              "\n -- Would you like to download it from Google Drive? [STRONGLY RECOMMENDED]")
+        check_input = input("-- Would you like to proceed [Y/N]: ")
+
+        if check_input.upper() == "Y":
+            # Download "models" folder
+            gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
+    else:
+        print("\n> The 'models' folder is in the workspace!")
+
+
 # Create a new directory
 def makedir(dirpath):
     """
@@ -60,9 +84,6 @@ def define_workspace_folders():
     """
     # create data folder
     makedir(const.DATA_PATH)
-
-    # create models folder
-    makedir(const.MODELS_PATH)
 
     # create plot folder
     makedir(const.PLOT_FOLDER)
