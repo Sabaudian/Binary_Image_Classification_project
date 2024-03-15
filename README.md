@@ -10,9 +10,9 @@ Use Keras to train a neural network for the binary classification of muffins and
 ## General Information
 
 - **Python** version is: **3.10.5**
-- **requirements.txt** contains all the necessary python packages
+- **requirements.txt** contains all the necessary python packages (use the command below to install)
 ```
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 - The **models folder** contains the saves of the hyperparameters tuning and k-fold cross-validation processes.
 - The file called "SMML_Project_Report" is the document describing the project
