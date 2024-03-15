@@ -10,9 +10,9 @@ Use Keras to train a neural network for the binary classification of muffins and
 ## General Information
 
 - **Python** version is: **3.10.5**
-- **requirements.txt** contains all the necessary python packages
+- **requirements.txt** contains all the necessary python packages (_use the command below to install all the pachages_)
 ```
-$ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 - The **models folder** contains the saves of the hyperparameters tuning and k-fold cross-validation processes.
 - The file called "SMML_Project_Report" is the document describing the project
@@ -20,9 +20,9 @@ $ pip install -r requirements.txt
 ## Structure of the project
 the architecture of this project is fundamentally organized into four blocks. The initial two blocks are dedicated to preprocessing and data preparation tasks, whereas the latter two blocks are focused on model construction: classification and evaluation.
 
-<p align="center">
+<picture>
   <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/4b168037-0c91-4363-bcd5-cc720ae99e86">
-</p>
+</picture>
 
 #### A. Preprocessing
 In the preprocessing phase, the emphasis is on refining the dataset. The process involves systematically addressing corrupted files, detecting and managing duplicates through image hashing, and conducting a thorough dataset check.
@@ -39,7 +39,7 @@ In the evaluation phase, the model’s performance is tested through the present
 ## Performace Summary:
 
 |   | MLP | CNN | MOBILENET | 
-| - | --- | ------------- | ------------------- |
+| --- | --- | --- | --- |
 | Accuracy (%)  | 71.537 | 94.510 | 99.493 |
 | Loss  | 0.573 | 0.222 | 0.019 |
 
