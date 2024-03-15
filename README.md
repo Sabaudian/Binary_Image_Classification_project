@@ -39,7 +39,7 @@ In the evaluation phase, the model’s performance is tested through the present
 ## Performace Summary:
 
 |   | MLP | CNN | MOBILENET | 
-| - | --- | ------------- | ------------------- |
+| --- | --- | --- | --- |
 | Accuracy (%)  | 71.537 | 94.510 | 99.493 |
 | Loss  | 0.573 | 0.222 | 0.019 |
 
