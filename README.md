@@ -1,13 +1,15 @@
 # Statistical Methods for Machine Learning: experimental project
-<img src="https://img.shields.io/badge/PyCharm-000000.svg?&style=for-the-badge&logo=PyCharm&logoColor=white"> <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"> <img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white"> <img src="https://img.shields.io/badge/Keras-FF0000?style=for-the-badge&logo=keras&logoColor=white">
+
+[![Pycharm Badge](https://img.shields.io/badge/PyCharm-000000.svg?&style=for-the-badge&logo=PyCharm&logoColor=white)](https://www.jetbrains.com/pycharm/)
+[![Pyton Badge](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3105/)
+[![Tensorflow Badge](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org)
+[![Keras Badge](https://img.shields.io/badge/Keras-FF0000?style=for-the-badge&logo=keras&logoColor=white)](https://keras.io)
 
 Use Keras to train a neural network for the binary classification of muffins and Chihuahuas.
 
 ## General Information
 
 - **Python** version is: **3.10.5**
-- **Scikit-learn** version is: **1.3.1**
-- **Tensorflow** version is: **2.15.0**
 - **requirements.txt** contains all the necessary python packages
 ```
 $ pip install -r requirements.txt
@@ -38,9 +40,8 @@ In the evaluation phase, the model’s performance is tested through the present
 
 |   | MLP | CNN | MOBILENET | 
 | - | --- | ------------- | ------------------- |
-| Accuracy (%)  | 73.057 | 92.821 | 99.155 |
-| Loss  | 0.752 | 0.292 | 0.022 |
-| F1-Score | 0.738 | 0.928 | 0.992 |
+| Accuracy (%)  | 71.537 | 94.510 | 99.493 |
+| Loss  | 0.573 | 0.222 | 0.019 |
 
 The models exhibit varying degrees of performance, with MobileNet emerging as the
 standout performer, achieving near-perfect accuracy and classification proficiency.
