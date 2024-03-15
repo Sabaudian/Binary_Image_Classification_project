@@ -465,8 +465,8 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
     """
 
     # Select random images from the Test set
-    num_samples = min(20, len(x_test))  # Adjust the number of samples to display
-    random.seed(22)  # Set random seed
+    num_samples = min(10, len(x_test))  # Adjust the number of samples to display
+    random.seed(11)  # Set random seed
     random_indices = random.sample(range(len(x_test)), num_samples)
 
     # Select a subset of x_test and y_test based on the random indices
@@ -486,7 +486,7 @@ def plot_visual_prediction(model, model_name, x_test, y_test, show_on_screen=Tru
 
     # Plot configuration
     figure_size = (16, 8)
-    subplot_rows, subplot_cols = 4, 5
+    subplot_rows, subplot_cols = 2, 5
 
     # Plot
     plt.figure(figsize=figure_size)

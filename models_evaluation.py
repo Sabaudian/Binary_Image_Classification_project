@@ -112,19 +112,16 @@ def test_accuracy_loss_model(model, model_name, x_test, y_test):
     # Loss and Accuracy for the test set
     test_loss = test_score[0]
     test_accuracy = test_score[1]
-    test_zero_one_loss = test_score[2]
 
     # Print evaluation info. about the model
     print("- Test Loss: {:.4f}".format(test_loss))
     print("- Test Accuracy: {:.4f} %".format(test_accuracy * 100))
-    print("- Test 0-1 Loss: {:.4f}".format(test_zero_one_loss))
 
     # Collect data
     data_list = {
         "Model": model_name,
         "Loss": test_loss,
-        "Accuracy (%)": test_accuracy * 100,
-        "0-1 Loss": test_zero_one_loss
+        "Accuracy (%)": test_accuracy * 100
     }
 
     # Return dictionary

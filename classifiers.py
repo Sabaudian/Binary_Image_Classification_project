@@ -294,9 +294,6 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, be
     # Create a directory for the best model
     general.makedir(best_model_directory)
 
-    # CSV logger path
-    csv_path = os.path.join(const.DATA_PATH, f"{model_name}_tuning_history.csv")
-
     # Tuning model
     tuner = kt.Hyperband(
         hypermodel=model,
@@ -336,15 +333,12 @@ def tuning_hyperparameters(model, model_name, x_train, y_train, x_val, y_val, be
     # Build the model with the optimal hyperparameters
     optimal_hp_model = tuner.hypermodel.build(best_hyperparameters)
 
-    # Save history to csv file
-    csv_logger = tf.keras.callbacks.CSVLogger(filename=csv_path)
-
     # Train the model for 10 epochs
     history = optimal_hp_model.fit(
         x=x_train, y=y_train,
         epochs=10,
         validation_data=(x_val, y_val),
-        callbacks=[csv_logger, early_stopping]
+        callbacks=[early_stopping]
     )
 
     # Serialize model structure to JSON
