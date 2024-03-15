@@ -20,9 +20,9 @@ $ pip install -r requirements.txt
 ## Structure of the project
 the architecture of this project is fundamentally organized into four blocks. The initial two blocks are dedicated to preprocessing and data preparation tasks, whereas the latter two blocks are focused on model construction: classification and evaluation.
 
-<p align="center">
+<picture align="center">
   <img src="https://github.com/Sabaudian/SMML_project/assets/32509505/4b168037-0c91-4363-bcd5-cc720ae99e86">
-</p>
+</picture>
 
 #### A. Preprocessing
 In the preprocessing phase, the emphasis is on refining the dataset. The process involves systematically addressing corrupted files, detecting and managing duplicates through image hashing, and conducting a thorough dataset check.
