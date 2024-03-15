@@ -10,7 +10,7 @@ Use Keras to train a neural network for the binary classification of muffins and
 ## General Information
 
 - **Python** version is: **3.10.5**
-- **requirements.txt** contains all the necessary python packages (use the command below to install)
+- **requirements.txt** contains all the necessary python packages (_use the command below to install all the pachages_)
 ```
 pip install -r requirements.txt
 ```
