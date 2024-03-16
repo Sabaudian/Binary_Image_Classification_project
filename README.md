@@ -14,7 +14,6 @@ Use Keras to train a neural network for the binary classification of muffins and
 ```
 pip install -r requirements.txt
 ```
-- The **models folder** contains the saves of the hyperparameters tuning and k-fold cross-validation processes.
 - The file called "SMML_Project_Report" is the document describing the project
 
 ## Structure of the project
