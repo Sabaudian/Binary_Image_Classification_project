@@ -37,26 +37,24 @@ def download_dataset_from_kaggle(dataset_id, dataset_path):
 
 
 # Download from Google Drive the pre-trained models
-def download_models_saves_from_drive(drive_url, root_dir):
+def download_models_saves_from_drive(models_dir, drive_url, root_dir):
     """
     Download from Google Drive the models folder that contains the saves from the previous run of the project.
     This will speed up the entire process.
 
+    :param models_dir: Directory of models saves.
     :param drive_url: Link to Google drive folder.
     :param root_dir: Root directory of the project, for saving the downloaded folder at the right location.
     :return: if successful, return the list of files downloaded.
     """
     # Check if model folder exist or it is empty
-    if not os.path.exists("models") or len(os.listdir("models")) == 0:
-        # Checking folder
-        print("\n> The 'models' directory does not exist or is empty! "
-              "\n -- Would you like to download it from Google Drive? [STRONGLY RECOMMENDED]")
-        check_input = input("-- Would you like to proceed [Y/N]: ")
+    if not os.path.exists(models_dir):
 
-        if check_input.upper() == "Y":
-            # Download "models" folder
-            gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
+        # Download "models" folder
+        print("\n> Downloading the folder from Drive...\n")
+        gdown.download_folder(url=drive_url, quiet=False, output=root_dir)
     else:
+        # Models folder exist
         print("\n> The 'models' folder is in the workspace!")
 
 

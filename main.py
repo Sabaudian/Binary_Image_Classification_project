@@ -38,7 +38,7 @@ def main():
     print("- Python version is: {}".format(platform.python_version()))
     print("- Scikit-learn version is: {}".format(sklearn.__version__))
     print("- Tensorflow version is: {}".format(tensorflow.__version__))
-    print("______________________________________________________________________________")
+    print("________________________________________________________________________________")
 
     # Set up the project folders workspace
     define_workspace_folders()
@@ -53,10 +53,12 @@ def main():
                          train_dir_path=const.TRAIN_DIR,
                          test_dir_path=const.TEST_DIR,
                          show_plot=False, save_plot=True)
-    print("______________________________________________________________________________")
+    print("________________________________________________________________________________")
 
     # Download models' saves from Google drive folder
-    download_models_saves_from_drive(drive_url=const.GDRIVE_URL, root_dir=const.PROJECT_ROOT)
+    download_models_saves_from_drive(models_dir=const.MODELS_PATH,
+                                     drive_url=const.GDRIVE_URL, root_dir=const.PROJECT_ROOT)
+    print("________________________________________________________________________________")
 
     # Classification and Evaluation of the Models
     classification_and_evaluation(train_path=const.TRAIN_DIR, test_path=const.TEST_DIR,
