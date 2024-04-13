@@ -2,8 +2,6 @@
 import numpy as np
 import tensorflow as tf
 
-from tensorflow import keras
-
 # My import
 import constants as const
 
