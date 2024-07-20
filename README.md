@@ -46,4 +46,4 @@ The models exhibit varying degrees of performance, with MobileNet emerging as th
 standout performer, achieving near-perfect accuracy and classification proficiency.
 The CNN model also demonstrates notable results. The MLP model performs worse
 than its counterparts, exhibiting suboptimal performance characterized by higher loss
-resulting in a notable rate of misclassification.
+resulting in a notable rate of misclassification (underfitting).
