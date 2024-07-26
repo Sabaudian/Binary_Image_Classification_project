@@ -47,3 +47,8 @@ standout performer, achieving near-perfect accuracy and classification proficien
 The CNN model also demonstrates notable results. The MLP model performs worse
 than its counterparts, exhibiting suboptimal performance characterized by higher loss
 resulting in a notable rate of misclassification (underfitting).
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/7277174b-6fb6-4901-a71b-6e56ba4055aa"
+">
+</p>
